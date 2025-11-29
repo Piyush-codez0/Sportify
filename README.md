@@ -576,6 +576,16 @@ vercel --prod
 ---
 
 
+=======
+## 👥 Team
+
+**Project**: Sportify - Sports Tournament Management Platform  
+**Type**: Full-Stack Web Application  
+**Tech**: Next.js, TypeScript, MongoDB, Tailwind CSS  
+**Status**: Active Development
+
+---
+
 <div align="center">
 
 **Made with ❤️ for Indian Sports Community by Piyush Rawat**
