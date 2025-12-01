@@ -157,17 +157,23 @@ export default function TournamentsBrowse() {
                 {t.sport} • {t.city}, {t.state}
               </p>
               <p className="text-xs mt-1">
-                Starts: {new Date(t.startDate).toLocaleDateString()}
+                Starts: {new Date(t.startDate).toLocaleDateString("en-GB")}
               </p>
               {t.entryFee > 0 && (
                 <p className="text-xs mt-1">Entry Fee: ₹{t.entryFee}</p>
               )}
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex gap-3 items-center">
                 <Link
                   href={`/tournaments/${t._id}`}
                   className="text-indigo-600 text-sm hover:underline"
                 >
                   Details
+                </Link>
+                <Link
+                  href={`/tournaments/${t._id}#register`}
+                  className="inline-block bg-indigo-600 text-white text-xs px-3 py-1 rounded hover:bg-indigo-700"
+                >
+                  Participate
                 </Link>
                 {t.googleMapsLink && (
                   <a

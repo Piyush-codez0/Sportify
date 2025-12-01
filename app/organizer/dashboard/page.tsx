@@ -8,18 +8,46 @@ interface Tournament {
   _id: string;
   name: string;
   sport: string;
+  venue: string;
   startDate: string;
   endDate: string;
+  registrationDeadline: string;
   city: string;
   state: string;
   status: string;
   currentParticipants: number;
   maxParticipants: number;
+  entryFee: number;
+  prizePool?: number;
+  ageGroup?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  allowTeamRegistration: boolean;
+  teamSize?: number;
+}
+
+interface Sponsorship {
+  _id: string;
+  status: string;
+  amount: number;
+  sponsorshipType: string;
+  message?: string;
+  sponsor: {
+    companyName?: string;
+    email: string;
+    phone?: string;
+  };
+  tournament: {
+    _id: string;
+    name: string;
+    sport: string;
+  };
 }
 
 export default function OrganizerDashboard() {
   const { user, token, logout } = useAuth();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
+  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -27,12 +55,20 @@ export default function OrganizerDashboard() {
     if (!token) return;
     const load = async () => {
       try {
-        const res = await fetch("/api/organizer/tournaments", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Failed");
-        setTournaments(data.tournaments);
+        const [tRes, sRes] = await Promise.all([
+          fetch("/api/organizer/tournaments", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("/api/organizer/sponsorships", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+        const tData = await tRes.json();
+        const sData = await sRes.json();
+        if (!tRes.ok) throw new Error(tData.error || "Failed tournaments");
+        if (!sRes.ok) throw new Error(sData.error || "Failed sponsorships");
+        setTournaments(tData.tournaments);
+        setSponsorships(sData.sponsorships);
       } catch (e: any) {
         setError(e.message);
       } finally {
@@ -84,44 +120,137 @@ export default function OrganizerDashboard() {
             Loading...
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-4">
-            {tournaments.map((t) => (
-              <div
-                key={t._id}
-                className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
-              >
-                <h2 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white transition-colors">
-                  {t.name}
+          <>
+            {sponsorships.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
+                  Sponsorship Requests
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
-                  {t.sport} • {t.city}, {t.state}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
-                  {new Date(t.startDate).toLocaleDateString()} -{" "}
-                  {new Date(t.endDate).toLocaleDateString()}
-                </p>
-                <p className="mt-2 text-sm text-gray-900 dark:text-white transition-colors">
-                  Participants: {t.currentParticipants}/{t.maxParticipants}
-                </p>
-                <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
-                  Status: <span className="font-medium">{t.status}</span>
-                </p>
-                <div className="mt-3 flex gap-2">
-                  <Link
-                    href={`/organizer/tournaments/${t._id}/registrations`}
-                    className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline transition-colors"
-                  >
-                    Registrations
-                  </Link>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {sponsorships.map((s) => (
+                    <div
+                      key={s._id}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
+                    >
+                      <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
+                        {s.sponsor.companyName || "Sponsor"}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                        Tournament: {s.tournament.name}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                        Amount: ₹{s.amount} • Type: {s.sponsorshipType}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                        Contact: {s.sponsor.email}
+                      </p>
+                      {s.message && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
+                          Message: {s.message}
+                        </p>
+                      )}
+                      <p
+                        className={`text-sm font-semibold mt-2 ${
+                          s.status === "pending"
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : s.status === "approved"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-red-600 dark:text-red-400"
+                        }`}
+                      >
+                        Status: {s.status}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-            {tournaments.length === 0 && (
-              <div className="text-gray-600 dark:text-gray-300 transition-colors">
-                No tournaments are organised by you yet.
-              </div>
             )}
-          </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
+              Your Tournaments
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {tournaments.map((t) => (
+                <div
+                  key={t._id}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
+                >
+                  <h2 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white transition-colors">
+                    {t.name}
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
+                    {t.sport}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                    <span className="font-medium">Venue:</span> {t.venue}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                    <span className="font-medium">Location:</span> {t.city},{" "}
+                    {t.state}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                    <span className="font-medium">Starts:</span>{" "}
+                    {new Date(t.startDate).toLocaleDateString("en-GB")}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                    <span className="font-medium">Registration Deadline:</span>{" "}
+                    {new Date(t.registrationDeadline).toLocaleDateString(
+                      "en-GB"
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                    <span className="font-medium">Entry Fee:</span> ₹
+                    {t.entryFee}
+                    {t.prizePool && ` • Prize Pool: ₹${t.prizePool}`}
+                  </p>
+                  {t.ageGroup && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                      <span className="font-medium">Age Group:</span>{" "}
+                      {t.ageGroup}
+                    </p>
+                  )}
+                  {(t.contactEmail || t.contactPhone) && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                      <span className="font-medium">Contact:</span>{" "}
+                      {t.contactPhone || t.contactEmail}
+                    </p>
+                  )}
+                  <div className="mt-3 p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded border border-indigo-200 dark:border-indigo-700 transition-colors">
+                    <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-100 transition-colors">
+                      Participants: {t.currentParticipants}/{t.maxParticipants}
+                      {t.allowTeamRegistration &&
+                        t.teamSize &&
+                        ` (Team size: ${t.teamSize})`}
+                    </p>
+                    <p className="text-sm font-semibold mt-1 transition-colors">
+                      Status:{" "}
+                      <span
+                        className={
+                          t.status === "open"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-red-600 dark:text-red-400"
+                        }
+                      >
+                        {t.status}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <Link
+                      href={`/organizer/tournaments/${t._id}/registrations`}
+                      className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline transition-colors"
+                    >
+                      Registered Players
+                    </Link>
+                  </div>
+                </div>
+              ))}
+              {tournaments.length === 0 && (
+                <div className="text-gray-600 dark:text-gray-300 transition-colors">
+                  No tournaments are organised by you yet.
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

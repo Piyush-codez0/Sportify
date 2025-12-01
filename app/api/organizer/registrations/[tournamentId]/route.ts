@@ -7,14 +7,15 @@ import { requireRole, AuthenticatedRequest } from "@/lib/middleware";
 // GET: Fetch all registrations for a specific tournament
 async function handler(
   request: AuthenticatedRequest,
-  context: { params: { tournamentId: string } }
+  context: { params: Promise<{ tournamentId: string }> }
 ) {
-  const { params } = context;
   try {
     await dbConnect();
 
+    const { tournamentId } = await context.params;
+
     // Verify that the organizer owns this tournament
-    const tournament = await Tournament.findById(params.tournamentId);
+    const tournament = await Tournament.findById(tournamentId);
     if (!tournament) {
       return NextResponse.json(
         { error: "Tournament not found" },
@@ -31,7 +32,7 @@ async function handler(
 
     // Fetch registrations
     const registrations = await Registration.find({
-      tournament: params.tournamentId,
+      tournament: tournamentId,
     })
       .populate("player", "name email phone")
       .sort({ registrationDate: -1 });

@@ -2,18 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Tournament from "@/models/Tournament";
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
-// GET: Fetch single tournament by ID
-export async function GET(request: NextRequest, { params }: Params) {
+// GET: Fetch single tournament by ID (Next.js 16: params is a Promise)
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     await dbConnect();
 
-    const tournament = await Tournament.findById(params.id).populate(
+    const { id } = await context.params;
+
+    const tournament = await Tournament.findById(id).populate(
       "organizer",
       "name email organizationName phone contactEmail contactPhone"
     );

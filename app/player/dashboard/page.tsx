@@ -101,7 +101,7 @@ export default function PlayerDashboard() {
                 </p>
                 <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
                   Starts:{" "}
-                  {new Date(r.tournament.startDate).toLocaleDateString()}
+                  {new Date(r.tournament.startDate).toLocaleDateString("en-GB")}
                 </p>
                 <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
                   Type: {r.registrationType}

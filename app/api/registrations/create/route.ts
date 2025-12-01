@@ -152,7 +152,7 @@ async function handler(request: AuthenticatedRequest) {
         user.email,
         user.name,
         tournament.name,
-        new Date(tournament.startDate).toLocaleDateString(),
+        new Date(tournament.startDate).toLocaleDateString("en-GB"),
         registrationType
       );
     }

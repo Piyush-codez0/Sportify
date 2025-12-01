@@ -237,7 +237,7 @@ export default function TournamentDetailPage() {
           View on Google Maps
         </a>
       )}
-      <div className="mt-6 border-t pt-6">
+      <div className="mt-6 border-t pt-6" id="register">
         <h2 className="text-xl font-semibold mb-4">Register</h2>
         {!user && (
           <div className="mb-4 text-sm text-gray-700">

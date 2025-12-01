@@ -23,7 +23,22 @@ interface Tournament {
   sport: string;
   city: string;
   state: string;
+  venue: string;
   startDate: string;
+  registrationDeadline: string;
+  maxParticipants: number;
+  currentParticipants: number;
+  entryFee: number;
+  prizePool?: number;
+  ageGroup?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  allowTeamRegistration: boolean;
+  teamSize?: number;
+  organizer?: {
+    name: string;
+    organizationName?: string;
+  };
 }
 
 export default function SponsorDashboard() {
@@ -33,10 +48,11 @@ export default function SponsorDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
+  const [showBrowse, setShowBrowse] = useState(false);
+  const [selectedTournament, setSelectedTournament] =
+    useState<Tournament | null>(null);
   const [form, setForm] = useState({
-    tournamentId: "",
     amount: "",
-    sponsorshipType: "gold",
     benefits: "",
     message: "",
   });
@@ -69,13 +85,17 @@ export default function SponsorDashboard() {
 
   const submit = async (e: any) => {
     e.preventDefault();
+    if (!selectedTournament) {
+      setMsg("Please select a tournament");
+      return;
+    }
     setMsg("");
     setCreating(true);
     try {
       const payload = {
-        tournamentId: form.tournamentId,
+        tournamentId: selectedTournament._id,
         amount: parseFloat(form.amount),
-        sponsorshipType: form.sponsorshipType,
+        sponsorshipType: "gold",
         benefits: form.benefits
           ? form.benefits.split(",").map((b) => b.trim())
           : [],
@@ -94,12 +114,12 @@ export default function SponsorDashboard() {
       setSponsorships((prev) => [data.sponsorship, ...prev]);
       setMsg("Sponsorship request submitted");
       setForm({
-        tournamentId: "",
         amount: "",
-        sponsorshipType: "gold",
         benefits: "",
         message: "",
       });
+      setSelectedTournament(null);
+      setShowBrowse(false);
     } catch (e: any) {
       setMsg(e.message);
     } finally {
@@ -141,21 +161,37 @@ export default function SponsorDashboard() {
               New Sponsorship
             </h2>
             <form onSubmit={submit} className="space-y-3">
-              <select
-                value={form.tournamentId}
-                onChange={(e) =>
-                  setForm({ ...form, tournamentId: e.target.value })
-                }
-                className="border border-gray-300 dark:border-gray-600 p-2 w-full rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                required
+              <div className="border border-gray-300 dark:border-gray-600 p-3 rounded bg-gray-50 dark:bg-gray-700/50 transition-colors">
+                {selectedTournament ? (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      {selectedTournament.name}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                      {selectedTournament.sport} • {selectedTournament.city},{" "}
+                      {selectedTournament.state}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedTournament(null)}
+                      className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline mt-2"
+                    >
+                      Change Tournament
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    No tournament selected
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowBrowse(!showBrowse)}
+                className="bg-gray-700 dark:bg-gray-600 text-white px-4 py-2 rounded w-full hover:bg-gray-800 dark:hover:bg-gray-500 transition-colors"
               >
-                <option value="">Select Tournament</option>
-                {tournaments.map((t) => (
-                  <option key={t._id} value={t._id}>
-                    {t.name} - {t.city}
-                  </option>
-                ))}
-              </select>
+                {showBrowse ? "Hide Tournaments" : "Browse Tournaments"}
+              </button>
               <input
                 placeholder="Amount (INR)"
                 value={form.amount}
@@ -163,20 +199,6 @@ export default function SponsorDashboard() {
                 className="border border-gray-300 dark:border-gray-600 p-2 w-full rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                 required
               />
-              <select
-                value={form.sponsorshipType}
-                onChange={(e) =>
-                  setForm({ ...form, sponsorshipType: e.target.value })
-                }
-                className="border border-gray-300 dark:border-gray-600 p-2 w-full rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-              >
-                <option value="title">Title</option>
-                <option value="platinum">Platinum</option>
-                <option value="gold">Gold</option>
-                <option value="silver">Silver</option>
-                <option value="bronze">Bronze</option>
-                <option value="associate">Associate</option>
-              </select>
               <input
                 placeholder="Benefits (comma separated)"
                 value={form.benefits}
@@ -188,12 +210,13 @@ export default function SponsorDashboard() {
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
                 className="border border-gray-300 dark:border-gray-600 p-2 w-full rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                rows={3}
               />
               <button
-                disabled={creating}
-                className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded w-full hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                disabled={creating || !selectedTournament}
+                className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded w-full hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-300 dark:disabled:bg-indigo-800 disabled:cursor-not-allowed transition-colors"
               >
-                {creating ? "Submitting..." : "Submit"}
+                {creating ? "Submitting..." : "Submit Sponsorship"}
               </button>
               {msg && (
                 <div className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
@@ -203,37 +226,131 @@ export default function SponsorDashboard() {
             </form>
           </div>
           <div className="md:col-span-2 space-y-4">
-            <h2 className="font-semibold text-gray-900 dark:text-white transition-colors">
-              Your Sponsorships
-            </h2>
-            {loading ? (
-              <div className="text-gray-900 dark:text-white transition-colors">
-                Loading...
+            {showBrowse ? (
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="font-semibold text-gray-900 dark:text-white transition-colors">
+                    Browse Tournaments
+                  </h2>
+                  <button
+                    onClick={() => setShowBrowse(false)}
+                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                  >
+                    ✕ Close
+                  </button>
+                </div>
+                {loading ? (
+                  <div className="text-gray-900 dark:text-white transition-colors">
+                    Loading...
+                  </div>
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto pr-2">
+                    {tournaments.map((t) => (
+                      <div
+                        key={t._id}
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow hover:shadow-lg transition-all cursor-pointer"
+                        onClick={() => {
+                          setSelectedTournament(t);
+                          setShowBrowse(false);
+                        }}
+                      >
+                        <h3 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white transition-colors">
+                          {t.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
+                          {t.sport}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                          <span className="font-medium">Venue:</span> {t.venue}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                          <span className="font-medium">Location:</span>{" "}
+                          {t.city}, {t.state}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                          <span className="font-medium">Starts:</span>{" "}
+                          {new Date(t.startDate).toLocaleDateString("en-GB")}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                          <span className="font-medium">
+                            Registration Deadline:
+                          </span>{" "}
+                          {new Date(t.registrationDeadline).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                          <span className="font-medium">Participants:</span>{" "}
+                          {t.currentParticipants}/{t.maxParticipants}
+                          {t.allowTeamRegistration &&
+                            t.teamSize &&
+                            ` (Team size: ${t.teamSize})`}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors">
+                          <span className="font-medium">Entry Fee:</span> ₹
+                          {t.entryFee}
+                          {t.prizePool && ` • Prize Pool: ₹${t.prizePool}`}
+                        </p>
+                        {t.ageGroup && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                            <span className="font-medium">Age Group:</span>{" "}
+                            {t.ageGroup}
+                          </p>
+                        )}
+                        {(t.contactEmail || t.contactPhone) && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                            <span className="font-medium">Contact:</span>{" "}
+                            {t.contactPhone || t.contactEmail}
+                          </p>
+                        )}
+                        <button className="mt-3 text-indigo-600 dark:text-indigo-400 text-sm hover:underline transition-colors">
+                          Select Tournament →
+                        </button>
+                      </div>
+                    ))}
+                    {tournaments.length === 0 && (
+                      <div className="text-gray-600 dark:text-gray-300 transition-colors">
+                        No tournaments available.
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
-                {sponsorships.map((s) => (
-                  <div
-                    key={s._id}
-                    className="border border-gray-200 dark:border-gray-700 p-4 rounded bg-white dark:bg-gray-800 shadow transition-colors"
-                  >
-                    <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
-                      {s.tournament.name}
-                    </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-300 transition-colors">
-                      {s.tournament.sport} • {s.tournament.city}
-                    </p>
-                    <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
-                      Type: {s.sponsorshipType} • Amount: ₹{s.amount}
-                    </p>
-                    <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
-                      Status: {s.status}
-                    </p>
+              <div>
+                <h2 className="font-semibold text-gray-900 dark:text-white transition-colors">
+                  Your Sponsorships
+                </h2>
+                {loading ? (
+                  <div className="text-gray-900 dark:text-white transition-colors">
+                    Loading...
                   </div>
-                ))}
-                {sponsorships.length === 0 && (
-                  <div className="text-gray-600 dark:text-gray-300 transition-colors">
-                    No sponsorships yet.
+                ) : (
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {sponsorships.map((s) => (
+                      <div
+                        key={s._id}
+                        className="border border-gray-200 dark:border-gray-700 p-4 rounded bg-white dark:bg-gray-800 shadow transition-colors"
+                      >
+                        <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
+                          {s.tournament.name}
+                        </h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 transition-colors">
+                          {s.tournament.sport} • {s.tournament.city}
+                        </p>
+                        <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
+                          Type: {s.sponsorshipType} • Amount: ₹{s.amount}
+                        </p>
+                        <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
+                          Status: {s.status}
+                        </p>
+                      </div>
+                    ))}
+                    {sponsorships.length === 0 && (
+                      <div className="text-gray-600 dark:text-gray-300 transition-colors">
+                        No sponsorships yet.
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
