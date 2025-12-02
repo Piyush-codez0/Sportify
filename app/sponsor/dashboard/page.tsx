@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 
 interface Sponsorship {
@@ -43,6 +44,7 @@ interface Tournament {
 
 export default function SponsorDashboard() {
   const { user, token, logout } = useAuth();
+  const searchParams = useSearchParams();
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,17 @@ export default function SponsorDashboard() {
     };
     load();
   }, [token]);
+
+  // Preselect tournament when navigated with ?tournamentId=
+  useEffect(() => {
+    const tid = searchParams?.get("tournamentId");
+    if (!tid || tournaments.length === 0) return;
+    const found = tournaments.find((t) => t._id === tid);
+    if (found) {
+      setSelectedTournament(found);
+      setShowBrowse(false);
+    }
+  }, [searchParams, tournaments]);
 
   const submit = async (e: any) => {
     e.preventDefault();

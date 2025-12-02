@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type Role = "organizer" | "player" | "sponsor";
 type Gender = "male" | "female" | "other";
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
   const [gender, setGender] = useState<Gender | "">("");
   const [formData, setFormData] = useState({
@@ -62,13 +65,28 @@ export default function RegisterPage() {
         userData.companyName = formData.companyName;
       }
 
-      await register(userData);
+      // Build optional redirect based on intent
+      let redirectTo: string | undefined;
+      const tournamentId = searchParams?.get("tournamentId");
+      if (role === "sponsor" && tournamentId) {
+        redirectTo = `/sponsor/dashboard?tournamentId=${tournamentId}`;
+      }
+
+      await register(userData, redirectTo);
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
+
+  // Preselect role from query param (?role=player|sponsor|organizer)
+  useEffect(() => {
+    const qpRole = (searchParams?.get("role") || "") as Role | "";
+    if (qpRole === "organizer" || qpRole === "player" || qpRole === "sponsor") {
+      setRole(qpRole);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-12 relative transition-colors">

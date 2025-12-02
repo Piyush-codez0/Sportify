@@ -18,7 +18,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (userData: any) => Promise<void>;
+  register: (userData: any, redirectTo?: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (userData: any) => {
+  const register = async (userData: any, redirectTo?: string) => {
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -108,13 +108,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data.user);
     localStorage.setItem("token", data.token);
 
-    // Redirect based on role
-    if (data.user.role === "organizer") {
-      router.push("/organizer/dashboard");
-    } else if (data.user.role === "player") {
-      router.push("/player/dashboard");
-    } else if (data.user.role === "sponsor") {
-      router.push("/sponsor/dashboard");
+    // Redirect preference
+    if (redirectTo) {
+      router.push(redirectTo);
+    } else {
+      // Default redirect based on role
+      if (data.user.role === "organizer") {
+        router.push("/organizer/dashboard");
+      } else if (data.user.role === "player") {
+        router.push("/player/dashboard");
+      } else if (data.user.role === "sponsor") {
+        router.push("/sponsor/dashboard");
+      }
     }
   };
 

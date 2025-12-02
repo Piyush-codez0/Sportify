@@ -12,6 +12,7 @@ async function handler(request: AuthenticatedRequest) {
     await dbConnect();
 
     const body = await request.json();
+    console.log("Registration request body:", body);
     const {
       tournamentId,
       registrationType,
@@ -19,6 +20,7 @@ async function handler(request: AuthenticatedRequest) {
       teamMembers,
       aadharNumber,
       aadharDocument,
+      aadharBackDocument,
     } = body;
 
     // Validation
@@ -62,8 +64,12 @@ async function handler(request: AuthenticatedRequest) {
 
     if (existingRegistration) {
       return NextResponse.json(
-        { error: "You have already registered for this tournament" },
-        { status: 400 }
+        {
+          message: "You have already registered for this tournament",
+          alreadyRegistered: true,
+          registration: existingRegistration,
+        },
+        { status: 200 }
       );
     }
 
@@ -93,18 +99,25 @@ async function handler(request: AuthenticatedRequest) {
 
       // Validate all team members have Aadhar
       for (const member of teamMembers) {
-        if (!member.aadharNumber || !member.aadharDocument) {
+        if (
+          !member.aadharNumber ||
+          !member.aadharFrontDocument ||
+          !member.aadharBackDocument
+        ) {
           return NextResponse.json(
-            { error: "All team members must upload Aadhar card" },
+            {
+              error:
+                "All team members must upload Aadhar card (front and back)",
+            },
             { status: 400 }
           );
         }
       }
     } else {
       // Individual registration - Aadhar required
-      if (!aadharNumber || !aadharDocument) {
+      if (!aadharNumber || !aadharDocument || !aadharBackDocument) {
         return NextResponse.json(
-          { error: "Aadhar card upload is mandatory" },
+          { error: "Aadhar card (front and back) upload is mandatory" },
           { status: 400 }
         );
       }
@@ -112,15 +125,40 @@ async function handler(request: AuthenticatedRequest) {
 
     // Create Razorpay order if entry fee > 0
     let razorpayOrder = null;
+    const hasRazorpayConfig =
+      process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET;
+
     if (tournament.entryFee > 0) {
-      razorpayOrder = await razorpay.orders.create({
-        amount: tournament.entryFee * 100, // Convert to paise
-        currency: "INR",
-        receipt: `reg_${tournamentId}_${request.user!.userId}`,
-      });
+      if (!hasRazorpayConfig) {
+        console.warn(
+          "Razorpay not configured. Registration will be created with pending payment status."
+        );
+        // Allow registration without payment gateway - organizer can collect payment offline
+      } else {
+        try {
+          razorpayOrder = await razorpay.orders.create({
+            amount: tournament.entryFee * 100, // Convert to paise
+            currency: "INR",
+            receipt: `reg_${tournamentId}_${request.user!.userId}`,
+          });
+        } catch (razorpayError: any) {
+          console.error("Razorpay order creation failed:", razorpayError);
+          console.warn(
+            "Continuing with registration. Payment can be collected offline."
+          );
+          // Don't fail registration if Razorpay fails - allow offline payment
+        }
+      }
     }
 
     // Create registration
+    console.log("Creating registration with data:", {
+      tournament: tournamentId,
+      player: request.user!.userId,
+      registrationType,
+      aadharDocument,
+      aadharBackDocument,
+    });
     const registration = await Registration.create({
       tournament: tournamentId,
       player: request.user!.userId,
@@ -131,6 +169,8 @@ async function handler(request: AuthenticatedRequest) {
         registrationType === "individual" ? aadharNumber : undefined,
       aadharDocument:
         registrationType === "individual" ? aadharDocument : undefined,
+      aadharBackDocument:
+        registrationType === "individual" ? aadharBackDocument : undefined,
       razorpayOrderId: razorpayOrder?.id,
       amountPaid: tournament.entryFee,
       paymentStatus: tournament.entryFee === 0 ? "paid" : "pending",
@@ -148,13 +188,18 @@ async function handler(request: AuthenticatedRequest) {
     // Send email notification
     const user = await User.findById(request.user!.userId);
     if (user) {
-      await sendRegistrationConfirmation(
-        user.email,
-        user.name,
-        tournament.name,
-        new Date(tournament.startDate).toLocaleDateString("en-GB"),
-        registrationType
-      );
+      try {
+        await sendRegistrationConfirmation(
+          user.email,
+          user.name,
+          tournament.name,
+          new Date(tournament.startDate).toLocaleDateString("en-GB"),
+          registrationType
+        );
+      } catch (emailError: any) {
+        console.error("Email notification failed:", emailError);
+        // Don't fail the registration if email fails
+      }
     }
 
     return NextResponse.json(
@@ -173,9 +218,16 @@ async function handler(request: AuthenticatedRequest) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Registration error:", error);
+    console.error("Registration error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+    });
     return NextResponse.json(
-      { error: error.message || "Registration failed" },
+      {
+        error: error.message || "Registration failed",
+        details: error.toString(),
+      },
       { status: 500 }
     );
   }

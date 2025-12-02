@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import { INDIAN_STATES } from "@/lib/indianStates";
 
 declare global {
   interface Window {
@@ -235,14 +236,20 @@ export default function NewTournamentPage() {
               className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
               required
             />
-            <input
+            <select
               name="state"
-              placeholder="State"
               value={form.state}
               onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
               required
-            />
+            >
+              <option value="">Select State</option>
+              {INDIAN_STATES.map((state) => (
+                <option key={state} value={state}>
+                  {state}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Google Maps Location Picker */}

@@ -7,7 +7,20 @@ const sportsDoodles = [
   "🏀",
   "🏈",
   "⚾",
-  "🎾","⛹️‍♂️", "🥎", "🏏", "🎱", "🎳", "🚵‍♀️", "⛳", "🏁", "🏅", "🏇", "🏂", "🏄‍♀️", "🏄",
+  "🎾",
+  "⛹️‍♂️",
+  "🥎",
+  "🏏",
+  "🎱",
+  "🎳",
+  "🚵‍♀️",
+  "⛳",
+  "🏁",
+  "🏅",
+  "🏇",
+  "🏂",
+  "🏄‍♀️",
+  "🏄",
   "🏐",
   "🏓",
   "🏸",
@@ -22,7 +35,7 @@ const sportsDoodles = [
   "🤾",
   "🏹",
   "🥅",
-  "🏆"
+  "🏆",
 ];
 
 interface Doodle {
@@ -39,23 +52,31 @@ interface Doodle {
 }
 
 export default function SportsDoodlesBackground() {
+  const [mounted, setMounted] = useState(false);
   const [doodles, setDoodles] = useState<Doodle[]>([]);
 
   useEffect(() => {
+    setMounted(true);
     const generatedDoodles: Doodle[] = Array.from({ length: 25 }, (_, i) => ({
       id: i,
       emoji: sportsDoodles[Math.floor(Math.random() * sportsDoodles.length)],
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: Math.random() * 30 + 20,
-      duration: Math.random() * 20 + 20,
-      delay: Math.random() * 5,
+      duration: Math.random() * 8 + 8,
+      delay: Math.random() * 3,
       rotate: Math.random() * 360,
       moveX: (Math.random() - 0.5) * 100,
       moveY: (Math.random() - 0.5) * 100,
     }));
     setDoodles(generatedDoodles);
   }, []);
+
+  if (!mounted) {
+    return (
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" />
+    );
+  }
 
   return (
     <>

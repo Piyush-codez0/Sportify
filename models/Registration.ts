@@ -5,7 +5,9 @@ export interface ITeamMember {
   email: string;
   phone: string;
   aadharNumber: string;
-  aadharDocument: string; // URL to uploaded Aadhar card
+  aadharDocument?: string; // URL to uploaded Aadhar card (kept for backward compatibility)
+  aadharFrontDocument?: string; // Front of Aadhar
+  aadharBackDocument?: string; // Back of Aadhar
   dateOfBirth?: Date;
   gender?: string;
 }
@@ -24,7 +26,8 @@ export interface IRegistration extends Document {
 
   // Individual player Aadhar (for individual registration)
   aadharNumber?: string;
-  aadharDocument?: string;
+  aadharDocument?: string; // Front of Aadhar
+  aadharBackDocument?: string; // Back of Aadhar
 
   // Payment details
   paymentStatus: "pending" | "paid" | "failed" | "refunded";
@@ -67,10 +70,9 @@ const TeamMemberSchema = new Schema<ITeamMember>(
       type: String,
       required: true,
     },
-    aadharDocument: {
-      type: String,
-      required: true,
-    },
+    aadharDocument: String, // Kept for backward compatibility
+    aadharFrontDocument: String,
+    aadharBackDocument: String,
     dateOfBirth: Date,
     gender: String,
   },
@@ -103,7 +105,8 @@ const RegistrationSchema = new Schema<IRegistration>(
 
     // Individual Aadhar
     aadharNumber: String,
-    aadharDocument: String,
+    aadharDocument: String, // Front of Aadhar
+    aadharBackDocument: String, // Back of Aadhar
 
     // Payment
     paymentStatus: {
