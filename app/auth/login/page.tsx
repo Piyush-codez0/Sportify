@@ -32,11 +32,15 @@ export default function LoginPage() {
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700 transition-colors">
           <div className="text-center mb-8">
-            <Link
-              href="/"
-              className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors"
-            >
-              Sportify
+            <Link href="/" className="inline-flex flex-col items-center gap-3">
+              <img
+                src="/icon.png"
+                alt="Sportify"
+                className="w-16 h-16 rounded-2xl shadow-lg"
+              />
+              <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
+                Sportify
+              </span>
             </Link>
             <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white transition-colors">
               Welcome Back
@@ -116,7 +120,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                placeholder="you@example.com"
+                placeholder="your.email@example.com"
               />
             </div>
 
@@ -134,7 +138,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                placeholder="••••••••"
+                placeholder="Enter your password"
               />
             </div>
 

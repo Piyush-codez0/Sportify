@@ -20,6 +20,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: any, redirectTo?: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
+  updateUser: (updates: Partial<User>) => void;
   isLoading: boolean;
 }
 
@@ -48,11 +50,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
+        cache: "no-store",
       });
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        console.log("Fetched user data:", data.user);
+        // Merge persisted phoneVerified from localStorage if backend returns false/undefined
+        const persistedPhoneVerified =
+          localStorage.getItem("phoneVerified") === "true";
+        const mergedUser = {
+          ...data.user,
+          phoneVerified:
+            typeof data.user.phoneVerified === "boolean"
+              ? data.user.phoneVerified || persistedPhoneVerified
+              : persistedPhoneVerified,
+        };
+        setUser(mergedUser);
       } else {
         localStorage.removeItem("token");
         setToken(null);
@@ -130,9 +144,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/");
   };
 
+  const refreshUser = async () => {
+    if (token) {
+      await fetchUser(token);
+    }
+  };
+
+  const updateUser = (updates: Partial<User>) => {
+    // Keep phoneVerified persisted if set to true
+    if (updates.phoneVerified === true) {
+      localStorage.setItem("phoneVerified", "true");
+    }
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, token, login, register, logout, isLoading }}
+      value={{
+        user,
+        token,
+        login,
+        register,
+        logout,
+        refreshUser,
+        updateUser,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

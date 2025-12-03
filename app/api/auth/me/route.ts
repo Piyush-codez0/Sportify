@@ -13,6 +13,11 @@ async function handler(request: AuthenticatedRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    console.log("User from DB:", {
+      id: user._id,
+      phoneVerified: user.phoneVerified,
+    });
+
     return NextResponse.json(
       {
         user: {
@@ -25,6 +30,9 @@ async function handler(request: AuthenticatedRequest) {
           city: user.city,
           state: user.state,
           verified: user.verified,
+          phoneVerified: user.phoneVerified || false,
+
+          gender: user.gender,
 
           // Role-specific fields
           ...(user.role === "organizer" && {
@@ -38,7 +46,6 @@ async function handler(request: AuthenticatedRequest) {
             skillLevel: user.skillLevel,
             achievements: user.achievements,
             dateOfBirth: user.dateOfBirth,
-            gender: user.gender,
           }),
 
           ...(user.role === "sponsor" && {

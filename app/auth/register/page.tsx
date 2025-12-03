@@ -7,24 +7,16 @@ import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type Role = "organizer" | "player" | "sponsor";
-type Gender = "male" | "female" | "other";
 
 export default function RegisterPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
-  const [gender, setGender] = useState<Gender | "">("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     phone: "",
-    city: "",
-    state: "",
-    // Role-specific
-    organizationName: "",
-    sportsPreferences: "",
-    companyName: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,23 +39,7 @@ export default function RegisterPage() {
         password: formData.password,
         phone: formData.phone,
         role,
-        city: formData.city,
-        state: formData.state,
       };
-
-      if (gender) {
-        userData.gender = gender;
-      }
-
-      if (role === "organizer") {
-        userData.organizationName = formData.organizationName;
-      } else if (role === "player") {
-        userData.sportsPreferences = formData.sportsPreferences
-          .split(",")
-          .map((s) => s.trim());
-      } else if (role === "sponsor") {
-        userData.companyName = formData.companyName;
-      }
 
       // Build optional redirect based on intent
       let redirectTo: string | undefined;
@@ -94,11 +70,15 @@ export default function RegisterPage() {
       <div className="max-w-2xl w-full relative z-10">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700 transition-colors">
           <div className="text-center mb-8">
-            <Link
-              href="/"
-              className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors"
-            >
-              Sportify
+            <Link href="/" className="inline-flex flex-col items-center gap-3">
+              <img
+                src="/icon2.png"
+                alt="Sportify"
+                className="w-26 h-26 rounded-2xl shadow-lg"
+              />
+              {/* <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
+                Sportify
+              </span> */}
             </Link>
             <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white transition-colors">
               Create Account
@@ -172,36 +152,20 @@ export default function RegisterPage() {
           ) : (
             <div>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder=""
+                  />
                 </div>
 
                 <div>
@@ -216,6 +180,23 @@ export default function RegisterPage() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder=""
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder=""
                   />
                 </div>
 
@@ -232,148 +213,17 @@ export default function RegisterPage() {
                       setFormData({ ...formData, password: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Minimum 6 characters"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.city}
-                      onChange={(e) =>
-                        setFormData({ ...formData, city: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      State
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.state}
-                      onChange={(e) =>
-                        setFormData({ ...formData, state: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    💡 You'll complete your profile with additional details
+                    (city, state, gender, etc.) after registration in your
+                    dashboard.
+                  </p>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 transition-colors">
-                    Gender
-                  </label>
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setGender("male")}
-                      className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
-                        gender === "male"
-                          ? "border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-                          : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                      }`}
-                    >
-                      <div className="text-3xl mb-1">👨</div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        Male
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setGender("female")}
-                      className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
-                        gender === "female"
-                          ? "border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-                          : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                      }`}
-                    >
-                      <div className="text-3xl mb-1">👩</div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        Female
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setGender("other")}
-                      className={`flex-1 p-4 border-2 rounded-lg transition-colors ${
-                        gender === "other"
-                          ? "border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-                          : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                      }`}
-                    >
-                      <div className="text-3xl mb-1">🧑</div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        Other
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {role === "organizer" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      Organization Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.organizationName}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          organizationName: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
-                )}
-
-                {role === "player" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      Sports Preferences (comma-separated)
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Cricket, Football, Basketball"
-                      value={formData.sportsPreferences}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          sportsPreferences: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-                    />
-                  </div>
-                )}
-
-                {role === "sponsor" && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.companyName}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          companyName: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    />
-                  </div>
-                )}
 
                 <button
                   type="submit"

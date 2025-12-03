@@ -87,9 +87,16 @@ export default function TournamentsBrowse() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
       <SportsDoodlesBackground />
       <div className="max-w-6xl mx-auto p-6 relative z-10">
-        <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white transition-colors">
-          Browse Tournaments
-        </h1>
+        <div className="flex items-center gap-4 mb-6">
+          <img
+            src="/icon.png"
+            alt="Sportify"
+            className="w-12 h-12 rounded-xl shadow-lg"
+          />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
+            Browse Tournaments
+          </h1>
+        </div>
 
         {/* Location Filters */}
         <div className="grid md:grid-cols-3 gap-4 mb-4">

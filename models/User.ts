@@ -16,6 +16,7 @@ export interface IUser extends Document {
   city?: string;
   state?: string;
   verified: boolean;
+  phoneVerified?: boolean;
   createdAt: Date;
   updatedAt: Date;
 
@@ -83,6 +84,10 @@ const UserSchema = new Schema<IUser>(
     city: String,
     state: String,
     verified: {
+      type: Boolean,
+      default: false,
+    },
+    phoneVerified: {
       type: Boolean,
       default: false,
     },

@@ -315,6 +315,19 @@ export default function TournamentDetailPage() {
       <SportsDoodlesBackground />
       <div className="max-w-4xl mx-auto px-6 relative z-10">
         <div className="bg-white/80 dark:bg-[#1E2939]/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-200/50 dark:border-gray-700/50 transition-colors">
+          <div className="flex items-center gap-3 mb-4">
+            <img
+              src="/icon.png"
+              alt="Sportify"
+              className="w-10 h-10 rounded-xl shadow-lg"
+            />
+            <Link
+              href="/"
+              className="text-lg font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+            >
+              Sportify
+            </Link>
+          </div>
           <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white transition-colors">
             {tournament.name}
           </h1>

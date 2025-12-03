@@ -46,14 +46,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
-                  <span className="text-white font-bold text-xl">S</span>
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+              <Link href="/" className="flex items-center gap-2">
+                <img
+                  src="/icon2.png"
+                  alt="Sportify"
+                  className="w-20 h-19 h-10 rounded-xl shadow-lg"
+                />
+                {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
                   Sportify
-                </h1>
-              </div>
+                </h1> */}
+              </Link>
             </div>
             <div className="flex gap-3 items-center">
               <ThemeToggle />
@@ -67,7 +69,7 @@ export default function Home() {
                 href="/auth/register"
                 className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
               >
-                Sign Up Free
+                Sign Up
               </Link>
             </div>
           </div>
@@ -116,7 +118,7 @@ export default function Home() {
               href="/auth/register"
               className="group px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg font-bold hover:shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
             >
-              Get Started Free
+              Get Started
               <svg
                 className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                 fill="none"
@@ -409,9 +411,11 @@ export default function Home() {
             {/* Brand */}
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xl">S</span>
-                </div>
+                <img
+                  src="/icon.png"
+                  alt="Sportify"
+                  className="w-10 h-10 rounded-xl shadow-lg"
+                />
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
                   Sportify
                 </h3>

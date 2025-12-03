@@ -86,7 +86,14 @@ export default function TournamentRegistrations() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Registrations</h1>
+      <div className="flex items-center gap-3 mb-4">
+        <img
+          src="/icon.png"
+          alt="Sportify"
+          className="w-10 h-10 rounded-xl shadow-lg"
+        />
+        <h1 className="text-2xl font-bold">Registrations</h1>
+      </div>
       {error && (
         <div className="mb-4 bg-red-50 text-red-700 p-3 rounded">{error}</div>
       )}
