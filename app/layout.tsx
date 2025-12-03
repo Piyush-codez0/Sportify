@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   title: "Sportify - Local Sports Tournament Platform",
   description:
     "Organize and participate in local sports tournaments across India",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({
