@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
@@ -8,7 +8,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 
 type Role = "organizer" | "player" | "sponsor";
 
-export default function RegisterPage() {
+function RegisterContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [role, setRole] = useState<Role | null>(null);
@@ -314,5 +314,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

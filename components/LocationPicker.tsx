@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 
-// Fix default marker icon issue with webpack
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+// Import leaflet only on client side
+const getLeaflet = () => {
+  if (typeof window === "undefined") return null;
+  const L = require("leaflet");
+  return L;
+};
+
+// CSS import
+import "leaflet/dist/leaflet.css";
 
 interface LocationPickerProps {
   initialLat?: number;
@@ -31,8 +30,8 @@ export default function LocationPicker({
   onLocationChange,
   height = "400px",
 }: LocationPickerProps) {
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
+  const mapRef = useRef<any>(null);
+  const markerRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -40,6 +39,20 @@ export default function LocationPicker({
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
+
+    // Get Leaflet - this will work because it's in useEffect (client-side only)
+    const L = getLeaflet();
+    if (!L) return;
+
+    // Setup L.Icon for markers
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    });
 
     // Initialize map
     const map = L.map(mapContainerRef.current, {
@@ -72,7 +85,7 @@ export default function LocationPicker({
     });
 
     // Handle map click
-    map.on("click", async (e) => {
+    map.on("click", async (e: any) => {
       marker.setLatLng(e.latlng);
       onLocationChange(e.latlng.lat, e.latlng.lng);
       await reverseGeocode(e.latlng.lat, e.latlng.lng);

@@ -1,16 +1,13 @@
 "use client";
 import { useEffect, useRef } from "react";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix default marker icon issue with webpack
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-});
+// Get Leaflet dynamically to avoid SSR issues
+const getLeaflet = () => {
+  if (typeof window === "undefined") return null;
+  const L = require("leaflet");
+  return L;
+};
 
 interface MapDisplayProps {
   lat: number;
@@ -28,10 +25,24 @@ export default function MapDisplay({
   zoom = 15,
 }: MapDisplayProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<any>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
+
+    // Get Leaflet - works because useEffect runs on client-side only
+    const L = getLeaflet();
+    if (!L) return;
+
+    // Setup L.Icon for markers
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    });
 
     // Initialize map
     const map = L.map(mapContainerRef.current).setView([lat, lng], zoom);

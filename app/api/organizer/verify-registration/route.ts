@@ -12,12 +12,18 @@ async function handler(request: AuthenticatedRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { registrationId, verified, verificationNotes } = body;
+    const { registrationId, verified, verificationNotes, reset } = body;
 
     // Validation
-    if (!registrationId || verified === undefined) {
+    if (!registrationId) {
       return NextResponse.json(
-        { error: "Registration ID and verification status are required" },
+        { error: "Registration ID is required" },
+        { status: 400 }
+      );
+    }
+    if (!reset && verified === undefined) {
+      return NextResponse.json(
+        { error: "Verification status is required" },
         { status: 400 }
       );
     }
@@ -42,6 +48,22 @@ async function handler(request: AuthenticatedRequest) {
       return NextResponse.json(
         { error: "Unauthorized - You do not own this tournament" },
         { status: 403 }
+      );
+    }
+
+    // Handle reset to pending
+    if (reset) {
+      registration.verified = false;
+      registration.status = "pending";
+      registration.verificationNotes = undefined;
+      registration.verifiedBy = undefined as any;
+      registration.verifiedAt = undefined as any;
+
+      await registration.save();
+
+      return NextResponse.json(
+        { message: "Registration reset to pending", registration },
+        { status: 200 }
       );
     }
 

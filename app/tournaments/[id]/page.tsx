@@ -47,6 +47,7 @@ export default function TournamentDetailPage() {
   const [registrationType, setRegistrationType] = useState<
     "individual" | "team"
   >("individual");
+  const [aadharNumber, setAadharNumber] = useState("");
   const [aadharFrontFile, setAadharFrontFile] = useState<File | null>(null);
   const [aadharBackFile, setAadharBackFile] = useState<File | null>(null);
   const [aadharFrontUrl, setAadharFrontUrl] = useState("");
@@ -231,9 +232,11 @@ export default function TournamentDetailPage() {
     try {
       let payload: any = { tournamentId: id, registrationType };
       if (registrationType === "individual") {
+        if (!aadharNumber || aadharNumber.trim().length === 0)
+          throw new Error("Please enter your Aadhar number");
         if (!aadharFrontUrl || !aadharBackUrl)
           throw new Error("Upload both Aadhar front and back");
-        payload.aadharNumber = "NA"; // Could collect number field
+        payload.aadharNumber = aadharNumber.trim();
         payload.aadharDocument = aadharFrontUrl;
         payload.aadharBackDocument = aadharBackUrl;
         console.log("Sending individual registration payload:", payload);
@@ -280,7 +283,7 @@ export default function TournamentDetailPage() {
         await startPayment(data.registration._id, data.razorpayOrder);
       } else {
         // Check if payment was expected
-        if (tournament.entryFee > 0) {
+        if (tournament && tournament.entryFee > 0) {
           setRegMessage(
             `Registration successful! Payment of ₹${tournament.entryFee} is pending. Please contact the organizer for payment details.`
           );
@@ -347,13 +350,11 @@ export default function TournamentDetailPage() {
                 </Link>
               </div>
               <h1 className="text-4xl font-bold mb-3 drop-shadow-lg">
-                {tournament.sport} Tournament
+                {tournament.name}
               </h1>
-              {/* {tournament.name && (
-                <p className="text-xl font-semibold mb-3 text-white/90">
-                  {tournament.name}
-                </p>
-              )} */}
+              <p className="text-lg font-semibold mb-3 text-white/90">
+                {tournament.sport} Tournament
+              </p>
               <div className="flex flex-wrap items-center gap-4 text-white/90">
                 {/* <div className="flex items-center gap-2">
                   <svg

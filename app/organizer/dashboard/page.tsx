@@ -32,6 +32,7 @@ interface Sponsorship {
   status: string;
   amount: number;
   sponsorshipType: string;
+  benefits?: string[];
   message?: string;
   sponsor: {
     companyName?: string;
@@ -205,30 +206,125 @@ export default function OrganizerDashboard() {
                         {s.sponsor.companyName || "Sponsor"}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
-                        Tournament: {s.tournament.name}
+                        Sponser: {s.tournament.name}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
-                        Amount: ₹{s.amount} • Type: {s.sponsorshipType}
+                        Amount: ₹{s.amount.toLocaleString()}
                       </p>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
                         Contact: {s.sponsor.email}
+                        {s.sponsor.phone && ` • ${s.sponsor.phone}`}
                       </p>
                       {s.message && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 transition-colors">
-                          Message: {s.message}
+                          <span className="font-semibold">Message:</span>{" "}
+                          {s.message}
                         </p>
                       )}
-                      <p
-                        className={`text-sm font-semibold mt-2 ${
-                          s.status === "pending"
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : s.status === "approved"
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-red-600 dark:text-red-400"
-                        }`}
-                      >
-                        Status: {s.status}
-                      </p>
+                      {s.benefits && s.benefits.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                            Benefits:
+                          </p>
+                          <ul className="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside">
+                            {s.benefits.map((benefit: string, idx: number) => (
+                              <li key={idx}>{benefit}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {s.status === "approved" && (
+                        <div className="mt-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
+                          <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                            ✓ Sponsorship Accepted
+                          </p>
+                        </div>
+                      )}
+                      {s.status === "rejected" && (
+                        <div className="mt-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3">
+                          <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                            ✗ Sponsorship Declined
+                          </p>
+                        </div>
+                      )}
+                      {s.status === "pending" && (
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(
+                                  `/api/organizer/sponsorships/manage`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                    body: JSON.stringify({
+                                      sponsorshipId: s._id,
+                                      action: "approve",
+                                    }),
+                                  }
+                                );
+                                const data = await res.json();
+                                if (!res.ok)
+                                  throw new Error(
+                                    data.error || "Failed to approve"
+                                  );
+                                setSponsorships((prev) =>
+                                  prev.map((sp) =>
+                                    sp._id === s._id
+                                      ? { ...sp, status: "approved" }
+                                      : sp
+                                  )
+                                );
+                              } catch (e: any) {
+                                alert(e.message);
+                              }
+                            }}
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-semibold transition-colors"
+                          >
+                            Accept
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(
+                                  `/api/organizer/sponsorships/manage`,
+                                  {
+                                    method: "POST",
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      Authorization: `Bearer ${token}`,
+                                    },
+                                    body: JSON.stringify({
+                                      sponsorshipId: s._id,
+                                      action: "reject",
+                                    }),
+                                  }
+                                );
+                                const data = await res.json();
+                                if (!res.ok)
+                                  throw new Error(
+                                    data.error || "Failed to reject"
+                                  );
+                                setSponsorships((prev) =>
+                                  prev.map((sp) =>
+                                    sp._id === s._id
+                                      ? { ...sp, status: "rejected" }
+                                      : sp
+                                  )
+                                );
+                              } catch (e: any) {
+                                alert(e.message);
+                              }
+                            }}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded text-sm font-semibold transition-colors"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -253,11 +349,8 @@ export default function OrganizerDashboard() {
                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
                     >
                       <h2 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white transition-colors">
-                        {t.name}
+                        {t.sport} <span>Tournament</span>
                       </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors">
-                        {t.sport}
-                      </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
                         <span className="font-medium">Venue:</span> {t.venue}
                       </p>

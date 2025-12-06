@@ -1,6 +1,6 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import ProfileModal from "@/components/ProfileModal";
@@ -43,7 +43,7 @@ interface Tournament {
   };
 }
 
-export default function SponsorDashboard() {
+function SponsorDashboardContent() {
   const { user, token, logout } = useAuth();
   const searchParams = useSearchParams();
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
@@ -385,11 +385,39 @@ export default function SponsorDashboard() {
                           {s.tournament.sport} • {s.tournament.city}
                         </p>
                         <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
-                          Type: {s.sponsorshipType} • Amount: ₹{s.amount}
+                          Amount: ₹{s.amount.toLocaleString()}
                         </p>
-                        <p className="text-xs mt-1 text-gray-600 dark:text-gray-300 transition-colors">
-                          Status: {s.status}
-                        </p>
+                        {s.status === "approved" && (
+                          <>
+                            <div className="mt-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-3">
+                              <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                ✓ Your Sponsorship is Accepted
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                alert(
+                                  `Payment Demo:\n\nSponsorship Amount: ₹${s.amount}\nTournament: ${s.tournament.name}\n\nIn production, this would open a payment gateway (Razorpay, Stripe, etc.)\n\nPayment processed successfully! ✓`
+                                );
+                              }}
+                              className="mt-3 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg"
+                            >
+                              💳 Pay ₹{s.amount.toLocaleString()}
+                            </button>
+                          </>
+                        )}
+                        {s.status === "rejected" && (
+                          <div className="mt-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-3">
+                            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                              ✗ Your Sponsorship is Declined
+                            </p>
+                          </div>
+                        )}
+                        {s.status === "pending" && (
+                          <div className="mt-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-2 text-xs text-yellow-700 dark:text-yellow-300">
+                            ⏳ Awaiting organizer approval
+                          </div>
+                        )}
                       </div>
                     ))}
                     {sponsorships.length === 0 && (
@@ -405,5 +433,13 @@ export default function SponsorDashboard() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SponsorDashboard() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SponsorDashboardContent />
+    </Suspense>
   );
 }

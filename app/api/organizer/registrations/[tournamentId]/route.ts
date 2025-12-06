@@ -37,7 +37,14 @@ async function handler(
       .populate("player", "name email phone")
       .sort({ registrationDate: -1 });
 
-    return NextResponse.json({ registrations }, { status: 200 });
+    return NextResponse.json(
+      {
+        registrations,
+        tournamentName: tournament.name,
+        sport: tournament.sport,
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Fetch registrations error:", error);
     return NextResponse.json(

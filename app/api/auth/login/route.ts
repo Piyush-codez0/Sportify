@@ -55,6 +55,12 @@ export async function POST(request: NextRequest) {
           profilePicture: user.profilePicture,
           city: user.city,
           state: user.state,
+          phone: user.phone,
+          gender: user.gender,
+          phoneVerified: user.phoneVerified || false,
+          organizationName: user.organizationName,
+          sportsPreferences: user.sportsPreferences,
+          companyName: user.companyName,
         },
       },
       { status: 200 }
