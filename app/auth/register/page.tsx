@@ -86,6 +86,15 @@ export default function RegisterPage() {
             <p className="text-gray-600 dark:text-gray-300 mt-2 transition-colors">
               Join Sportify and transform local sports
             </p>
+            {role && (
+              <div className="mt-4 inline-block px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 rounded-full border border-indigo-300 dark:border-indigo-700">
+                <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+                  {role === "organizer" && "🏆 Organizer Account"}
+                  {role === "player" && "⚽ Player Account"}
+                  {role === "sponsor" && "💼 Sponsor Account"}
+                </span>
+              </div>
+            )}
           </div>
 
           {error && (
