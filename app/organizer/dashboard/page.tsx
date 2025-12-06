@@ -53,7 +53,7 @@ export default function OrganizerDashboard() {
   const [error, setError] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [activeTab, setActiveTab] = useState<"sponsorships" | "tournaments">(
-    "sponsorships"
+    "tournaments"
   );
 
   useEffect(() => {
@@ -148,21 +148,6 @@ export default function OrganizerDashboard() {
         {/* Navigation Bar */}
         <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 flex gap-2 transition-colors">
           <button
-            onClick={() => setActiveTab("sponsorships")}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
-              activeTab === "sponsorships"
-                ? "bg-indigo-600 text-white shadow-md"
-                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }`}
-          >
-            Sponsorship Requests
-            {sponsorships.length > 0 && (
-              <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
-                {sponsorships.length}
-              </span>
-            )}
-          </button>
-          <button
             onClick={() => setActiveTab("tournaments")}
             className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
               activeTab === "tournaments"
@@ -174,6 +159,21 @@ export default function OrganizerDashboard() {
             {tournaments.length > 0 && (
               <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900 rounded-full">
                 {tournaments.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab("sponsorships")}
+            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
+              activeTab === "sponsorships"
+                ? "bg-indigo-50 text-indigo-700 dark:bg-gray-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shadow-sm"
+                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+          >
+            Sponsorship Requests
+            {sponsorships.length > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+                {sponsorships.length}
               </span>
             )}
           </button>

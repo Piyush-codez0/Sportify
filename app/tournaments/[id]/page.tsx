@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import MapDisplay from "@/components/MapDisplay";
 
 interface Tournament {
   _id: string;
@@ -13,6 +14,9 @@ interface Tournament {
   city: string;
   state: string;
   venue: string;
+  location?: {
+    coordinates: [number, number]; // [longitude, latitude]
+  };
   googleMapsLink?: string;
   allowTeamRegistration: boolean;
   teamSize?: number;
@@ -337,14 +341,16 @@ export default function TournamentDetailPage() {
           <p className="text-sm mb-4 text-gray-700 dark:text-gray-200 transition-colors">
             {tournament.description}
           </p>
-          {tournament.googleMapsLink && (
-            <a
-              href={tournament.googleMapsLink}
-              target="_blank"
-              className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline transition-colors"
-            >
-              View on Google Maps
-            </a>
+          {tournament.location?.coordinates && (
+            <div className="mb-4">
+              <MapDisplay
+                lat={tournament.location.coordinates[1]}
+                lng={tournament.location.coordinates[0]}
+                popupText={`<strong>${tournament.name}</strong><br/>${tournament.venue}<br/>${tournament.city}, ${tournament.state}`}
+                height="300px"
+                zoom={15}
+              />
+            </div>
           )}
 
           {/* Primary CTAs: Player Register and Sponsor */}

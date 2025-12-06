@@ -88,10 +88,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           console.log("refreshUser completed");
           // Immediately update local state to reflect verification
           updateUser({ phoneVerified: true });
-          // Persist locally across manual reloads
-          try {
-            localStorage.setItem("phoneVerified", "true");
-          } catch {}
+          // Rely on backend persistence and refreshed user; no localStorage override
           setOtpSent(false);
           setOtp("");
           setActiveTab("profile");
@@ -150,10 +147,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setTimeout(() => {
         setMessage("");
       }, 5000);
-      // Preserve verified status locally in case backend returns stale value
-      if (user?.phoneVerified) {
-        updateUser({ phoneVerified: true });
-      }
     } catch (err: any) {
       setMessage(err.message);
     } finally {
@@ -650,17 +643,17 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                     Phone Verified
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {user?.phone}
+                    Mobile No: {user?.phone || "Not set"}
                   </p>
                 </div>
               ) : (
                 <>
                   <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Phone Number
+                      Mobile No
                     </p>
                     <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {user?.phone}
+                      {user?.phone || "Not set"}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       We'll send a 6-digit OTP to verify

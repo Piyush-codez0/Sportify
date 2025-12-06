@@ -35,6 +35,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Load token from localStorage
+    // Clear any legacy phoneVerified override
+    try {
+      localStorage.removeItem("phoneVerified");
+    } catch {}
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
@@ -56,17 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const data = await response.json();
         console.log("Fetched user data:", data.user);
-        // Merge persisted phoneVerified from localStorage if backend returns false/undefined
-        const persistedPhoneVerified =
-          localStorage.getItem("phoneVerified") === "true";
-        const mergedUser = {
-          ...data.user,
-          phoneVerified:
-            typeof data.user.phoneVerified === "boolean"
-              ? data.user.phoneVerified || persistedPhoneVerified
-              : persistedPhoneVerified,
-        };
-        setUser(mergedUser);
+        // Trust backend state; do not override phoneVerified client-side
+        setUser(data.user);
       } else {
         localStorage.removeItem("token");
         setToken(null);
@@ -151,10 +146,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateUser = (updates: Partial<User>) => {
-    // Keep phoneVerified persisted if set to true
-    if (updates.phoneVerified === true) {
-      localStorage.setItem("phoneVerified", "true");
-    }
     setUser((prev) => (prev ? { ...prev, ...updates } : prev));
   };
 

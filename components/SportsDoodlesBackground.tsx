@@ -84,7 +84,7 @@ export default function SportsDoodlesBackground() {
         {doodles.map((doodle) => (
           <div
             key={doodle.id}
-            className="absolute animate-float-smooth opacity-[0.15] dark:opacity-[0.25]"
+            className="absolute animate-float-smooth opacity-[0.08] dark:opacity-[0.12]"
             style={{
               left: `${doodle.x}%`,
               top: `${doodle.y}%`,

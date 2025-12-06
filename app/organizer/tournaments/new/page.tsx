@@ -1,15 +1,10 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import LocationPicker from "@/components/LocationPicker";
 import { INDIAN_STATES } from "@/lib/indianStates";
-
-declare global {
-  interface Window {
-    google: any;
-  }
-}
 
 export default function NewTournamentPage() {
   const { user, token } = useAuth();
@@ -21,7 +16,6 @@ export default function NewTournamentPage() {
   const isVerified = isProfileComplete && isPhoneVerified;
 
   const [form, setForm] = useState<any>({
-    name: "",
     sport: "",
     description: "",
     venue: "",
@@ -39,113 +33,20 @@ export default function NewTournamentPage() {
     prizePool: "",
     rules: "",
     ageGroup: "",
-    contactEmail: "",
-    contactPhone: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
 
-  useEffect(() => {
-    // Load Google Maps script
-    if (!window.google) {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setMapLoaded(true);
-      document.head.appendChild(script);
-    } else {
-      setMapLoaded(true);
+  const handleLocationChange = (lat: number, lng: number, address?: string) => {
+    setForm((prev: any) => ({
+      ...prev,
+      latitude: lat.toString(),
+      longitude: lng.toString(),
+    }));
+    if (address) {
+      setSelectedLocation(address);
     }
-  }, []);
-
-  useEffect(() => {
-    if (mapLoaded && document.getElementById("map")) {
-      initMap();
-    }
-  }, [mapLoaded]);
-
-  const initMap = () => {
-    const map = new window.google.maps.Map(document.getElementById("map"), {
-      center: { lat: 28.6139, lng: 77.209 }, // Default: New Delhi
-      zoom: 12,
-    });
-
-    const marker = new window.google.maps.Marker({
-      map: map,
-      draggable: true,
-    });
-
-    const searchBox = new window.google.maps.places.SearchBox(
-      document.getElementById("location-search") as HTMLInputElement
-    );
-
-    map.addListener("bounds_changed", () => {
-      searchBox.setBounds(map.getBounds() as any);
-    });
-
-    searchBox.addListener("places_changed", () => {
-      const places = searchBox.getPlaces();
-      if (places.length === 0) return;
-
-      const place = places[0];
-      if (!place.geometry || !place.geometry.location) return;
-
-      map.setCenter(place.geometry.location);
-      marker.setPosition(place.geometry.location);
-
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-
-      setForm((prev: any) => ({
-        ...prev,
-        latitude: lat.toString(),
-        longitude: lng.toString(),
-      }));
-
-      setSelectedLocation(place.formatted_address || "");
-    });
-
-    marker.addListener("dragend", () => {
-      const position = marker.getPosition();
-      if (position) {
-        setForm((prev: any) => ({
-          ...prev,
-          latitude: position.lat().toString(),
-          longitude: position.lng().toString(),
-        }));
-
-        // Reverse geocode to get address
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode(
-          { location: position },
-          (results: any, status: any) => {
-            if (status === "OK" && results[0]) {
-              setSelectedLocation(results[0].formatted_address);
-            }
-          }
-        );
-      }
-    });
-
-    map.addListener("click", (e: any) => {
-      marker.setPosition(e.latLng);
-      setForm((prev: any) => ({
-        ...prev,
-        latitude: e.latLng.lat().toString(),
-        longitude: e.latLng.lng().toString(),
-      }));
-
-      // Reverse geocode
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: e.latLng }, (results: any, status: any) => {
-        if (status === "OK" && results[0]) {
-          setSelectedLocation(results[0].formatted_address);
-        }
-      });
-    });
   };
 
   if (!user || user.role !== "organizer")
@@ -164,6 +65,10 @@ export default function NewTournamentPage() {
     setError("");
     setLoading(true);
     try {
+      if (!user?.name) {
+        throw new Error("Account name not found. Please re-login.");
+      }
+
       const res = await fetch("/api/tournaments", {
         method: "POST",
         headers: {
@@ -172,6 +77,9 @@ export default function NewTournamentPage() {
         },
         body: JSON.stringify({
           ...form,
+          name: user.name,
+          contactEmail: user.email,
+          contactPhone: user.phone,
           latitude: parseFloat(form.latitude),
           longitude: parseFloat(form.longitude),
           startDate: form.tournamentStartDate,
@@ -359,6 +267,22 @@ export default function NewTournamentPage() {
         <h4 className="text-sm text-red-600 dark:text-red-400 mb-4 transition-colors">
           Enter Tournament details...
         </h4>
+        <div className="mb-4 flex items-center gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-900/30 shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+            {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+          </div>
+          <div>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Organizer
+            </p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-white leading-tight">
+              {user?.name || "Unknown"}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {user?.email}
+            </p>
+          </div>
+        </div>
         {error && (
           <div className="mb-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded border border-red-200 dark:border-red-800 transition-colors">
             {error}
@@ -366,14 +290,6 @@ export default function NewTournamentPage() {
         )}
         <form onSubmit={submit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <input
-              name="name"
-              placeholder="Name"
-              value={form.name}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-              required
-            />
             <input
               name="sport"
               placeholder="Sport"
@@ -414,22 +330,17 @@ export default function NewTournamentPage() {
             </select>
           </div>
 
-          {/* Google Maps Location Picker */}
+          {/* Leaflet Location Picker */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
               Tournament Location
             </label>
-            <input
-              id="location-search"
-              type="text"
-              placeholder="Search for a location..."
-              className="w-full border border-gray-300 dark:border-gray-600 p-2 rounded mb-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+            <LocationPicker
+              initialLat={30.3165}
+              initialLng={78.0322}
+              onLocationChange={handleLocationChange}
+              height="400px"
             />
-            <div
-              id="map"
-              className="w-full h-96 border border-gray-300 dark:border-gray-600 rounded transition-colors"
-              style={{ minHeight: "400px" }}
-            ></div>
             {selectedLocation && (
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 transition-colors">
                 Selected: {selectedLocation}
@@ -443,7 +354,7 @@ export default function NewTournamentPage() {
           </div>
 
           {/* Date Fields */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
                 Registration Start Date
@@ -483,32 +394,33 @@ export default function NewTournamentPage() {
                 required
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                Max Participants
+              </label>
+              <input
+                name="maxParticipants"
+                placeholder="Max Participants"
+                value={form.maxParticipants}
+                onChange={handleChange}
+                className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                required
+              />
+            </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="maxParticipants"
-              placeholder="Max Participants"
-              value={form.maxParticipants}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-              required
-            />
-            <input
-              name="entryFee"
-              placeholder="Entry Fee (INR)"
-              value={form.entryFee}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
-          </div>
+          <input
+            name="entryFee"
+            placeholder="Entry Fee (INR)"
+            value={form.entryFee}
+            onChange={handleChange}
+            className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+          />
           <textarea
             name="description"
             placeholder="Description"
             value={form.description}
             onChange={handleChange}
             className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            required
           />
           <textarea
             name="rules"
@@ -532,20 +444,9 @@ export default function NewTournamentPage() {
               onChange={handleChange}
               className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
             />
-            <input
-              name="contactEmail"
-              placeholder="Contact Email"
-              value={form.contactEmail}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
-            <input
-              name="contactPhone"
-              placeholder="Contact Phone"
-              value={form.contactPhone}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
+            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400">
+              Contact details will use your account email/phone.
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <input

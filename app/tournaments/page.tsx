@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import { INDIAN_STATES } from "@/lib/indianStates";
+import { INDIAN_DISTRICTS } from "@/lib/indianDistricts";
 
 interface Tournament {
   _id: string;
@@ -11,6 +12,9 @@ interface Tournament {
   sport: string;
   city: string;
   state: string;
+  location?: {
+    coordinates: [number, number]; // [lng, lat]
+  };
   googleMapsLink?: string;
   startDate: string;
   entryFee: number;
@@ -25,7 +29,7 @@ interface Tournament {
 export default function TournamentsBrowse() {
   const { token } = useAuth();
   const [filters, setFilters] = useState({
-    city: "",
+    district: "",
     state: "",
     sport: "",
     useRadius: false,
@@ -43,7 +47,7 @@ export default function TournamentsBrowse() {
     setError("");
     try {
       const params = new URLSearchParams();
-      if (filters.city) params.set("city", filters.city);
+      if (filters.district) params.set("district", filters.district);
       if (filters.state) params.set("state", filters.state);
       if (filters.sport) params.set("sport", filters.sport);
       if (filters.useRadius && location) {
@@ -63,8 +67,16 @@ export default function TournamentsBrowse() {
   };
 
   useEffect(() => {
+    if (filters.useRadius && !location) return;
     fetchTournaments();
-  }, []);
+  }, [
+    filters.state,
+    filters.district,
+    filters.sport,
+    filters.useRadius,
+    filters.radiusKm,
+    location,
+  ]);
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -78,10 +90,6 @@ export default function TournamentsBrowse() {
       () => setError("Failed to get location")
     );
   };
-
-  useEffect(() => {
-    if (filters.useRadius && location) fetchTournaments();
-  }, [filters.useRadius, location, filters.radiusKm]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
@@ -100,16 +108,11 @@ export default function TournamentsBrowse() {
 
         {/* Location Filters */}
         <div className="grid md:grid-cols-3 gap-4 mb-4">
-          <input
-            placeholder="City"
-            value={filters.city}
-            onChange={(e) => setFilters({ ...filters, city: e.target.value })}
-            className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 rounded transition-colors"
-            disabled={filters.useRadius}
-          />
           <select
             value={filters.state}
-            onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+            onChange={(e) => {
+              setFilters({ ...filters, state: e.target.value, district: "" });
+            }}
             className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 rounded transition-colors"
             disabled={filters.useRadius}
           >
@@ -119,6 +122,22 @@ export default function TournamentsBrowse() {
                 {state}
               </option>
             ))}
+          </select>
+          <select
+            value={filters.district}
+            onChange={(e) =>
+              setFilters({ ...filters, district: e.target.value })
+            }
+            className="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 rounded transition-colors"
+            disabled={!filters.state || filters.useRadius}
+          >
+            <option value="">Select District</option>
+            {filters.state &&
+              INDIAN_DISTRICTS[filters.state]?.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
           </select>
           <input
             placeholder="Sport"
@@ -196,22 +215,15 @@ export default function TournamentsBrowse() {
         </div>
         <div className="flex gap-2 mb-6">
           <button
-            onClick={fetchTournaments}
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          >
-            Search
-          </button>
-          <button
             onClick={() => {
               setFilters({
-                city: "",
+                district: "",
                 state: "",
                 sport: "",
                 useRadius: false,
                 radiusKm: "10",
               });
               setLocation(null);
-              fetchTournaments();
             }}
             className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
@@ -345,35 +357,23 @@ export default function TournamentsBrowse() {
                   <div className="flex items-center">
                     <Link
                       href={`/tournaments/${t._id}#register`}
-                      className="w-full text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-xl shadow-purple-400/40 hover:shadow-purple-500/60"
+                      className="w-full text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-purple-400/20 hover:shadow-purple-500/30"
                     >
                       ⚡ Join Now
                     </Link>
                   </div>
 
-                  {t.googleMapsLink && (
-                    <a
-                      href={t.googleMapsLink}
-                      target="_blank"
-                      className="mt-3 flex items-center justify-center gap-1 text-xs text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors font-medium group/map"
-                    >
-                      <svg
-                        className="w-4 h-4 group-hover/map:scale-110 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                  {t.location?.coordinates && (
+                    <div className="mt-3">
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${t.location.coordinates[1]},${t.location.coordinates[0]}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full block text-center bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold py-2.5 px-4 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-green-400/20 hover:shadow-green-500/30"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                        />
-                      </svg>
-                      <span className="group-hover/map:underline">
-                        View on Map
-                      </span>
-                    </a>
+                        📍 Show Location
+                      </a>
+                    </div>
                   )}
                 </div>
               </div>

@@ -36,8 +36,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-slate-950 relative overflow-hidden transition-colors">
       {/* Mesh gradient background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/20 via-transparent to-transparent dark:from-purple-600/10" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/20 via-transparent to-transparent dark:from-blue-600/10" />
+      <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/10 via-transparent to-transparent dark:from-purple-600/5" />
+      <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/10 via-transparent to-transparent dark:from-blue-600/5" />
 
       <SportsDoodlesBackground />
 
@@ -79,7 +79,7 @@ export default function Home() {
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10">
         {/* Super soft hero gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/40 via-blue-50/30 to-white/20 dark:from-purple-900/10 dark:via-blue-900/10 dark:to-transparent -z-10 rounded-3xl blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-900/5 dark:via-blue-900/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
 
         <div className="text-center max-w-5xl mx-auto">
           {/* Badge */}

@@ -60,7 +60,9 @@ export async function POST(request: NextRequest) {
           id: user._id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
           role: user.role,
+          phoneVerified: user.phoneVerified || false,
         },
       },
       { status: 201 }
