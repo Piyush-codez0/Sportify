@@ -247,10 +247,10 @@ export default function TournamentsBrowse() {
                 className="group relative border-2 border-purple-200/50 dark:border-purple-500/30 p-6 rounded-2xl bg-gradient-to-br from-white via-purple-50/40 to-blue-50/50 dark:from-gray-800 dark:via-purple-900/20 dark:to-blue-900/20 shadow-md hover:shadow-2xl hover:scale-[1.03] hover:border-purple-400/60 dark:hover:border-purple-400/50 transition-all duration-400 ease-out overflow-hidden cursor-pointer backdrop-blur-sm"
               >
                 {/* Soft purple gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-100/0 via-blue-100/0 to-pink-100/0 group-hover:from-purple-100/30 group-hover:via-blue-100/20 group-hover:to-pink-100/20 transition-all duration-500 rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-100/0 via-blue-100/0 to-pink-100/0 group-hover:from-purple-100/30 group-hover:via-blue-100/20 group-hover:to-pink-100/20 dark:group-hover:from-purple-900/15 dark:group-hover:via-blue-900/10 dark:group-hover:to-pink-900/15 transition-all duration-500 rounded-2xl" />
 
                 {/* Subtle glow effect on hover */}
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-70 transition-opacity duration-500 bg-gradient-to-br from-purple-200/40 via-blue-200/30 to-pink-200/30 blur-2xl -z-10" />
+                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-70 dark:group-hover:opacity-30 transition-opacity duration-500 bg-gradient-to-br from-purple-200/40 via-blue-200/30 to-pink-200/30 dark:from-purple-500/20 dark:via-blue-500/15 dark:to-pink-500/20 blur-2xl -z-10" />
 
                 {t.prizePool && t.prizePool > 0 && (
                   <div className="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-2 rounded-full shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 z-10">
