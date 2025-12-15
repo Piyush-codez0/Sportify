@@ -299,7 +299,7 @@ export default function Home() {
 
             <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {/* Feature 1 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-slate-800/70 backdrop-blur-sm border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400 dark:hover:border-purple-300 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -366,8 +366,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Feature 3 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+              {/* Feature 2 */}
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-slate-800/70 backdrop-blur-sm border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400 dark:hover:border-purple-300 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
