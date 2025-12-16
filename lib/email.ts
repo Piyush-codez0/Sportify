@@ -67,9 +67,8 @@ export async function sendRegistrationConfirmation(
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #4f46e5;">Registration Confirmed!</h2>
       <p>Hi ${name},</p>
-      <p>Your registration for <strong>${tournamentName}</strong> has been confirmed.</p>
+      <p>Your registration for <strong>${tournamentName} tournament</strong> has been confirmed.</p>
       <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-        <p><strong>Tournament:</strong> ${tournamentName}</p>
         <p><strong>Date:</strong> ${tournamentDate}</p>
         <p><strong>Registration Type:</strong> ${registrationType}</p>
       </div>
@@ -123,21 +122,27 @@ export async function sendVerificationUpdate(
   email: string,
   name: string,
   tournamentName: string,
+  organizerName: string,
+  sportName: string,
   verified: boolean
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: ${verified ? "#10b981" : "#ef4444"};">
-        ${verified ? "Documents Verified!" : "Verification Issue"}
-      </h2>
-      <p>Hi ${name},</p>
-      ${
-        verified
-          ? `<p>Great news! Your documents for <strong>${tournamentName}</strong> have been verified by the organizer.</p>
-         <p>You're all set to participate. We'll send you more details as the tournament date approaches.</p>`
-          : `<p>Unfortunately, there was an issue with your document verification for <strong>${tournamentName}</strong>.</p>
-         <p>Please contact the organizer for more information or resubmit your documents.</p>`
-      }
+      <div style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #f9fafb;">
+        <h2 style="color: ${
+          verified ? "#10b981" : "#ef4444"
+        }; margin: 0 0 12px 0;">
+          ${verified ? "Documents Verified!" : "Verification Issue"}
+        </h2>
+        <p style="margin: 0 0 8px 0;">Hi ${name},</p>
+        ${
+          verified
+            ? `<p style="margin: 0 0 6px 0;">Great news! Your documents for <strong>${tournamentName}</strong> have been verified by <strong>${organizerName}</strong>.</p>
+              <p style="margin: 0 0 6px 0;">You're all set to participate. We'll send you more details as the tournament date approaches.</p>`
+            : `<p style="margin: 0 0 6px 0;">Unfortunately, there was an issue with your document verification for the tournament <strong>${tournamentName}</strong>, organized by <strong>${organizerName}</strong>.</p>
+              <p style="margin: 0 0 6px 0;">Please contact the organizer for more information or resubmit your documents.</p>`
+        }
+      </div>
       <p style="color: #6b7280; font-size: 12px; margin-top: 30px;">
         Sportify - Transforming Local Sports in India
       </p>

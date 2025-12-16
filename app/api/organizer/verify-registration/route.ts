@@ -84,11 +84,14 @@ async function handler(request: AuthenticatedRequest) {
 
     // Send verification email to player
     const user = await User.findById(registration.player);
+    const organizer = await User.findById(tournament.organizer);
     if (user && tournament) {
       await sendVerificationUpdate(
         user.email,
         user.name,
         tournament.name,
+        organizer?.name || "Organizer",
+        tournament.sport || "Sport",
         verified
       );
     }
