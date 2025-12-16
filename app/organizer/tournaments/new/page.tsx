@@ -5,6 +5,20 @@ import { useRouter } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import LocationPicker from "@/components/LocationPicker";
 import { INDIAN_STATES } from "@/lib/indianStates";
+import Stepper, { Step } from "@/components/Stepper";
+
+const POPULAR_SPORTS = [
+  "Cricket",
+  "Football",
+  "Chess",
+  "Badminton",
+  "Tennis",
+  "Kabaddi",
+  "Basketball",
+  "Volleyball",
+  "Table Tennis",
+  "Athletics",
+];
 
 export default function NewTournamentPage() {
   const { user, token } = useAuth();
@@ -17,6 +31,7 @@ export default function NewTournamentPage() {
 
   const [form, setForm] = useState<any>({
     sport: "",
+    sportOther: "",
     description: "",
     venue: "",
     city: "",
@@ -28,7 +43,6 @@ export default function NewTournamentPage() {
     tournamentStartDate: "",
     maxParticipants: "",
     allowTeamRegistration: false,
-    teamSize: "",
     entryFee: "",
     prizePool: "",
     rules: "",
@@ -37,8 +51,96 @@ export default function NewTournamentPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [stepError, setStepError] = useState<string>("");
 
-  const handleLocationChange = (lat: number, lng: number, address?: string) => {
+  // Validation functions for each step
+  const validateStep1 = (): boolean => {
+    setStepError("");
+    if (!form.sport) {
+      setStepError("Please select a sport");
+      return false;
+    }
+    if (form.sport === "Other" && !form.sportOther.trim()) {
+      setStepError("Please enter the sport name");
+      return false;
+    }
+    if (!form.venue.trim()) {
+      setStepError("Please enter the venue");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep2 = (): boolean => {
+    setStepError("");
+    if (!form.latitude || !form.longitude) {
+      setStepError("Please select a location on the map");
+      return false;
+    }
+    if (!form.city) {
+      setStepError(
+        "City could not be detected from location. Please try a different location."
+      );
+      return false;
+    }
+    if (!form.state) {
+      setStepError(
+        "State could not be detected from location. Please try a different location."
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep3 = (): boolean => {
+    setStepError("");
+    if (!form.registrationStartDate) {
+      setStepError("Please enter registration start date");
+      return false;
+    }
+    if (!form.registrationDeadline) {
+      setStepError("Please enter registration deadline");
+      return false;
+    }
+    if (!form.tournamentStartDate) {
+      setStepError("Please enter tournament start date");
+      return false;
+    }
+    if (!form.maxParticipants) {
+      setStepError("Please enter max participants");
+      return false;
+    }
+    if (parseInt(form.maxParticipants) < 2) {
+      setStepError("Max participants must be at least 2");
+      return false;
+    }
+    return true;
+  };
+
+  const validateStep4 = (): boolean => {
+    setStepError("");
+    // All fields in step 4 are optional, so validation passes
+    return true;
+  };
+
+  const validateStep5 = (): boolean => {
+    setStepError("");
+    return true;
+  };
+
+  const handleStepChange = (step: number): boolean => {
+    if (step === 2) return validateStep1();
+    if (step === 3) return validateStep2();
+    if (step === 4) return validateStep3();
+    if (step === 5) return validateStep4();
+    return true;
+  };
+
+  const handleLocationChange = async (
+    lat: number,
+    lng: number,
+    address?: string
+  ) => {
     setForm((prev: any) => ({
       ...prev,
       latitude: lat.toString(),
@@ -46,6 +148,26 @@ export default function NewTournamentPage() {
     }));
     if (address) {
       setSelectedLocation(address);
+    }
+
+    // Extract city and state from coordinates using reverse geocoding
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const data = await response.json();
+      if (data.address) {
+        const city =
+          data.address.city || data.address.town || data.address.village || "";
+        const state = data.address.state || "";
+        setForm((prev: any) => ({
+          ...prev,
+          city,
+          state,
+        }));
+      }
+    } catch (err) {
+      console.log("Could not extract city/state from location");
     }
   };
 
@@ -60,13 +182,16 @@ export default function NewTournamentPage() {
     }));
   };
 
-  const submit = async (e: any) => {
-    e.preventDefault();
+  const submit = async () => {
     setError("");
     setLoading(true);
     try {
       if (!user?.name) {
         throw new Error("Account name not found. Please re-login.");
+      }
+
+      if (!form.latitude || !form.longitude) {
+        throw new Error("Please select a location on the map");
       }
 
       const res = await fetch("/api/tournaments", {
@@ -77,6 +202,7 @@ export default function NewTournamentPage() {
         },
         body: JSON.stringify({
           ...form,
+          sport: form.sport === "Other" ? form.sportOther : form.sport,
           name: user.name,
           contactEmail: user.email,
           contactPhone: user.phone,
@@ -251,235 +377,418 @@ export default function NewTournamentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 transition-colors relative">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 transition-colors relative overflow-hidden">
       <SportsDoodlesBackground />
-      <div className="max-w-3xl mx-auto p-6 relative z-10">
-        <div className="flex items-center gap-3 mb-4">
-          <img
-            src="/icon.png"
-            alt="Sportify"
-            className="w-12 h-12 rounded-xl shadow-lg"
-          />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-            Organise a Tournament
-          </h1>
-        </div>
-        <h4 className="text-sm text-red-600 dark:text-red-400 mb-4 transition-colors">
-          Enter Tournament details...
-        </h4>
-        <div className="mb-4 flex items-center gap-3 p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/70 dark:bg-indigo-900/30 shadow-sm">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-            {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Organizer
-            </p>
-            <p className="text-lg font-semibold text-gray-900 dark:text-white leading-tight">
-              {user?.name || "Unknown"}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              {user?.email}
-            </p>
-          </div>
-        </div>
-        {error && (
-          <div className="mb-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded border border-red-200 dark:border-red-800 transition-colors">
-            {error}
-          </div>
-        )}
-        <form onSubmit={submit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="sport"
-              placeholder="Sport"
-              value={form.sport}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-              required
-            />
-            <input
-              name="venue"
-              placeholder="Venue"
-              value={form.venue}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-              required
-            />
-            <input
-              name="city"
-              placeholder="City"
-              value={form.city}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-              required
-            />
-            <select
-              name="state"
-              value={form.state}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
-              required
-            >
-              <option value="">Select State</option>
-              {INDIAN_STATES.map((state) => (
-                <option key={state} value={state}>
-                  {state}
-                </option>
-              ))}
-            </select>
+      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
+        {/* Header Section */}
+        <div className="flex-shrink-0 px-6 pt-6 pb-2">
+          {/* Header with Logo */}
+          <div className="flex items-center gap-4 mb-2">
+            <div className="relative">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-slate-500 rounded-2xl blur opacity-30"></div>
+              <img
+                src="/icon.png"
+                alt="Sportify"
+                className="relative w-12 h-12 rounded-xl shadow-xl"
+              />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-slate-600 dark:from-blue-400 dark:to-slate-400 bg-clip-text text-transparent">
+                Create a Tournament
+              </h1>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                Fill in the details to organize your event
+              </p>
+            </div>
           </div>
 
-          {/* Leaflet Location Picker */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
-              Tournament Location
-            </label>
-            <LocationPicker
-              initialLat={30.3165}
-              initialLng={78.0322}
-              onLocationChange={handleLocationChange}
-              height="400px"
-            />
-            {selectedLocation && (
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 transition-colors">
-                Selected: {selectedLocation}
-              </p>
-            )}
-            {form.latitude && form.longitude && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">
-                Coordinates: {form.latitude}, {form.longitude}
-              </p>
-            )}
-          </div>
-
-          {/* Date Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                Registration Start Date
-              </label>
-              <input
-                type="date"
-                name="registrationStartDate"
-                value={form.registrationStartDate}
-                onChange={handleChange}
-                className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
-                required
-              />
+          {error && (
+            <div className="text-sm bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg border border-red-200 dark:border-red-800 transition-colors shadow-sm flex items-center gap-1">
+              <svg
+                className="w-4 h-4 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>{error}</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                Registration Deadline
-              </label>
-              <input
-                type="date"
-                name="registrationDeadline"
-                value={form.registrationDeadline}
-                onChange={handleChange}
-                className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                Tournament Start Date
-              </label>
-              <input
-                type="date"
-                name="tournamentStartDate"
-                value={form.tournamentStartDate}
-                onChange={handleChange}
-                className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                Max Participants
-              </label>
-              <input
-                name="maxParticipants"
-                placeholder="Max Participants"
-                value={form.maxParticipants}
-                onChange={handleChange}
-                className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-                required
-              />
-            </div>
-          </div>
-          <input
-            name="entryFee"
-            placeholder="Entry Fee (INR)"
-            value={form.entryFee}
-            onChange={handleChange}
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={handleChange}
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-          />
-          <textarea
-            name="rules"
-            placeholder="Rules"
-            value={form.rules}
-            onChange={handleChange}
-            className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="ageGroup"
-              placeholder="Age Group (e.g. U19)"
-              value={form.ageGroup}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
-            <input
-              name="prizePool"
-              placeholder="Prize Pool (INR)"
-              value={form.prizePool}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
-            <div className="col-span-2 text-xs text-gray-500 dark:text-gray-400">
-              Contact details will use your account email/phone.
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="allowTeamRegistration"
-              checked={form.allowTeamRegistration}
-              onChange={handleChange}
-              id="teamReg"
-              className="rounded border-gray-300 dark:border-gray-600"
-            />
-            <label
-              htmlFor="teamReg"
-              className="text-gray-900 dark:text-white transition-colors"
-            >
-              Allow Team Registration
-            </label>
-          </div>
-          {form.allowTeamRegistration && (
-            <input
-              name="teamSize"
-              placeholder="Team Size"
-              value={form.teamSize}
-              onChange={handleChange}
-              className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-            />
           )}
-          <button
-            disabled={loading}
-            className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
-          >
-            {loading ? "Creating..." : "Create Tournament"}
-          </button>
-        </form>
+        </div>
+
+        {/* Main Card Container - Fills remaining space */}
+        <div className="flex-1 overflow-auto px-6 pb-6">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col h-full max-w-4xl mx-auto w-full">
+            {/* Organizer Info Header */}
+            <div className="relative bg-gradient-to-r from-blue-600 via-slate-600 to-blue-700 flex-shrink-0 p-4">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-xl ring-4 ring-white/30 flex-shrink-0">
+                  <span className="text-xl font-bold bg-gradient-to-br from-blue-600 to-slate-600 bg-clip-text text-transparent">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full whitespace-nowrap">
+                      ORGANIZER
+                    </span>
+                  </div>
+                  <p className="text-lg font-bold text-white mt-0.5 truncate">
+                    {user?.name || "Unknown"}
+                  </p>
+                  <p className="text-xs text-white/80 truncate">
+                    {user?.email}
+                  </p>
+                </div>
+                <div className="hidden lg:flex flex-shrink-0">
+                  <div className="text-right">
+                    <p className="text-xs text-white/70 uppercase tracking-wide">
+                      Creator
+                    </p>
+                    <div className="flex items-center gap-1 mt-1 text-white justify-end">
+                      <svg
+                        className="w-3 h-3"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs font-semibold">Verified</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stepper Container - Flex grow to fill space, overflow scroll */}
+            <div className="flex-1 overflow-auto p-4 md:p-6">
+              <Stepper
+                initialStep={1}
+                onFinalStepCompleted={submit}
+                onValidate={handleStepChange}
+                onStepChange={(step) => {
+                  setStepError("");
+                }}
+                stepCircleContainerClassName="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 pt-0 shadow-inner"
+                contentClassName=""
+                footerClassName="border-t border-gray-200 dark:border-gray-700 pt-6 mt-8"
+              >
+                {/* Step 1: Basic Information */}
+                <Step>
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Basic Information
+                    </h2>
+
+                    {stepError && (
+                      <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded border border-red-200 dark:border-red-800">
+                        {stepError}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Sport<span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          name="sport"
+                          value={form.sport}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                          required
+                        >
+                          <option value="">Select a Sport</option>
+                          {POPULAR_SPORTS.map((sport) => (
+                            <option key={sport} value={sport}>
+                              {sport}
+                            </option>
+                          ))}
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      {form.sport === "Other" && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            Sport Name<span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            name="sportOther"
+                            placeholder="Enter sport name"
+                            value={form.sportOther}
+                            onChange={handleChange}
+                            className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                            required
+                          />
+                        </div>
+                      )}
+                      <div
+                        className={form.sport === "Other" ? "" : "col-span-1"}
+                      >
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Venue<span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="venue"
+                          placeholder="Stadium or Ground name"
+                          value={form.venue}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Step>
+
+                {/* Step 2: Tournament Location */}
+                <Step>
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Tournament Location
+                    </h2>
+
+                    {stepError && (
+                      <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded border border-red-200 dark:border-red-800">
+                        {stepError}
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
+                        Select Location<span className="text-red-500">*</span>
+                      </label>
+                      <LocationPicker
+                        initialLat={
+                          form.latitude ? parseFloat(form.latitude) : 30.3165
+                        }
+                        initialLng={
+                          form.longitude ? parseFloat(form.longitude) : 78.0322
+                        }
+                        onLocationChange={handleLocationChange}
+                        height="300px"
+                      />
+                      {form.latitude && form.longitude && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">
+                          Coordinates: {form.latitude}, {form.longitude}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Step>
+
+                {/* Step 3: Dates & Participants */}
+                <Step>
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Dates & Participants
+                    </h2>
+
+                    {stepError && (
+                      <div className="p-3 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded border border-red-200 dark:border-red-800">
+                        {stepError}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                          Registration Start Date<span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="registrationStartDate"
+                          value={form.registrationStartDate}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                          Registration Deadline<span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="registrationDeadline"
+                          value={form.registrationDeadline}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                          Tournament Start Date<span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="date"
+                          name="tournamentStartDate"
+                          value={form.tournamentStartDate}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                          Max Participants<span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          name="maxParticipants"
+                          placeholder="e.g. 50"
+                          value={form.maxParticipants}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Entry Fee (INR)
+                      </label>
+                      <input
+                        type="number"
+                        name="entryFee"
+                        placeholder="0 for free tournament"
+                        value={form.entryFee}
+                        onChange={handleChange}
+                        className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+                </Step>
+
+                {/* Step 4: Details & Rules */}
+                <Step>
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Tournament Details
+                    </h2>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Description
+                      </label>
+                      <textarea
+                        name="description"
+                        placeholder="Describe your tournament..."
+                        value={form.description}
+                        onChange={handleChange}
+                        rows={4}
+                        className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Rules & Regulations
+                      </label>
+                      <textarea
+                        name="rules"
+                        placeholder="Tournament rules and guidelines..."
+                        value={form.rules}
+                        onChange={handleChange}
+                        rows={4}
+                        className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Age Group
+                        </label>
+                        <input
+                          name="ageGroup"
+                          placeholder="e.g. U19, Open, 18+"
+                          value={form.ageGroup}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Prize Pool (INR)
+                        </label>
+                        <input
+                          type="number"
+                          name="prizePool"
+                          placeholder="Optional"
+                          value={form.prizePool}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
+                      ℹ️ Contact details will use your account email (
+                      {user?.email}) and phone.
+                    </div>
+                  </div>
+                </Step>
+
+                {/* Step 5: Team Settings */}
+                <Step>
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      Team Registration Settings
+                    </h2>
+
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <input
+                          type="checkbox"
+                          name="allowTeamRegistration"
+                          checked={form.allowTeamRegistration}
+                          onChange={handleChange}
+                          id="teamReg"
+                          className="mt-1 rounded border-gray-300 dark:border-gray-600"
+                        />
+                        <div>
+                          <label
+                            htmlFor="teamReg"
+                            className="text-gray-900 dark:text-white font-medium transition-colors cursor-pointer"
+                          >
+                            Allow Team Registration
+                          </label>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Enable this if participants can register as teams
+                            instead of individuals
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                      <h3 className="font-semibold text-green-900 dark:text-green-300 mb-2">
+                        Ready to Create!
+                      </h3>
+                      <p className="text-sm text-green-700 dark:text-green-400">
+                        Click "Complete" to create your tournament. You'll be
+                        redirected to your dashboard where you can manage
+                        registrations.
+                      </p>
+                    </div>
+                  </div>
+                </Step>
+              </Stepper>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

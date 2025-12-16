@@ -59,7 +59,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-slate-900 dark:via-purple-900/30 dark:to-blue-900/20 relative overflow-hidden transition-colors">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-gray-950 dark:via-purple-950/30 dark:to-gray-950 relative overflow-hidden transition-colors">
         {/* Mesh gradient background */}
         <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/10 via-transparent to-transparent dark:from-purple-500/20" />
         <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/10 via-transparent to-transparent dark:from-blue-500/20" />
@@ -67,7 +67,7 @@ export default function Home() {
         <SportsDoodlesBackground />
 
         {/* Modern Navigation */}
-        <nav className="bg-white/80 dark:bg-slate-900/90 backdrop-blur-lg shadow-sm fixed inset-x-0 top-0 z-40 border-b border-purple-200/20 dark:border-purple-500/30 transition-colors">
+        <nav className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-lg shadow-sm fixed inset-x-0 top-0 z-40 border-b border-purple-200/20 dark:border-purple-500/30 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-20 items-center">
               <div className="flex items-center">
@@ -172,7 +172,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/tournaments"
-                className="px-10 py-4 bg-white/80 dark:bg-slate-800/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-400 rounded-2xl text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-800/50 hover:border-purple-500 dark:hover:border-purple-300 hover:scale-105 transition-all duration-300"
+                className="px-10 py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
               >
                 Explore Tournaments
               </Link>
@@ -182,7 +182,7 @@ export default function Home() {
           {/* How Sportify Can Help You Section */}
           <div className="mt-32">
             <h2 className="text-4xl md:text-5xl font-black text-center mb-16">
-              <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-gray-100 dark:via-purple-300 dark:to-gray-100 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 How Sportify Can Help You
               </span>
             </h2>
@@ -213,7 +213,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     For Organizers
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Create and manage tournaments with ease. Track
                     registrations, verify players, and handle payments
                     seamlessly.
@@ -245,7 +245,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     For Players
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Discover nearby tournaments, register digitally, and build
                     your competitive profile. Never miss an opportunity to play.
                   </p>
@@ -276,7 +276,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                     For Sponsors
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Find relevant tournaments and promote your brand directly
                     within the sporting community. Maximize your reach and
                     impact.
@@ -289,17 +289,17 @@ export default function Home() {
           {/* Key Features - 2x2 Grid with Sport Icons */}
           <div className="mt-32">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-gray-100 dark:via-purple-300 dark:to-gray-100 bg-clip-text text-transparent">
+              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 Powerful Features
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-200">
+              <p className="text-lg text-gray-600 dark:text-gray-400">
                 Everything you need to revolutionize sports tournaments
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {/* Feature 1 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-slate-800/70 backdrop-blur-sm border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400 dark:hover:border-purple-300 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -367,7 +367,7 @@ export default function Home() {
               </div>
 
               {/* Feature 2 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-slate-800/70 backdrop-blur-sm border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400 dark:hover:border-purple-300 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
