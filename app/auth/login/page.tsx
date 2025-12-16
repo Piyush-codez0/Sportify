@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import { BorderBeam } from "@/components/ui/border-beam";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -30,13 +31,31 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 relative transition-colors">
       <SportsDoodlesBackground />
       <div className="max-w-md w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700 transition-colors">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+          <BorderBeam
+            size={120}
+            duration={12}
+            colorFrom="#22d3ee"
+            colorTo="#a78bfa"
+            borderWidth={3}
+            initialOffset={0}
+          />
+          <BorderBeam
+            size={120}
+            duration={12}
+            colorFrom="#f472b6"
+            colorTo="#f59e0b"
+            borderWidth={3}
+            initialOffset={50}
+            reverse
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex flex-col items-center gap-3">
               <img
                 src="/icon.png"
                 alt="Sportify"
-                className="w-16 h-16 rounded-2xl shadow-lg"
+                className="w-16 h-16 "
               />
               <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
                 Sportify

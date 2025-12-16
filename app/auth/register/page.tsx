@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import { BorderBeam } from "@/components/ui/border-beam";
 import { useSearchParams, useRouter } from "next/navigation";
 
 type Role = "organizer" | "player" | "sponsor";
@@ -65,30 +66,44 @@ function RegisterContent() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-12 relative transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-4 relative transition-colors">
       <SportsDoodlesBackground />
       <div className="max-w-2xl w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700 transition-colors">
-          <div className="text-center mb-8">
-            <Link href="/" className="inline-flex flex-col items-center gap-3">
-              <img
-                src="/icon2.png"
-                alt="Sportify"
-                className="w-26 h-26 rounded-2xl shadow-lg"
-              />
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+          <BorderBeam
+            size={150}
+            duration={14}
+            colorFrom="#22d3ee"
+            colorTo="#a78bfa"
+            borderWidth={3}
+            initialOffset={0}
+          />
+          <BorderBeam
+            size={150}
+            duration={14}
+            colorFrom="#f472b6"
+            colorTo="#f59e0b"
+            borderWidth={3}
+            initialOffset={50}
+            reverse={true}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
+          <div className="text-center mb-4">
+            <Link href="/" className="inline-flex flex-col items-center gap-2">
+              <img src="/icon.png" alt="Sportify" className="w-16 h-16 " />
               {/* <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
                 Sportify
               </span> */}
             </Link>
-            <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white transition-colors">
+            <h2 className="mt-3 text-xl font-bold text-gray-900 dark:text-white transition-colors">
               Create Account
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-2 transition-colors">
+            <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm transition-colors">
               Join Sportify and transform local sports
             </p>
             {role && (
-              <div className="mt-4 inline-block px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 rounded-full border border-indigo-300 dark:border-indigo-700">
-                <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+              <div className="mt-3 inline-block px-3 py-1.5 bg-indigo-100 dark:bg-indigo-900/40 rounded-full border border-indigo-300 dark:border-indigo-700">
+                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
                   {role === "organizer" && "🏆 Organizer Account"}
                   {role === "player" && "⚽ Player Account"}
                   {role === "sponsor" && "💼 Sponsor Account"}
@@ -105,50 +120,50 @@ function RegisterContent() {
 
           {!role ? (
             <div>
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white transition-colors">
+              <h3 className="text-base font-semibold mb-3 text-gray-900 dark:text-white transition-colors">
                 Select Your Role
               </h3>
-              <div className="grid gap-4">
+              <div className="grid md:grid-cols-3 gap-3">
                 <button
                   onClick={() => setRole("organizer")}
-                  className="p-6 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition-colors"
+                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
                 >
-                  <div className="text-2xl mb-2">🏆</div>
-                  <h4 className="font-bold text-lg text-gray-900 dark:text-white transition-colors">
+                  <div className="text-2xl mb-1">🏆</div>
+                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
                     Organizer
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">
-                    Create and manage tournaments
+                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
+                    Create tournaments
                   </p>
                 </button>
 
                 <button
                   onClick={() => setRole("player")}
-                  className="p-6 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition-colors"
+                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
                 >
-                  <div className="text-2xl mb-2">⚽</div>
-                  <h4 className="font-bold text-lg text-gray-900 dark:text-white transition-colors">
+                  <div className="text-2xl mb-1">⚽</div>
+                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
                     Player
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">
-                    Discover and register for tournaments
+                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
+                    Join tournaments
                   </p>
                 </button>
 
                 <button
                   onClick={() => setRole("sponsor")}
-                  className="p-6 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-left transition-colors"
+                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
                 >
-                  <div className="text-2xl mb-2">💼</div>
-                  <h4 className="font-bold text-lg text-gray-900 dark:text-white transition-colors">
+                  <div className="text-2xl mb-1">💼</div>
+                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
                     Sponsor
                   </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">
-                    Promote your brand at tournaments
+                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
+                    Promote brand
                   </p>
                 </button>
               </div>
-              <p className="mt-6 text-center text-gray-600 dark:text-gray-300 transition-colors">
+              <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300 transition-colors">
                 Already have an account?{" "}
                 <Link
                   href="/auth/login"
@@ -160,25 +175,43 @@ function RegisterContent() {
             </div>
           ) : (
             <div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder=""
-                  />
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      placeholder=""
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={(e) =>
+                        setFormData({ ...formData, phone: e.target.value })
+                      }
+                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      placeholder=""
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
                     Email
                   </label>
                   <input
@@ -188,29 +221,13 @@ function RegisterContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                     placeholder=""
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder=""
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
                     Password
                   </label>
                   <input
@@ -221,29 +238,28 @@ function RegisterContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder="Minimum 6 characters"
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    placeholder="Min 6 characters"
                   />
                 </div>
 
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    💡 You'll complete your profile with additional details
-                    (city, state, gender, etc.) after registration in your
-                    dashboard.
+                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    💡 Complete your profile with city, state, gender after
+                    registration.
                   </p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
+                  className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
                 >
                   {loading ? "Creating Account..." : "Sign Up"}
                 </button>
               </form>
 
-              <div className="relative my-6">
+              <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
