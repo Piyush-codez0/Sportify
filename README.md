@@ -11,7 +11,22 @@
 
 _A comprehensive digital ecosystem connecting tournament organizers, players, and sponsors across India_
 
-[Features](#-features) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start) • [Setup Guide](#-complete-setup-guide)
+[Features](#-features) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start) • [Deployment](#-deployment) • [Setup Guide](#-complete-setup-guide)
+
+---
+
+## 🚀 Deployment
+
+**Deploy to production in minutes:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Piyush-codez0/Sportify)
+
+📖 **[Complete Deployment Guide →](DEPLOYMENT.md)**
+
+- GitHub Actions CI/CD configured
+- Automatic deployments on push to `main`
+- Environment variables template included
+- Support for Vercel, Netlify, Railway, and more
 
 ---
 
@@ -541,7 +556,20 @@ Use Razorpay test cards:
 
 ### **Step 11: Production Deployment**
 
-#### **Vercel Deployment** (Recommended)
+**🚀 Quick Deploy:**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Piyush-codez0/Sportify)
+
+**📖 For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
+
+#### **Quick Vercel Deployment**
+
+1. Click the "Deploy with Vercel" button above
+2. Connect your GitHub account
+3. Add all environment variables from `.env.example`
+4. Deploy!
+
+#### **Or use Vercel CLI:**
 
 ```bash
 # 1. Install Vercel CLI
@@ -550,28 +578,29 @@ npm install -g vercel
 # 2. Login
 vercel login
 
-# 3. Deploy
-vercel
-
-# 4. Add environment variables in Vercel Dashboard
-# Project Settings → Environment Variables → Add all from .env.local
-
-# 5. Deploy to production
+# 3. Deploy to production
 vercel --prod
 ```
 
 #### **Production Checklist**
 
-- [ ] Switch to **production Razorpay keys** (rzp*live*)
-- [ ] Update `NEXT_PUBLIC_RAZORPAY_KEY_ID` in Vercel env
+- [ ] Switch to **production Razorpay keys** (rzp_live_*)
+- [ ] Update `NEXT_PUBLIC_RAZORPAY_KEY_ID` in hosting platform
 - [ ] Set **strong JWT_SECRET** (different from dev)
-- [ ] Configure **MongoDB Atlas IP whitelist** (Vercel IPs or 0.0.0.0/0)
+- [ ] Configure **MongoDB Atlas IP whitelist** (0.0.0.0/0 for Vercel)
 - [ ] Add **production domain** to Cloudinary allowed origins
 - [ ] Update **Google Maps API key** restrictions (add prod domain)
 - [ ] Enable **MongoDB Atlas backup** (recommended)
 - [ ] Set up **monitoring** (Vercel Analytics, Sentry, etc.)
 - [ ] Test **all payment flows** with real test transactions
-- [ ] Configure **custom domain** in Vercel
+- [ ] Configure **custom domain** (optional)
+
+**💡 See [DEPLOYMENT.md](DEPLOYMENT.md) for:**
+- GitHub Actions CI/CD setup
+- Multiple hosting options (Netlify, Railway, etc.)
+- Troubleshooting guide
+- Security best practices
+- Post-deployment configuration
 
 ---
 
