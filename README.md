@@ -9,6 +9,9 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
+[![CI](https://github.com/Piyush-codez0/Sportify/actions/workflows/ci.yml/badge.svg)](https://github.com/Piyush-codez0/Sportify/actions/workflows/ci.yml)
+[![Deploy to Vercel](https://github.com/Piyush-codez0/Sportify/actions/workflows/deploy-vercel.yml/badge.svg)](https://github.com/Piyush-codez0/Sportify/actions/workflows/deploy-vercel.yml)
+
 _A comprehensive digital ecosystem connecting tournament organizers, players, and sponsors across India_
 
 [Features](#-features) • [Tech Stack](#-tech-stack) • [Quick Start](#-quick-start) • [Deployment](#-deployment) • [Setup Guide](#-complete-setup-guide)
