@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Sponsorship from "@/models/Sponsorship";
 import Tournament from "@/models/Tournament";
+import User from "@/models/User";
 import { requireRole, AuthenticatedRequest } from "@/lib/middleware";
 
 // POST: Create sponsorship request
@@ -26,6 +27,24 @@ async function postHandler(request: AuthenticatedRequest) {
       return NextResponse.json(
         { error: "Tournament not found" },
         { status: 404 }
+      );
+    }
+
+    // Enforce sponsor verification and profile completeness
+    const user = await User.findById(request.user!.userId).select(
+      "city state gender phoneVerified"
+    );
+    const isProfileComplete = Boolean(
+      user?.city && user?.state && user?.gender
+    );
+    const isPhoneVerified = Boolean(user?.phoneVerified);
+    if (!isProfileComplete || !isPhoneVerified) {
+      return NextResponse.json(
+        {
+          error:
+            "Sponsor must complete profile (city, state, gender) and verify phone before creating a sponsorship",
+        },
+        { status: 403 }
       );
     }
 

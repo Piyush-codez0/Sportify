@@ -42,7 +42,22 @@ export async function POST(
 
     // Check if organizer owns the tournament
     const tournament = sponsorship.tournament as any;
-    if (tournament.organizer.toString() !== decoded.userId) {
+    const organizerId =
+      tournament.organizer?._id?.toString() ||
+      tournament.organizer?.toString() ||
+      "";
+    const userId = String(decoded.userId);
+
+    console.log(
+      "Comparison - organizerId:",
+      organizerId,
+      "userId:",
+      userId,
+      "tournament.organizer:",
+      tournament.organizer
+    );
+
+    if (organizerId !== userId) {
       return NextResponse.json(
         { error: "You can only manage sponsorships for your tournaments" },
         { status: 403 }
