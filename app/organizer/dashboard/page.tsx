@@ -1,6 +1,7 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
+import { MapPin, CalendarDays, Users, IndianRupee, Trophy } from "lucide-react";
 import Link from "next/link";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import ProfileModal from "@/components/ProfileModal";
@@ -56,6 +57,7 @@ export default function OrganizerDashboard() {
   const [activeTab, setActiveTab] = useState<"sponsorships" | "tournaments">(
     "tournaments"
   );
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!token) return;
@@ -346,75 +348,130 @@ export default function OrganizerDashboard() {
                   {tournaments.map((t) => (
                     <div
                       key={t._id}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
+                      className="group relative border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300"
                     >
-                      <h2 className="font-semibold text-lg mb-1 text-gray-900 dark:text-white transition-colors">
-                        {t.sport} <span>Tournament</span>
-                      </h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
-                        <span className="font-medium">Venue:</span> {t.venue}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
-                        <span className="font-medium">Location:</span> {t.city},{" "}
-                        {t.state}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
-                        <span className="font-medium">Starts:</span>{" "}
-                        {new Date(t.startDate).toLocaleDateString("en-GB")}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
-                        <span className="font-medium">
-                          Registration Deadline:
-                        </span>{" "}
-                        {new Date(t.registrationDeadline).toLocaleDateString(
-                          "en-GB"
+                      <div className="flex items-center justify-between mb-2">
+                        <h2 className="font-semibold text-lg text-gray-900 dark:text-white">
+                          {t.sport} <span>Tournament</span>
+                        </h2>
+                        {t.prizePool && (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300/60">
+                            <Trophy className="w-3 h-3" /> ₹{t.prizePool}
+                          </span>
                         )}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors">
-                        <span className="font-medium">Entry Fee:</span> ₹
-                        {t.entryFee}
-                        {t.prizePool && ` • Prize Pool: ₹${t.prizePool}`}
-                      </p>
+                      </div>
+
+                      <div className="mt-2 space-y-2">
+                        <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-medium">Venue:</span> {t.venue}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          <MapPin className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-medium">Location:</span>{" "}
+                          {t.city}, {t.state}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          <CalendarDays className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-medium">Starts:</span>{" "}
+                          {new Date(t.startDate).toLocaleDateString("en-GB")}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          <CalendarDays className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-medium">
+                            Registration Deadline:
+                          </span>{" "}
+                          {new Date(t.registrationDeadline).toLocaleDateString(
+                            "en-GB"
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                          <IndianRupee className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                          <span className="font-medium">Entry Fee:</span> ₹
+                          {t.entryFee}
+                        </div>
+                      </div>
                       {t.ageGroup && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                        <div className="mt-2 text-xs text-gray-600 dark:text-gray-300">
                           <span className="font-medium">Age Group:</span>{" "}
                           {t.ageGroup}
-                        </p>
+                        </div>
                       )}
                       {(t.contactEmail || t.contactPhone) && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
+                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">
                           <span className="font-medium">Contact:</span>{" "}
                           {t.contactPhone || t.contactEmail}
-                        </p>
+                        </div>
                       )}
-                      <div className="mt-3 p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded border border-indigo-200 dark:border-indigo-700 transition-colors">
-                        <p className="text-sm font-semibold text-indigo-900 dark:text-indigo-100 transition-colors">
-                          Participants: {t.currentParticipants}/
-                          {t.maxParticipants}
-                          {t.allowTeamRegistration &&
-                            t.teamSize &&
-                            ` (Team size: ${t.teamSize})`}
-                        </p>
-                        <p className="text-sm font-semibold mt-1 transition-colors">
-                          Status:{" "}
-                          <span
-                            className={
-                              t.status === "open"
-                                ? "text-green-600 dark:text-green-400"
-                                : "text-red-600 dark:text-red-400"
-                            }
-                          >
-                            {t.status}
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700">
+                          <Users className="w-3.5 h-3.5" />
+                          {t.currentParticipants}/{t.maxParticipants}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full border ${
+                            t.status === "open"
+                              ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700"
+                              : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700"
+                          }`}
+                        >
+                          {t.status === "open" ? "Open" : "Closed"}
+                        </span>
+                        {t.allowTeamRegistration && t.teamSize && (
+                          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+                            Team size: {t.teamSize}
                           </span>
-                        </p>
+                        )}
                       </div>
                       <div className="mt-3 flex gap-2">
                         <Link
                           href={`/organizer/tournaments/${t._id}/registrations`}
-                          className="text-indigo-600 dark:text-indigo-400 text-sm hover:underline transition-colors"
+                          className="flex-1 text-center bg-indigo-600 dark:bg-indigo-500 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm"
                         >
                           Registered Players
                         </Link>
+                        <button
+                          onClick={async () => {
+                            if (
+                              !confirm(
+                                `Are you sure you want to delete ${t.sport} Tournament? This action cannot be undone.`
+                              )
+                            ) {
+                              return;
+                            }
+                            setDeletingId(t._id);
+                            try {
+                              const res = await fetch(
+                                `/api/tournaments/${t._id}`,
+                                {
+                                  method: "DELETE",
+                                  headers: {
+                                    Authorization: `Bearer ${token}`,
+                                  },
+                                }
+                              );
+                              const data = await res.json();
+                              if (!res.ok)
+                                throw new Error(
+                                  data.error || "Failed to delete tournament"
+                                );
+                              setTournaments((prev) =>
+                                prev.filter(
+                                  (tournament) => tournament._id !== t._id
+                                )
+                              );
+                              alert("Tournament deleted successfully!");
+                            } catch (e: any) {
+                              alert(e.message);
+                            } finally {
+                              setDeletingId(null);
+                            }
+                          }}
+                          disabled={deletingId === t._id}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-semibold transition-colors disabled:bg-red-400 disabled:cursor-not-allowed shadow-sm"
+                        >
+                          {deletingId === t._id ? "Deleting..." : "Delete"}
+                        </button>
                       </div>
                     </div>
                   ))}

@@ -306,7 +306,7 @@ interface StepProps {
 }
 
 export function Step({ children }: StepProps) {
-  return <div className="px-2">{children}</div>;
+  return <div className="px-2 h-full flex flex-col">{children}</div>;
 }
 
 interface StepIndicatorProps {

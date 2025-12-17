@@ -203,7 +203,8 @@ export default function NewTournamentPage() {
         body: JSON.stringify({
           ...form,
           sport: form.sport === "Other" ? form.sportOther : form.sport,
-          name: user.name,
+          // Use the sport as the tournament display name per requirements
+          name: form.sport === "Other" ? form.sportOther : form.sport,
           contactEmail: user.email,
           contactPhone: user.phone,
           latitude: parseFloat(form.latitude),
@@ -602,7 +603,8 @@ export default function NewTournamentPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                          Registration Start Date<span className="text-red-500">*</span>
+                          Registration Start Date
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="date"
@@ -615,7 +617,8 @@ export default function NewTournamentPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                          Registration Deadline<span className="text-red-500">*</span>
+                          Registration Deadline
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="date"
@@ -628,7 +631,8 @@ export default function NewTournamentPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                          Tournament Start Date<span className="text-red-500">*</span>
+                          Tournament Start Date
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="date"
@@ -641,7 +645,8 @@ export default function NewTournamentPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                          Max Participants<span className="text-red-500">*</span>
+                          Max Participants
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="number"
