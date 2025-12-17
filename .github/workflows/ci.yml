@@ -33,11 +33,11 @@ jobs:
     - name: Build application
       run: npm run build
       env:
-        # Dummy environment variables for build
+        # Dummy environment variables for build only (not used in production)
         MONGODB_URI: mongodb://localhost:27017/sportify
-        JWT_SECRET: dummy-secret-for-build-only-min-32-chars
+        JWT_SECRET: aW1wb3J0YW50c2VjcmV0Zm9yYnVpbGRvbmx5dGVzdGluZ3B1cnBvc2Vz
         NEXT_PUBLIC_RAZORPAY_KEY_ID: rzp_test_dummy
-        RAZORPAY_KEY_SECRET: dummy_secret
+        RAZORPAY_KEY_SECRET: dummy_secret_key_for_build_testing_purposes_only
         CLOUDINARY_CLOUD_NAME: dummy
         CLOUDINARY_API_KEY: dummy
         CLOUDINARY_API_SECRET: dummy
