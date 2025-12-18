@@ -24,11 +24,36 @@ _A comprehensive digital ecosystem connecting tournament organizers, players, an
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Piyush-codez0/Sportify)
 
-📖 **[Complete Deployment Guide →](DEPLOYMENT.md)**
+### Quick Deploy Options
 
+| Method | Time | Best For |
+|--------|------|----------|
+| **[One-Click Vercel](https://vercel.com/new/clone?repository-url=https://github.com/Piyush-codez0/Sportify)** | 5 mins | First-time deployment |
+| **[CLI Deployment](#vercel-cli-deployment)** | 3 mins | Developers |
+| **[Automated Script](./deploy-to-vercel.sh)** | 2 mins | Quick setup |
+
+### Vercel CLI Deployment
+
+```bash
+# 1. Install Vercel CLI
+npm install -g vercel
+
+# 2. Deploy
+vercel --prod
+
+# Or use our automated script
+chmod +x deploy-to-vercel.sh
+./deploy-to-vercel.sh
+```
+
+📖 **Detailed Guides:**
+- **[Quick Start Guide →](VERCEL_DEPLOY_GUIDE.md)** - Step-by-step with screenshots
+- **[Complete Documentation →](DEPLOYMENT.md)** - All platforms and advanced options
+
+✨ **Features:**
 - GitHub Actions CI/CD configured
 - Automatic deployments on push to `main`
-- Environment variables template included
+- Environment variables template (`.env.example`)
 - Support for Vercel, Netlify, Railway, and more
 
 ---
