@@ -39,16 +39,18 @@ export function Pointer({
         parentElement.style.cursor = "none";
 
         // Add event listeners to parent
-        const handleMouseMove = (e: MouseEvent) => {
+        const updateCursorPosition = (e: MouseEvent) => {
           const rect = parentElement.getBoundingClientRect();
           x.set(e.clientX - rect.left);
           y.set(e.clientY - rect.top);
         };
 
+        const handleMouseMove = (e: MouseEvent) => {
+          updateCursorPosition(e);
+        };
+
         const handleMouseEnter = (e: MouseEvent) => {
-          const rect = parentElement.getBoundingClientRect();
-          x.set(e.clientX - rect.left);
-          y.set(e.clientY - rect.top);
+          updateCursorPosition(e);
           setIsActive(true);
         };
 
@@ -56,15 +58,49 @@ export function Pointer({
           setIsActive(false);
         };
 
+        const handleScroll = (e: Event) => {
+          // Check if mouse is still over the element during scroll
+          const mouseEvent = new MouseEvent("mousemove", {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: (window as any).lastMouseX || 0,
+            clientY: (window as any).lastMouseY || 0,
+          });
+
+          const rect = parentElement.getBoundingClientRect();
+          const isInside =
+            (window as any).lastMouseX >= rect.left &&
+            (window as any).lastMouseX <= rect.right &&
+            (window as any).lastMouseY >= rect.top &&
+            (window as any).lastMouseY <= rect.bottom;
+
+          if (!isInside) {
+            setIsActive(false);
+          } else if ((window as any).lastMouseX && (window as any).lastMouseY) {
+            x.set((window as any).lastMouseX - rect.left);
+            y.set((window as any).lastMouseY - rect.top);
+          }
+        };
+
+        const trackMousePosition = (e: MouseEvent) => {
+          (window as any).lastMouseX = e.clientX;
+          (window as any).lastMouseY = e.clientY;
+        };
+
+        window.addEventListener("mousemove", trackMousePosition);
         parentElement.addEventListener("mousemove", handleMouseMove);
         parentElement.addEventListener("mouseenter", handleMouseEnter);
         parentElement.addEventListener("mouseleave", handleMouseLeave);
+        window.addEventListener("scroll", handleScroll, true);
 
         return () => {
           parentElement.style.cursor = "";
+          window.removeEventListener("mousemove", trackMousePosition);
           parentElement.removeEventListener("mousemove", handleMouseMove);
           parentElement.removeEventListener("mouseenter", handleMouseEnter);
           parentElement.removeEventListener("mouseleave", handleMouseLeave);
+          window.removeEventListener("scroll", handleScroll, true);
         };
       }
     }

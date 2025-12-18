@@ -53,6 +53,9 @@ export default function NewTournamentPage() {
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [stepError, setStepError] = useState<string>("");
 
+  // Local ISO date string (YYYY-MM-DD) without timezone issues
+  const todayStr = new Date().toLocaleDateString("en-CA");
+
   // Validation functions for each step
   const validateStep1 = (): boolean => {
     setStepError("");
@@ -608,6 +611,7 @@ export default function NewTournamentPage() {
                         </label>
                         <input
                           type="date"
+                          min={todayStr}
                           name="registrationStartDate"
                           value={form.registrationStartDate}
                           onChange={handleChange}
@@ -622,6 +626,7 @@ export default function NewTournamentPage() {
                         </label>
                         <input
                           type="date"
+                          min={todayStr}
                           name="registrationDeadline"
                           value={form.registrationDeadline}
                           onChange={handleChange}
@@ -636,6 +641,7 @@ export default function NewTournamentPage() {
                         </label>
                         <input
                           type="date"
+                          min={todayStr}
                           name="tournamentStartDate"
                           value={form.tournamentStartDate}
                           onChange={handleChange}

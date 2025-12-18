@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { useSearchParams, useRouter } from "next/navigation";
+import { motion } from "motion/react";
+import { Users, Award, Briefcase } from "lucide-react";
 
 type Role = "organizer" | "player" | "sponsor";
 
@@ -68,8 +70,8 @@ function RegisterContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-4 relative transition-colors">
       <SportsDoodlesBackground />
-      <div className="max-w-2xl w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+      <div className="max-w-3xl w-full relative z-10">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
           <BorderBeam
             size={150}
             duration={14}
@@ -120,48 +122,126 @@ function RegisterContent() {
 
           {!role ? (
             <div>
-              <h3 className="text-base font-semibold mb-3 text-gray-900 dark:text-white transition-colors">
+              <h3 className="text-lg font-semibold mb-6 text-gray-900 dark:text-white transition-colors">
                 Select Your Role
               </h3>
-              <div className="grid md:grid-cols-3 gap-3">
-                <button
+              <div className="grid md:grid-cols-3 gap-6">
+                {/* Organizer Card */}
+                <motion.button
                   onClick={() => setRole("organizer")}
-                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
+                  className="relative p-8 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-center overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0 }}
                 >
-                  <div className="text-2xl mb-1">🏆</div>
-                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
-                    Organizer
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
-                    Create tournaments
-                  </p>
-                </button>
+                  {/* Animated gradient background */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 opacity-0 group-hover:opacity-10"
+                    initial={{ scale: 0, rotate: 0 }}
+                    whileHover={{ scale: 1.5, rotate: 180 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
+                  <div className="relative z-10">
+                    <motion.div
+                      className="flex justify-center mb-3"
+                      whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.2 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Award
+                        className="w-14 h-14 text-amber-600 dark:text-amber-400"
+                        strokeWidth={1.5}
+                      />
+                    </motion.div>
+                    <h4 className="font-bold text-base text-gray-900 dark:text-white transition-colors group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                      Organizer
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 transition-colors">
+                      Create tournaments
+                    </p>
+                  </div>
+                </motion.button>
 
-                <button
+                {/* Player Card */}
+                <motion.button
                   onClick={() => setRole("player")}
-                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
+                  className="relative p-8 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-center overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                  <div className="text-2xl mb-1">⚽</div>
-                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
-                    Player
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
-                    Join tournaments
-                  </p>
-                </button>
+                  {/* Animated gradient background */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-blue-400 via-cyan-500 to-teal-500 opacity-0 group-hover:opacity-30 rounded-xl"
+                    initial={{ scale: 0, rotate: 0 }}
+                    whileHover={{ scale: 1.25, rotate: 0 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl opacity-0 group-hover:opacity-35 blur-xl" />
+                  <div className="relative z-10">
+                    <motion.div
+                      className="flex justify-center mb-3"
+                      whileHover={{ rotate: [0, -8, 8, -8, 0], scale: 1.2 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Users
+                        className="w-14 h-14 text-cyan-600 dark:text-cyan-400"
+                        strokeWidth={1.5}
+                      />
+                    </motion.div>
+                    <h4 className="font-bold text-base text-gray-900 dark:text-white transition-colors group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                      Player
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 transition-colors">
+                      Join tournaments
+                    </p>
+                  </div>
+                </motion.button>
 
-                <button
+                {/* Sponsor Card */}
+                <motion.button
                   onClick={() => setRole("sponsor")}
-                  className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg hover:border-indigo-500 dark:hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 text-center transition-colors"
+                  className="relative p-8 border-2 border-gray-200 dark:border-gray-600 rounded-xl text-center overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
                 >
-                  <div className="text-2xl mb-1">💼</div>
-                  <h4 className="font-bold text-sm text-gray-900 dark:text-white transition-colors">
-                    Sponsor
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 text-xs mt-1 transition-colors">
-                    Promote brand
-                  </p>
-                </button>
+                  {/* Animated gradient background */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-br from-purple-400 via-pink-500 to-rose-500 opacity-0 group-hover:opacity-10 rounded-xl"
+                    initial={{ scale: 0 }}
+                    whileHover={{ scale: 1.5, rotate: -90 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
+                  <div className="relative z-10">
+                    <motion.div
+                      className="flex justify-center mb-3"
+                      whileHover={{
+                        scale: [1, 1.1, 1.2, 1.1, 1],
+                        y: [0, -5, -10, -5, 0],
+                      }}
+                      transition={{ duration: 0.8 }}
+                    >
+                      <Briefcase
+                        className="w-14 h-14 text-purple-600 dark:text-purple-400"
+                        strokeWidth={1.5}
+                      />
+                    </motion.div>
+                    <h4 className="font-bold text-base text-gray-900 dark:text-white transition-colors group-hover:text-purple-600 dark:group-hover:text-purple-400">
+                      Sponsor
+                    </h4>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mt-2 transition-colors">
+                      Promote brand
+                    </p>
+                  </div>
+                </motion.button>
               </div>
               <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-300 transition-colors">
                 Already have an account?{" "}

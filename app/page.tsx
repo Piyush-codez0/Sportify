@@ -8,6 +8,72 @@ import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Pointer } from "@/components/ui/pointer";
 import LoadingScreen from "@/components/LoadingScreen";
+import { motion, AnimatePresence } from "framer-motion";
+
+// FAQ Item Component
+interface FAQItemProps {
+  question: string;
+  answer: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="group"
+    >
+      <button
+        onClick={onToggle}
+        className="w-full text-left p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg transition-all duration-300"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white pr-8 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+            {question}
+          </h3>
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
+          >
+            <svg
+              className="w-4 h-4 text-purple-600 dark:text-purple-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </motion.div>
+        </div>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed pt-4 border-t border-purple-100 dark:border-purple-800/30 mt-4">
+                {answer}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </button>
+    </motion.div>
+  );
+}
 
 export default function Home() {
   const { user, isLoading } = useAuth();
@@ -15,6 +81,7 @@ export default function Home() {
   const [currentTagline, setCurrentTagline] = useState(0);
   const [showLoading, setShowLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
 
   const taglines = [
     "Empowering India's Grassroots Sports",
@@ -431,8 +498,113 @@ export default function Home() {
           </div>
         </div>
 
+        {/* FAQ Section */}
+        <div className="mt-32 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-32">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-5 backdrop-blur-sm">
+              <svg
+                className="w-5 h-5 text-purple-600 dark:text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+                Frequently Asked Questions
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              Got Questions? We've Got Answers
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Everything you need to know about Sportify
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <FAQItem
+              question="How do I create a tournament on Sportify?"
+              answer="Creating a tournament is simple! Sign up as an organizer, complete your profile with organization details, and navigate to your dashboard. Click 'Create Tournament', fill in the tournament details including sport, venue, dates, and registration fee. Once submitted, your tournament will be visible to players across India."
+              isOpen={openFAQIndex === 0}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 0 ? null : 0)}
+            />
+            <FAQItem
+              question="What types of sports tournaments can I organize?"
+              answer="Sportify supports a wide range of sports including Cricket, Football, Basketball, Badminton, Volleyball, Tennis, Table Tennis, and Kabaddi. Whether you're organizing individual or team-based tournaments, our platform handles both formats seamlessly."
+              isOpen={openFAQIndex === 1}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 1 ? null : 1)}
+            />
+            <FAQItem
+              question="How do players register for tournaments?"
+              answer="Players can browse tournaments by location, sport, or date. Once they find a tournament, they can register individually or as a team. We require Aadhar verification for authenticity. Payment is processed securely through Razorpay, and players receive instant confirmation via email and in-app notifications."
+              isOpen={openFAQIndex === 2}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 2 ? null : 2)}
+            />
+            <FAQItem
+              question="What are the payment and security measures?"
+              answer="All payments are processed through Razorpay, India's leading payment gateway, ensuring bank-level security. We use SSL encryption and never store sensitive payment information. Players can pay registration fees using UPI, cards, net banking, or wallets. Organizers receive payouts after tournament completion."
+              isOpen={openFAQIndex === 3}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 3 ? null : 3)}
+            />
+            <FAQItem
+              question="How does sponsorship work on Sportify?"
+              answer="Sponsors can browse tournaments based on location, sport, and audience size. After selecting a tournament, sponsors can submit sponsorship proposals with their budget and benefits offered. Organizers review proposals and approve suitable sponsors. This creates win-win partnerships that support grassroots sports."
+              isOpen={openFAQIndex === 4}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 4 ? null : 4)}
+            />
+            <FAQItem
+              question="Can I get a refund if a tournament is cancelled?"
+              answer="Yes! If an organizer cancels a tournament, all registered players receive automatic refunds within 5-7 business days. Refunds are processed back to the original payment method. Organizers must provide a valid reason for cancellation, and our support team ensures fair resolution."
+              isOpen={openFAQIndex === 5}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 5 ? null : 5)}
+            />
+            <FAQItem
+              question="How does Sportify verify player authenticity?"
+              answer="We use Aadhar-based verification to ensure all players are genuine. This prevents fake registrations and maintains tournament integrity. Players need to complete profile verification with their Aadhar number before registering for any tournament. This data is encrypted and stored securely per Indian data protection laws."
+              isOpen={openFAQIndex === 6}
+              onToggle={() => setOpenFAQIndex(openFAQIndex === 6 ? null : 6)}
+            />
+           
+          </div>
+
+          {/* Contact CTA */}
+          <div className="mt-12 text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50/50 via-white/30 to-blue-50/50 dark:from-purple-900/20 dark:via-gray-800/30 dark:to-blue-900/20 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50">
+            <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+              Still have questions?
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-5">
+              Our team is here to help you get started with Sportify
+            </p>
+            <a
+              href="mailto:support@sportify.com"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                />
+              </svg>
+              Contact Support
+            </a>
+          </div>
+        </div>
+
         {/* Professional Footer */}
-        <footer className="bg-gradient-to-b from-purple-100/80 to-slate-100/90 dark:from-gray-900/95 dark:to-gray-950/90 backdrop-blur-xl border-t border-purple-200/30 dark:border-purple-800/30 mt-32 relative z-10 transition-colors">
+        <footer className="bg-gradient-to-b from-purple-100/80 to-slate-100/90 dark:from-gray-900/95 dark:to-gray-950/90 backdrop-blur-xl border-t border-purple-200/30 dark:border-purple-800/30 relative z-10 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="grid md:grid-cols-4 gap-8 mb-8">
               {/* Brand */}
