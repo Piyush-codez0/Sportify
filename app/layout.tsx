@@ -6,6 +6,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import ClickSparkWrapper from "@/components/ClickSparkWrapper";
 
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -57,7 +59,10 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
-            <ClickSparkWrapper>{children}</ClickSparkWrapper>
+            <ClickSparkWrapper>
+              {children}
+              <SpeedInsights />
+            </ClickSparkWrapper>
           </AuthProvider>
         </ThemeProvider>
       </body>
