@@ -102,7 +102,7 @@ export default function OrganizerDashboard() {
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
       />
-      <div className="pt-24 p-6 max-w-6xl mx-auto relative z-10">
+      <div className="pt-20 sm:pt-24 p-3 sm:p-6 max-w-6xl mx-auto relative z-10">
         <Link
           href="/organizer/tournaments/new"
           className="inline-block mb-6 bg-indigo-600 dark:bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors font-medium shadow-md hover:shadow-lg"
@@ -115,10 +115,10 @@ export default function OrganizerDashboard() {
         />
 
         {/* Navigation Bar */}
-        <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 flex gap-2 transition-colors">
+        <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 flex gap-1 sm:gap-2 transition-colors">
           <button
             onClick={() => setActiveTab("tournaments")}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-md font-medium text-xs sm:text-base transition-all ${
               activeTab === "tournaments"
                 ? "bg-indigo-600 text-white shadow-md"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -133,7 +133,7 @@ export default function OrganizerDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("sponsorships")}
-            className={`flex-1 py-3 px-4 rounded-md font-medium transition-all ${
+            className={`flex-1 py-2.5 sm:py-3 px-2 sm:px-4 rounded-md font-medium text-xs sm:text-base transition-all ${
               activeTab === "sponsorships"
                 ? "bg-indigo-50 text-indigo-700 dark:bg-gray-900 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shadow-sm"
                 : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -164,7 +164,7 @@ export default function OrganizerDashboard() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
                   Sponsorship Requests
                 </h2>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {sponsorships.map((s) => (
                     <div
                       key={s._id}
@@ -310,7 +310,7 @@ export default function OrganizerDashboard() {
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
                   Your Tournaments
                 </h2>
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {tournaments.map((t) => (
                     <div
                       key={t._id}

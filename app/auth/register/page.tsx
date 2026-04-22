@@ -71,7 +71,7 @@ function RegisterContent() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-8 relative transition-colors">
       <SportsDoodlesBackground />
       <div className="max-w-2xl w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
           <BorderBeam
             size={150}
             duration={14}
@@ -125,7 +125,7 @@ function RegisterContent() {
               <h3 className="text-lg font-semibold mb-6 text-gray-900 dark:text-white transition-colors">
                 Select Your Role
               </h3>
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                 {/* Organizer Card */}
                 <motion.button
                   onClick={() => setRole("organizer")}
@@ -256,7 +256,7 @@ function RegisterContent() {
           ) : (
             <div>
               <form onSubmit={handleSubmit} className="space-y-3">
-                <div className="grid md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
                       Name

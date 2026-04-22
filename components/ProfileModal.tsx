@@ -167,9 +167,9 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto transition-all animate-slideUp border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all animate-slideUp border border-gray-200 dark:border-gray-700 mx-2 sm:mx-4">
         {/* Header */}
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center rounded-t-xl">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-xl">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden">
               <img
@@ -211,7 +211,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </button>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Status Cards */}
           <div className="grid grid-cols-2 gap-3 mb-5">
             <div
@@ -420,7 +420,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           {activeTab === "profile" &&
             (!isProfileComplete || !isPhoneVerified || showEdit) && (
               <form onSubmit={updateProfile} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       City

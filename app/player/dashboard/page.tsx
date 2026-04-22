@@ -62,7 +62,7 @@ export default function PlayerDashboard() {
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
       />
-      <div className="pt-24 max-w-5xl mx-auto p-6 relative z-10">
+      <div className="pt-20 sm:pt-24 max-w-5xl mx-auto p-3 sm:p-6 relative z-10">
         <ProfileModal
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
@@ -85,7 +85,7 @@ export default function PlayerDashboard() {
             Loading...
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {registrations.map((r) => (
               <div
                 key={r._id}

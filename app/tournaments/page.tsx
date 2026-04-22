@@ -194,97 +194,139 @@ export default function TournamentsBrowse() {
       >
         {/* Page Header */}
         {!token && (
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-               Browse Tournaments
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100/50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/50 backdrop-blur-sm mb-4">
+              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+              <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">Active Events</span>
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
+              Discover Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Challenges</span>
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
-              Discover and join local sports tournaments near you
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium">
+              Find and join premier sports tournaments in your area. Compete, grow, and connect with the community.
             </p>
           </div>
         )}
 
-        {/* Filter Card */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200/60 dark:border-gray-700/60 p-5 mb-6">
+        {/* Premium Filter Card */}
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-gray-700/50 p-6 mb-8 relative overflow-hidden group">
+          {/* Subtle Glow Effect */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-gradient-to-b from-indigo-500/5 to-transparent blur-3xl -z-10 group-hover:from-indigo-500/10 transition-colors duration-500"></div>
 
           {/* Filter Row */}
-          <div className="grid md:grid-cols-3 gap-3 mb-4">
-            <div className="relative">
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 relative z-10">
+            <div className="relative group/input">
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-widest ml-1">
                 State
               </label>
-              <select
-                value={filters.state}
-                onChange={(e) =>
-                  setFilters({ ...filters, state: e.target.value, district: "" })
-                }
-                className="w-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                disabled={filters.useRadius}
-              >
-                <option value="">All States</option>
-                {INDIAN_STATES.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
-                District
-              </label>
-              <select
-                value={filters.district}
-                onChange={(e) =>
-                  setFilters({ ...filters, district: e.target.value })
-                }
-                className="w-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!filters.state || filters.useRadius}
-              >
-                <option value="">All Districts</option>
-                {filters.state &&
-                  INDIAN_DISTRICTS[filters.state]?.map((district) => (
-                    <option key={district} value={district}>
-                      {district}
+              <div className="relative">
+                <select
+                  value={filters.state}
+                  onChange={(e) =>
+                    setFilters({ ...filters, state: e.target.value, district: "" })
+                  }
+                  className="w-full appearance-none border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={filters.useRadius}
+                >
+                  <option value="">All States</option>
+                  {INDIAN_STATES.map((state) => (
+                    <option key={state} value={state}>
+                      {state}
                     </option>
                   ))}
-              </select>
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover/input:text-indigo-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
+            <div className="relative group/input">
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-widest ml-1">
+                District
+              </label>
+              <div className="relative">
+                <select
+                  value={filters.district}
+                  onChange={(e) =>
+                    setFilters({ ...filters, district: e.target.value })
+                  }
+                  className="w-full appearance-none border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white px-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!filters.state || filters.useRadius}
+                >
+                  <option value="">All Districts</option>
+                  {filters.state &&
+                    INDIAN_DISTRICTS[filters.state]?.map((district) => (
+                      <option key={district} value={district}>
+                        {district}
+                      </option>
+                    ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover/input:text-indigo-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group/input">
+              <label className="block text-[10px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-widest ml-1">
                 Sport
               </label>
-              <input
-                placeholder="e.g. Football, Chess..."
-                value={filters.sport}
-                onChange={(e) =>
-                  setFilters({ ...filters, sport: e.target.value })
-                }
-                className="w-full border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder:text-gray-400"
-              />
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover/input:text-indigo-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  placeholder="e.g. Football, Chess..."
+                  value={filters.sport}
+                  onChange={(e) =>
+                    setFilters({ ...filters, sport: e.target.value })
+                  }
+                  className="w-full border border-gray-300/50 dark:border-gray-600/50 bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white pl-11 pr-4 py-3 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-gray-400 shadow-sm hover:shadow-md"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Reset Row */}
-          <div className="flex items-center justify-end gap-3">
+          {/* Stats & Reset Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50 relative z-10">
             {!loading && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                {tournaments.length} tournament{tournaments.length !== 1 ? "s" : ""} found
-                {activeCount < tournaments.length && (
-                  <span className="ml-1 text-green-600 dark:text-green-400"> · {activeCount} open</span>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
+                  {tournaments.length}
+                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  results found
+                </span>
+                {activeCount > 0 && activeCount < tournaments.length && (
+                  <>
+                    <span className="text-gray-300 dark:text-gray-600">•</span>
+                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {activeCount} active
+                    </span>
+                  </>
                 )}
-              </span>
+              </div>
             )}
+            
             <button
               onClick={() => {
                 setFilters({ district: "", state: "", sport: "", useRadius: false, radiusKm: "10" });
                 setLocation(null);
               }}
-              className="flex items-center gap-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+              className="flex items-center justify-center gap-2 text-sm bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all font-semibold shadow-sm hover:shadow active:scale-95"
             >
-              ✕ Reset
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Reset Filters
             </button>
           </div>
         </div>
@@ -381,7 +423,7 @@ export default function TournamentsBrowse() {
 
         {/* Loading */}
         {loading ? (
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
@@ -390,7 +432,7 @@ export default function TournamentsBrowse() {
             ))}
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {tournaments.map((t) => {
               const status = getTournamentStatus(t);
               const isInactive = !status.isActive;
@@ -432,18 +474,20 @@ export default function TournamentsBrowse() {
               return (
                 <div
                   key={t._id}
-                  className={`group relative rounded-2xl overflow-hidden shadow-lg transition-all duration-300 border-0 ${
+                  className={`group relative rounded-3xl overflow-hidden bg-white/70 dark:bg-gray-800/60 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 shadow-xl transition-all duration-500 flex flex-col ${
                     isInactive
                       ? "opacity-90 grayscale-[20%]"
-                      : "hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
+                      : "hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-300/50 dark:hover:border-indigo-500/50 cursor-pointer"
                   }`}
                 >
                   {/* ── COLORED HEADER STRIP ─────────────────────── */}
                   <div
-                    className={`relative bg-gradient-to-r ${
+                    className={`relative bg-gradient-to-br ${
                       isInactive ? "from-gray-400 to-gray-500" : headerGradient
-                    } px-5 pt-4 pb-10`}
+                    } px-6 pt-5 pb-12 overflow-hidden`}
                   >
+                    {/* Decorative pattern overlay */}
+                    <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "16px 16px" }}></div>
                     {/* Sport name + emoji */}
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{sportEmoji}</span>
@@ -468,8 +512,8 @@ export default function TournamentsBrowse() {
                       </div>
                     )}
 
-                    {/* Curved bottom edge */}
-                    <div className="absolute bottom-0 left-0 right-0 h-5 bg-white dark:bg-gray-800 rounded-t-[50%]" />
+                    {/* Bottom curved gradient shade */}
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent pointer-events-none rounded-t-[100%]" style={{ transform: "scaleX(1.5)", transformOrigin: "bottom center" }} />
                   </div>
 
                   {/* ── STATUS BANNER (replaces ribbon) ─────────────── */}
@@ -483,7 +527,7 @@ export default function TournamentsBrowse() {
                   )}
 
                   {/* ── CARD BODY ────────────────────────────────────── */}
-                  <div className="bg-white dark:bg-gray-800 px-5 pt-3 pb-5 space-y-2">
+                  <div className="px-6 pt-1 pb-6 space-y-4 flex-1 flex flex-col relative z-10">
 
                     {/* Open badge for active */}
                     {status.isActive && (
@@ -523,67 +567,42 @@ export default function TournamentsBrowse() {
                     </div>
 
                     {/* Entry fee */}
-                    <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full ${
+                    <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border ${
                       t.entryFee === 0
-                        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400"
-                        : "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-400"
+                        ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50"
+                        : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50"
                     }`}>
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       {t.entryFee === 0 ? "🎁 Free Entry" : `Entry: ₹${t.entryFee}`}
                     </div>
 
-                    {/* Divider */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-600 to-transparent !mt-3 !mb-1" />
+                    <div className="flex-1"></div> {/* Spacer to push buttons to bottom */}
 
-                    {/* CTA Buttons */}
-                    {status.isActive ? (
-                      <div className="space-y-2 !mt-3">
-                        <Link
-                          href={`/tournaments/${t._id}#register`}
-                          className="w-full block text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold py-2.5 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
-                        >
-                          ⚡ Join Now
-                        </Link>
-                        {t.location?.coordinates && (
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${t.location.coordinates[1]},${t.location.coordinates[0]}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full block text-center bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold py-2 px-4 rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 hover:scale-[1.02]"
-                          >
-                            📍 Show Location
-                          </a>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-2 !mt-3">
-                        <Link
-                          href={`/tournaments/${t._id}`}
-                          className="w-full block text-center bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm font-semibold py-2.5 px-4 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all border border-gray-200 dark:border-gray-600"
-                        >
-                          👁 View Details
-                        </Link>
-                        {t.location?.coordinates && (
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${t.location.coordinates[1]},${t.location.coordinates[0]}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full block text-center bg-gray-50 dark:bg-gray-700/60 text-gray-500 dark:text-gray-400 text-sm py-2 px-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all border border-gray-200 dark:border-gray-600"
-                          >
-                            📍 Show Location
-                          </a>
-                        )}
-                      </div>
-                    )}
+                    {/* Divider */}
+                    <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
+
+                    {/* CTA Button */}
+                    <div className="pt-2">
+                      <Link
+                        href={`/tournaments/${t._id}`}
+                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View Details
+                      </Link>
+                    </div>
                   </div>
                 </div>
               );
             })}
 
             {tournaments.length === 0 && (
-              <div className="md:col-span-3 text-center py-16">
+              <div className="md:col-span-3 sm:col-span-2 text-center py-16">
                 <div className="text-6xl mb-4">🔍</div>
                 <p className="text-xl font-semibold text-gray-600 dark:text-gray-400">
                   No tournaments found

@@ -30,7 +30,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
     >
       <button
         onClick={onToggle}
-        className="w-full text-left p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg transition-all duration-300"
+        className="w-full text-left p-4 sm:p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg transition-all duration-300"
       >
         <div className="flex items-start justify-between gap-4">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white pr-8 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -127,31 +127,28 @@ export default function Home() {
 
         {/* Modern Navigation */}
         <nav className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-lg shadow-sm fixed inset-x-0 top-0 z-40 border-b border-purple-200/20 dark:border-purple-500/30 transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-20 items-center">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-14 sm:h-20 items-center">
               <div className="flex items-center">
                 <Link href="/" className="flex items-center gap-2">
                   <img
                     src="/icon.png"
                     alt="Sportify"
-                    className="w-16 h-16 h-10 rounded-xl "
+                    className="w-10 h-10 sm:w-16 sm:h-16 rounded-xl"
                   />
-                  {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
-                  Sportify
-                </h1> */}
                 </Link>
               </div>
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-1.5 sm:gap-3 items-center">
                 {mounted && <ThemeToggle />}
                 <Link
                   href="/auth/login"
-                  className="px-5 py-2.5 text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
+                  className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
                 >
                   Login
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
                 >
                   Sign Up
                 </Link>
@@ -161,22 +158,22 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-12 sm:pb-24 relative z-10">
           {/* Super soft hero gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-950/10 dark:via-gray-950/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
 
           <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-5 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
               <span className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full animate-pulse" />
-              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+              <span className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-300">
                 India's Premier Sports Tournament Platform
               </span>
             </div>
 
             {/* Main Headline with Animated Taglines */}
-            <div className="mb-6 h-[200px] md:h-[240px] flex items-center justify-center">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center">
+            <div className="mb-4 sm:mb-6 h-[120px] sm:h-[200px] md:h-[240px] flex items-center justify-center">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center">
                 {taglines.map((tagline, index) => (
                   <div
                     key={index}
@@ -195,7 +192,7 @@ export default function Home() {
             </div>
 
             {/* Subheadline */}
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-10 max-w-3xl mx-auto leading-relaxed font-medium">
+            <p className="text-base sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-6 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               Organize, discover, and participate in local sports tournaments
               across India.
               <span className="text-purple-600 dark:text-purple-300 font-semibold">
@@ -206,7 +203,7 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 px-2">
               <Link
                 href="/auth/register"
                 className="group relative px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
@@ -239,17 +236,17 @@ export default function Home() {
           </div>
 
           {/* How Sportify Can Help You Section */}
-          <div className="mt-32">
-            <h2 className="text-4xl md:text-5xl font-black text-center mb-16">
+          <div className="mt-16 sm:mt-32">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
               <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 How Sportify Can Help You
               </span>
             </h2>
 
             {/* Role Cards - Glassmorphism */}
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {/* Organizers Card */}
-              <div className="group relative p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-purple-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 rounded-3xl transition-all duration-500" />
 
@@ -281,7 +278,7 @@ export default function Home() {
               </div>
 
               {/* Players Card */}
-              <div className="group relative p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-blue-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
@@ -312,7 +309,7 @@ export default function Home() {
               </div>
 
               {/* Sponsors Card */}
-              <div className="group relative p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-pink-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
@@ -346,19 +343,19 @@ export default function Home() {
           </div>
 
           {/* Key Features - 2x2 Grid with Sport Icons */}
-          <div className="mt-32">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+          <div className="mt-16 sm:mt-32">
+            <div className="text-center mb-8 sm:mb-16">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 Powerful Features
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
                 Everything you need to revolutionize sports tournaments
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto">
               {/* Feature 1 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
@@ -491,11 +488,11 @@ export default function Home() {
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-32 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-32">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-5 backdrop-blur-sm">
+        <div className="mt-16 sm:mt-32 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-16 sm:pb-32">
+          <div className="text-center mb-8 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
               <svg
-                className="w-5 h-5 text-purple-600 dark:text-purple-400"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -507,14 +504,14 @@ export default function Home() {
                   d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
+              <span className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-300">
                 Frequently Asked Questions
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
               Got Questions? We've Got Answers
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
               Everything you need to know about Sportify
             </p>
           </div>
@@ -598,9 +595,9 @@ export default function Home() {
         {/* Professional Footer */}
         <footer className="bg-gradient-to-b from-purple-100/80 to-slate-100/90 dark:from-gray-900/95 dark:to-gray-950/90 backdrop-blur-xl border-t border-purple-200/30 dark:border-purple-800/30 relative z-10 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
               {/* Brand */}
-              <div className="md:col-span-2">
+              <div className="col-span-2">
                 <div className="flex items-center gap-2 mb-4">
                   <img
                     src="/icon.png"
@@ -724,7 +721,7 @@ export default function Home() {
             </div>
 
             {/* Bottom Bar */}
-            <div className="pt-8 border-t border-purple-200/30 dark:border-purple-800/30 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="pt-6 sm:pt-8 border-t border-purple-200/30 dark:border-purple-800/30 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 © 2025 Sportify. Revolutionizing local sports in India.
               </p>

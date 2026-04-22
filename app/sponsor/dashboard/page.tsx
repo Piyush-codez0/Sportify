@@ -280,7 +280,7 @@ function SponsorDashboardContent() {
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
       />
-      <div className="pt-24 max-w-8xl mx-10 p-6 relative z-10">
+      <div className="pt-20 sm:pt-24 max-w-5xl mx-auto px-3 sm:px-6 lg:px-10 p-3 sm:p-6 relative z-10">
         <ProfileModal
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
@@ -495,8 +495,8 @@ function SponsorDashboardContent() {
             {error}
           </div>
         )}
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl">
-          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors h-[82vh] overflow-visible">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl">
+          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors min-h-[400px] md:h-[82vh] overflow-visible">
             {isProfileComplete && isPhoneVerified ? (
               <>
                 <h2 className="font-bold text-lg mb-4 text-gray-900 dark:text-white transition-colors bg-gradient-to-r from-blue-600 to-slate-600 bg-clip-text text-transparent">
@@ -1258,7 +1258,7 @@ function SponsorDashboardContent() {
                         </li>
                       </ul>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                         <div className="text-sm font-semibold text-gray-600 dark:text-gray-400">
                           Total Sponsorships
