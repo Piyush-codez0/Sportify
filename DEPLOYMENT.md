@@ -77,7 +77,33 @@ If successful, you should see: ✓ Compiled successfully
 
 ## Step 6: Deploy to Vercel
 
-### Option A: Using Vercel CLI (Recommended)
+### ⚠️ Important: Plan Limitations
+
+Your project has **20+ API routes**, but Vercel's **Hobby plan only supports 12 serverless functions**.
+
+#### Solutions:
+
+**Option A: Upgrade to Pro Plan (Recommended)**
+
+- Go to https://vercel.com/account/plan
+- Upgrade to **Pro ($20/month)**
+- Pro plan supports unlimited serverless functions
+- Then proceed with deployment
+
+**Option B: Deploy via GitHub (Automatic CI/CD)**
+
+- Connected Git repository: `https://github.com/Piyush-codez0/Sportify`
+- Go to https://vercel.com/import and select your GitHub repo
+- Vercel will prompt you to upgrade if needed
+- Environment variables auto-sync from your `.env.local`
+
+**Option C: Consolidate API Routes (Advanced)**
+
+- Combine multiple route handlers into fewer functions
+- Requires code refactoring
+- Not recommended for first deployment
+
+### Option A: Using Vercel CLI (Recommended after upgrade)
 
 1. Install Vercel CLI globally:
 
@@ -91,13 +117,15 @@ npm i -g vercel
 vercel login
 ```
 
-3. Deploy:
+3. **Upgrade your account to Pro** on https://vercel.com/account/plan
+
+4. Deploy:
 
 ```bash
-vercel
+vercel --prod
 ```
 
-4. When prompted:
+5. When prompted:
 
    - Set up and deploy? **Y**
    - Which scope? Select your account
@@ -106,7 +134,7 @@ vercel
    - Directory: `./` (press Enter)
    - Override settings? **N**
 
-5. Add environment variables:
+6. Add environment variables:
 
 ```bash
 vercel env add MONGODB_URI

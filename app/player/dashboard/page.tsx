@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import DashboardNavbar from "@/components/DashboardNavbar";
 import ProfileModal from "@/components/ProfileModal";
 
 interface Registration {
@@ -53,50 +54,15 @@ export default function PlayerDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
       <SportsDoodlesBackground />
-      <div className="max-w-5xl mx-auto p-6 relative z-10">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
-            <img
-              src="/icon.png"
-              alt="Sportify"
-              className="w-12 h-12 rounded-xl shadow-lg"
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-                Player Dashboard
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
-                Welcome, {user?.name}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowProfile(true)}
-              className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 font-medium transition-colors flex items-center gap-2"
-            >
-              <img
-                src={
-                  user?.city &&
-                  user?.state &&
-                  user?.gender &&
-                  user?.phoneVerified
-                    ? "https://t4.ftcdn.net/jpg/15/25/88/35/360_F_1525883513_jKfrd0siKwgg0vdNFL10xafVcjIOjxel.jpg"
-                    : "https://t3.ftcdn.net/jpg/07/51/48/94/360_F_751489462_vwzozYQfB2rQXOYyOrU7sF2awHI2jTEg.jpg"
-                }
-                alt="Profile"
-                className="w-5 h-5 rounded"
-              />
-              Profile
-            </button>
-            <button
-              onClick={logout}
-              className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
+      <DashboardNavbar
+        title="Player Dashboard"
+        userName={user?.name || "User"}
+        userProfileComplete={Boolean(user?.city && user?.state && user?.gender)}
+        userPhoneVerified={Boolean(user?.phoneVerified)}
+        onProfileClick={() => setShowProfile(true)}
+        onLogout={logout}
+      />
+      <div className="pt-24 max-w-5xl mx-auto p-6 relative z-10">
         <ProfileModal
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
@@ -104,9 +70,9 @@ export default function PlayerDashboard() {
         <div className="mb-4">
           <Link
             href="/tournaments"
-            className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm transition-colors"
+            className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium transition-colors"
           >
-            Browse Tournaments
+            ← Browse Tournaments
           </Link>
         </div>
         {error && (

@@ -575,8 +575,349 @@ vercel --prod
 
 ---
 
+## ❓ Frequently Asked Questions (FAQ)
+
+### **General Questions**
+
+<details>
+<summary><b>Q: Is Sportify free to use?</b></summary>
+
+A: Sportify is open-source and free to self-host! However, tournament organizers can charge entry fees for their tournaments, which are processed through Razorpay. Sponsors submit proposals directly to organizers.
+
+</details>
+
+<details>
+<summary><b>Q: Can I use Sportify outside of India?</b></summary>
+
+A: Sportify is designed specifically for India (uses Indian states/districts, Razorpay for payments, supports Aadhar verification). However, you can modify the codebase to support other countries by updating location data and payment gateways.
+
+</details>
+
+<details>
+<summary><b>Q: Do I need to buy a domain?</b></summary>
+
+A: Not initially! You can deploy on Vercel's free plan and get a `*.vercel.app` domain. You can add a custom domain later via Vercel settings.
+
+</details>
+
+### **Setup & Installation**
+
+<details>
+<summary><b>Q: I'm getting "MongoDB connection failed" error</b></summary>
+
+A: Common causes:
+
+- **IP Whitelist**: MongoDB Atlas → Network Access → Add your IP (0.0.0.0/0 for anywhere)
+- **Wrong Connection String**: Copy fresh from MongoDB Atlas → Connect → Drivers
+- **Special Characters in Password**: URL-encode password if it contains `@`, `#`, `!`, etc.
+- **Wrong Database Name**: Ensure connection string ends with `/sportify`
+
+</details>
+
+<details>
+<summary><b>Q: How do I generate a secure JWT_SECRET?</b></summary>
+
+A: Run in your terminal:
+
+```bash
+# macOS/Linux
+openssl rand -base64 32
+
+# Windows PowerShell
+-join ((65..90) + (97..122) + (48..57) | Get-Random -Count 32 | ForEach-Object {[char]$_})
+
+# Node.js (all platforms)
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+</details>
+
+<details>
+<summary><b>Q: My Gmail emails aren't being sent</b></summary>
+
+A: Check these:
+
+- **App Password Generated**: Settings → 2-Step Verification → App passwords (NOT your Gmail password)
+- **Correct Format**: Should be 16 characters without spaces
+- **Less Secure Apps**: If using regular password, enable "Less secure app access"
+- **SMTP Settings**: Verify `EMAIL_USER` and `EMAIL_PASSWORD` in `.env.local`
+
+</details>
+
+<details>
+<summary><b>Q: How do I fix "Cloudinary upload failed"?</b></summary>
+
+A: Verify:
+
+- **Correct Credentials**: Copy from Cloudinary Dashboard → Account Details
+- **API Secret Correct**: Don't use API Key for secret (they're different)
+- **File Size**: Aadhar upload limited to 5MB
+- **File Type**: Only JPG, PNG, PDF allowed
+
+</details>
+
+### **Development & Testing**
+
+<details>
+<summary><b>Q: How do I test payments without real money?</b></summary>
+
+A: Use Razorpay test mode:
+
+1. Login to Razorpay → Toggle "Test Mode" (top right)
+2. Use test card: `4111 1111 1111 1111`
+3. Any future expiry date and any CVV
+4. OTP auto-approves as `123456`
+
+**Important**: Switch to live keys only in production with production Razorpay account.
+
+</details>
+
+<details>
+<summary><b>Q: How do I test location-based features?</b></summary>
+
+A:
+
+- **Use Browser DevTools**: Open DevTools → More tools → Sensors → Set location
+- **Or use fixed coordinates**: Edit components to use hardcoded lat/lng for testing
+- **Test radius search**: Create tournaments at different locations, then filter by distance
+
+</details>
+
+<details>
+<summary><b>Q: Can I test without uploading real Aadhar?</b></summary>
+
+A: Yes! In development mode, upload any image file. The system validates file format but not content. For production, implement proper Aadhar validation.
+
+</details>
+
+<details>
+<summary><b>Q: How do I debug API route errors?</b></summary>
+
+A:
+
+- **Check Terminal**: npm run dev shows real-time errors
+- **Browser Console**: Press F12 → Console tab
+- **Network Tab**: Check API request/response in DevTools
+- **Logs**: Most errors are logged with descriptive messages
+
+</details>
+
+### **Deployment & Production**
+
+<details>
+<summary><b>Q: Why can't I deploy to Vercel Hobby plan?</b></summary>
+
+A: Your project has 21 API routes, but Hobby plan only allows 12 serverless functions. Solutions:
+
+1. **Upgrade to Pro** ($20/month) - easiest option
+2. **Consolidate API routes** - combine similar endpoints (advanced)
+3. **Deploy elsewhere** - use Render, Railway, or AWS Lambda
+
+</details>
+
+<details>
+<summary><b>Q: How do I connect a custom domain?</b></summary>
+
+A: After deployment on Vercel:
+
+1. Buy domain from GoDaddy, Namecheap, etc.
+2. Vercel Dashboard → Settings → Domains → Add domain
+3. Update nameservers to Vercel's (instructions provided)
+4. Wait 24-48 hours for DNS propagation
+
+</details>
+
+<details>
+<summary><b>Q: Should I use MongoDB Atlas free tier in production?</b></summary>
+
+A: **Not recommended** for production:
+
+- Free tier has storage limits (512MB)
+- No automatic backups
+- Limited performance
+- Upgrade to M2 ($9/month) or higher for production
+
+</details>
+
+<details>
+<summary><b>Q: How do I enable HTTPS?</b></summary>
+
+A: Vercel automatically handles HTTPS with free SSL certificate. Your domain will use `https://yourdomain.com` by default.
+
+</details>
+
+### **Features & Functionality**
+
+<details>
+<summary><b>Q: Can organizers edit tournaments after publishing?</b></summary>
+
+A: Currently, tournaments are immutable after publishing. To change details, organizers must create a new tournament. You can modify the code to allow edits if needed.
+
+</details>
+
+<details>
+<summary><b>Q: Can players withdraw registrations and get refunds?</b></summary>
+
+A: Currently not implemented. To add this:
+
+1. Create withdrawal API endpoint
+2. Validate withdrawal window (e.g., 3 days before tournament)
+3. Integrate Razorpay refund API
+4. Send confirmation email
+
+</details>
+
+<details>
+<summary><b>Q: How are teams managed in team tournaments?</b></summary>
+
+A: Captain registers with full roster:
+
+- Captain provides player names and contact info
+- Team members don't need individual accounts
+- Organizer receives full roster with captain's details
+- Payment is per team, not per player
+
+</details>
+
+<details>
+<summary><b>Q: Can sponsorships be auto-approved?</b></summary>
+
+A: Currently, organizers manually approve sponsorships. To auto-approve:
+
+1. Modify `/api/organizer/sponsorships/[id]/approve`
+2. Add auto-approval threshold (e.g., pre-approved sponsors)
+3. Update status automatically
+
+</details>
+
+### **Performance & Optimization**
+
+<details>
+<summary><b>Q: Why is the app loading slowly?</b></summary>
+
+A: Check:
+
+- **MongoDB Query**: Ensure indexes exist on frequently queried fields
+- **Image Optimization**: Verify Cloudinary is configured
+- **Bundle Size**: Run `npm run build` and check output
+- **Network**: Check DevTools Network tab for slow requests
+- **Vercel Cold Start**: First request may take 5-10s (expected)
+
+</details>
+
+<details>
+<summary><b>Q: How many concurrent users can the app handle?</b></summary>
+
+A: Depends on:
+
+- **MongoDB Atlas tier**: Free tier ~100, Pro tier ~1000+
+- **Vercel Plan**: Pro plan scales better
+- **Database optimization**: Proper indexing is critical
+- **Caching**: Implement Redis for high-traffic scenarios
+
+For scale beyond 10k concurrent users, consider upgrading to dedicated database and server infrastructure.
+
+</details>
+
+### **Security & Data**
+
+<details>
+<summary><b>Q: How is user data protected?</b></summary>
+
+A: Security measures:
+
+- **Password Hashing**: bcryptjs with salt rounds = 10
+- **JWT Tokens**: 30-day expiration, signed with JWT_SECRET
+- **HTTPS**: Enforced in production
+- **Aadhar Documents**: Uploaded to Cloudinary (encrypted storage)
+- **Payment Verification**: HMAC SHA256 signature validation
+- **Environment Variables**: Sensitive data never in code
+
+</details>
+
+<details>
+<summary><b>Q: Can I export user data for backups?</b></summary>
+
+A: Yes! MongoDB Atlas provides:
+
+- **Automated Backups**: Enabled by default
+- **Manual Export**: MongoDB → BSON or JSON
+- **Mongodump**: CLI tool for backups
+
+```bash
+mongodump --uri="your_mongodb_uri" --out ./backup
+```
+
+</details>
+
+<details>
+<summary><b>Q: How do I reset a user's password?</b></summary>
+
+A: Currently not implemented. To add password reset:
+
+1. Create "Forgot Password" page
+2. Generate temporary reset token (expires in 1 hour)
+3. Send reset link via email
+4. Validate token and allow password reset
+5. Invalidate all sessions after reset
+
+</details>
+
+### **Troubleshooting**
+
+<details>
+<summary><b>Q: Build fails with "next: command not found"</b></summary>
+
+A:
+
+```bash
+# Clear dependencies and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+```
+
+</details>
+
+<details>
+<summary><b>Q: Image uploads show broken image icon</b></summary>
+
+A: Check:
+
+- Cloudinary credentials are correct
+- Image URLs use HTTPS
+- Cloudinary URL is added to `next.config.ts` remotePatterns
+- Image dimensions don't exceed limits
+
+</details>
+
+<details>
+<summary><b>Q: Payment verification fails after successful transaction</b></summary>
+
+A: Verify:
+
+- Razorpay secret in `.env.local` is correct
+- HMAC verification logic is correct
+- Signature matches server calculation
+- Check Razorpay webhook logs
+
+</details>
+
+<details>
+<summary><b>Q: Dark mode toggle doesn't persist</b></summary>
+
+A: The theme context stores preference in browser localStorage. Check:
+
+- LocalStorage is enabled in browser
+- No browser privacy mode active
+- Cache is cleared after code updates
+
+</details>
+
+---
 
 =======
+
 ## 👥 Team
 
 **Project**: Sportify - Sports Tournament Management Platform  

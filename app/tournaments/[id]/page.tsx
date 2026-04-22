@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import DashboardNavbar from "@/components/DashboardNavbar";
 import MapDisplay from "@/components/MapDisplay";
 
 interface Tournament {
@@ -328,44 +329,34 @@ export default function TournamentDetailPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
       <SportsDoodlesBackground />
-      <div className="max-w-5xl mx-auto px-6 relative z-10">
+      {token && (
+        <DashboardNavbar
+          title={tournament ? `${tournament.sport} Tournament` : "Tournament Details"}
+          userName={user?.name || "User"}
+          userProfileComplete={Boolean(
+            user?.city && user?.state && user?.gender
+          )}
+          userPhoneVerified={Boolean(user?.phoneVerified)}
+          onProfileClick={() => {}}
+          onLogout={() => {}}
+        />
+      )}
+      <div
+        className={`${
+          token ? "pt-24" : ""
+        } py-8 max-w-5xl mx-auto px-6 relative z-10`}
+      >
         <div className="bg-white/90 dark:bg-[#1E2939]/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-colors overflow-hidden">
           {/* Header with gradient background */}
           <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 p-8 text-white">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <img
-                  src="/icon.png"
-                  alt="Sportify"
-                  className="w-10 h-10 rounded-xl shadow-lg"
-                />
-                <Link
-                  href="/"
-                  className="text-lg font-bold text-white hover:opacity-80 transition-opacity"
-                >
-                  Sportify
-                </Link>
-              </div>
               <h1 className="text-4xl font-bold mb-3 drop-shadow-lg">
-                {tournament.name}
-              </h1>
-              <p className="text-lg font-semibold mb-3 text-white/90">
                 {tournament.sport} Tournament
-              </p>
+              </h1>
               <div className="flex flex-wrap items-center gap-4 text-white/90">
-                {/* <div className="flex items-center gap-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
-                  </svg>
-                  <span className="font-medium">Tournament: {tournament.name}</span>
-                </div> */}
                 <div className="flex items-center gap-2">
                   <svg
                     className="w-5 h-5"
@@ -643,20 +634,79 @@ export default function TournamentDetailPage() {
             )}
 
             {/* Primary CTAs: Player Register and Sponsor */}
-            <div className="mb-6 flex flex-col sm:flex-row gap-4">
-              <Link
-                href={`/auth/register?role=player`}
-                className="flex-1 text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
-              >
-                🚀 Register as Player
-              </Link>
-              <Link
-                href={`/auth/register?role=sponsor&tournamentId=${id}`}
-                className="flex-1 text-center bg-white dark:bg-gray-800 border-2 border-purple-400 dark:border-purple-600 text-purple-700 dark:text-purple-300 font-semibold py-3.5 px-6 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-600 dark:hover:border-purple-500 transition-all duration-300 hover:scale-[1.02]"
-              >
-                💼 Sponsor This Tournament
-              </Link>
-            </div>
+            {(() => {
+              const now = new Date();
+              now.setHours(0, 0, 0, 0);
+
+              const isTournamentEnded =
+                tournament.endDate && new Date(tournament.endDate) < now;
+
+              const isRegistrationClosed =
+                (tournament.registrationDeadline &&
+                  (() => {
+                    const deadline = new Date(tournament.registrationDeadline);
+                    deadline.setHours(0, 0, 0, 0);
+                    return deadline < now;
+                  })()) ||
+                ["closed", "completed", "cancelled", "ongoing"].includes(
+                  (tournament as any).status || ""
+                );
+
+              if (isTournamentEnded) {
+                return (
+                  <div className="mb-6 flex items-center gap-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-6 py-5">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl">
+                      🏁
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                        Tournament Has Ended
+                      </p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                        This tournament has concluded. Registration and
+                        sponsorship are no longer available.
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isRegistrationClosed) {
+                return (
+                  <div className="mb-6 flex items-center gap-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-700 rounded-xl px-6 py-5">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-2xl">
+                      🔒
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-red-700 dark:text-red-400">
+                        Registration Closed
+                      </p>
+                      <p className="text-sm text-red-500 dark:text-red-400 mt-0.5">
+                        The registration deadline for this tournament has passed.
+                        You can no longer register as a player or sponsor.
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href={`/auth/register?role=player`}
+                    className="flex-1 text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
+                  >
+                    🚀 Register as Player
+                  </Link>
+                  <Link
+                    href={`/auth/register?role=sponsor&tournamentId=${id}`}
+                    className="flex-1 text-center bg-white dark:bg-gray-800 border-2 border-purple-400 dark:border-purple-600 text-purple-700 dark:text-purple-300 font-semibold py-3.5 px-6 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-600 dark:hover:border-purple-500 transition-all duration-300 hover:scale-[1.02]"
+                  >
+                    💼 Sponsor This Tournament
+                  </Link>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>

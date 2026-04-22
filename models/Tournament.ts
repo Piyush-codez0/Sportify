@@ -51,12 +51,12 @@ const TournamentSchema = new Schema<ITournament>(
   {
     name: {
       type: String,
-      required: [true, "Tournament name is required"],
+      required: [true, "Organiser's name is required"],
       trim: true,
     },
     sport: {
       type: String,
-      required: [true, "Sport type is required"],
+      required: [true, "Sport name is required"],
       trim: true,
     },
     description: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Tournament from "@/models/Tournament";
+import "@/models/User"; // register User schema so .populate("organizer") works
 import { requireRole, AuthenticatedRequest } from "@/lib/middleware";
 
 // GET: Fetch all tournaments with filters

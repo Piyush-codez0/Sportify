@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import DashboardNavbar from "@/components/DashboardNavbar";
 
 interface Registration {
   _id: string;
@@ -245,28 +246,17 @@ export default function TournamentRegistrations() {
   return (
     <div className="relative min-h-screen bg-white dark:bg-gray-900 transition-colors">
       <SportsDoodlesBackground />
-
-      <div className="relative z-10 max-w-7xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <img
-              src="/icon.png"
-              alt="Sportify"
-              className="w-10 h-10 rounded-xl shadow-lg"
-            />
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {sport} <span>Tournament Player Registrations</span>
-              </h1>
-              
-            </div>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 transition-colors">
-            Manage and verify participant registrations for this tournament
-          </p>
-        </div>
-
+      <DashboardNavbar
+        title={
+          `${sport} Tournament Registrations` || "Tournament Registrations"
+        }
+        userName={user?.name || "User"}
+        userProfileComplete={Boolean(user?.city && user?.state && user?.gender)}
+        userPhoneVerified={Boolean(user?.phoneVerified)}
+        onProfileClick={() => {}}
+        onLogout={() => {}}
+      />
+      <div className="relative z-10 pt-24 max-w-7xl mx-auto p-6">
         {/* Error Message */}
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-lg flex items-start gap-3 transition-colors">

@@ -12,39 +12,40 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // Initialize theme by reading from DOM to avoid hydration mismatch
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme") as Theme | null;
-      if (savedTheme) {
-        return savedTheme;
-      }
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return "light";
-  });
+  const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
+  // Initialize theme on mount
   useEffect(() => {
-    setMounted(true);
-    // Sync with the current state (class should already be set by script in head)
     const savedTheme = localStorage.getItem("theme") as Theme | null;
     const currentTheme =
       savedTheme ||
       (window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light");
+
     setTheme(currentTheme);
+
+    // Apply theme to DOM
+    if (currentTheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
+
+    // Update state
     setTheme(newTheme);
+
+    // Save to localStorage
     localStorage.setItem("theme", newTheme);
 
-    // Explicitly remove or add the class
+    // Update DOM class immediately
     if (newTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {

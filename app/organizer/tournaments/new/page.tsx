@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import DashboardNavbar from "@/components/DashboardNavbar";
 import LocationPicker from "@/components/LocationPicker";
 import { INDIAN_STATES } from "@/lib/indianStates";
 import Stepper, { Step } from "@/components/Stepper";
@@ -381,51 +382,36 @@ export default function NewTournamentPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 transition-colors relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 transition-colors relative overflow-hidden">
       <SportsDoodlesBackground />
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10">
-        {/* Header Section */}
-        <div className="flex-shrink-0 px-6 pt-6 pb-2">
-          {/* Header with Logo */}
-          <div className="flex items-center gap-4 mb-2">
-            <div className="relative">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-slate-500 rounded-2xl blur opacity-30"></div>
-              <img
-                src="/icon.png"
-                alt="Sportify"
-                className="relative w-12 h-12 rounded-xl shadow-xl"
+      <DashboardNavbar
+        title="Create a Tournament"
+        userName={user?.name || "User"}
+        userProfileComplete={isProfileComplete}
+        userPhoneVerified={isPhoneVerified}
+        onProfileClick={() => {}}
+        onLogout={() => {}}
+      />
+      <div className="pt-24 px-6 py-6 relative z-10 flex flex-col h-[calc(100vh-6rem)]">
+        {error && (
+          <div className="text-sm bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg border border-red-200 dark:border-red-800 transition-colors shadow-sm flex items-center gap-1 mb-4">
+            <svg
+              className="w-4 h-4 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
               />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-slate-600 dark:from-blue-400 dark:to-slate-400 bg-clip-text text-transparent">
-                Create a Tournament
-              </h1>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                Fill in the details to organize your event
-              </p>
-            </div>
+            </svg>
+            <span>{error}</span>
           </div>
-
-          {error && (
-            <div className="text-sm bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg border border-red-200 dark:border-red-800 transition-colors shadow-sm flex items-center gap-1">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>{error}</span>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Main Card Container - Fills remaining space */}
-        <div className="flex-1 overflow-auto px-6 pb-6">
+        <div className="flex-1 overflow-auto">
           <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col h-full max-w-4xl mx-auto w-full">
             {/* Organizer Info Header */}
             <div className="relative bg-gradient-to-r from-blue-600 via-slate-600 to-blue-700 flex-shrink-0 p-4">

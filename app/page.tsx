@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Pointer } from "@/components/ui/pointer";
-import LoadingScreen from "@/components/LoadingScreen";
+import SmoothScroll from "@/components/SmoothScroll";
+
 import { motion, AnimatePresence } from "framer-motion";
 
 // FAQ Item Component
@@ -79,7 +80,7 @@ export default function Home() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [currentTagline, setCurrentTagline] = useState(0);
-  const [showLoading, setShowLoading] = useState(true);
+
   const [mounted, setMounted] = useState(false);
   const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
 
@@ -100,13 +101,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoading(false);
-    }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -120,16 +115,13 @@ export default function Home() {
     }
   }, [user, isLoading, router]);
 
-  if (isLoading || !mounted || showLoading) {
-    return <LoadingScreen />;
-  }
 
   return (
-    <>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-gray-950 dark:via-purple-950/30 dark:to-gray-950 relative overflow-hidden transition-colors">
+    <SmoothScroll>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 relative overflow-hidden transition-colors">
         {/* Mesh gradient background */}
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/10 via-transparent to-transparent dark:from-purple-500/20" />
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/10 via-transparent to-transparent dark:from-blue-500/20" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/10 via-transparent to-transparent dark:from-purple-500/[0.07]" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/10 via-transparent to-transparent dark:from-blue-500/[0.07]" />
 
         <SportsDoodlesBackground />
 
@@ -150,7 +142,7 @@ export default function Home() {
                 </Link>
               </div>
               <div className="flex gap-3 items-center">
-                <ThemeToggle />
+                {mounted && <ThemeToggle />}
                 <Link
                   href="/auth/login"
                   className="px-5 py-2.5 text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
@@ -171,7 +163,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 relative z-10">
           {/* Super soft hero gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-900/5 dark:via-blue-900/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-950/10 dark:via-gray-950/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
 
           <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
@@ -760,6 +752,6 @@ export default function Home() {
           </div>
         </footer>
       </div>
-    </>
+    </SmoothScroll>
   );
 }

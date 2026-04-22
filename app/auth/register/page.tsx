@@ -19,7 +19,7 @@ function RegisterContent() {
     name: "",
     email: "",
     password: "",
-    phone: "",
+    phone: "+91 ",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,10 +68,10 @@ function RegisterContent() {
   }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-4 relative transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-8 relative transition-colors">
       <SportsDoodlesBackground />
-      <div className="max-w-3xl w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+      <div className="max-w-2xl w-full relative z-10">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
           <BorderBeam
             size={150}
             duration={14}
@@ -259,7 +259,7 @@ function RegisterContent() {
                 <div className="grid md:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 transition-colors">
-                      Full Name
+                      Name
                     </label>
                     <input
                       type="text"
@@ -269,7 +269,7 @@ function RegisterContent() {
                         setFormData({ ...formData, name: e.target.value })
                       }
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                      placeholder=""
+                      placeholder="Enter your full name"
                     />
                   </div>
 
@@ -281,11 +281,23 @@ function RegisterContent() {
                       type="tel"
                       required
                       value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
+                      maxLength={14}
+                      onChange={(e) => {
+                        let value = e.target.value;
+                        // Ensure it always starts with +91 
+                        if (!value.startsWith("+91 ")) {
+                          value = "+91 ";
+                        }
+                        // Only allow digits after +91 
+                        const numberPart = value.slice(4);
+                        const cleanedNumber = numberPart.replace(/\D/g, "").slice(0, 10);
+                        setFormData({
+                          ...formData,
+                          phone: "+91 " + cleanedNumber,
+                        });
+                      }}
                       className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                      placeholder=""
+                      placeholder="10-digit mobile number"
                     />
                   </div>
                 </div>
@@ -302,7 +314,7 @@ function RegisterContent() {
                       setFormData({ ...formData, email: e.target.value })
                     }
                     className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
-                    placeholder=""
+                    placeholder="Enter your email address"
                   />
                 </div>
 

@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import DashboardNavbar from "@/components/DashboardNavbar";
 import { motion } from "motion/react";
 import { MapPin, CalendarDays, Check } from "lucide-react";
 import ProfileModal from "@/components/ProfileModal";
@@ -83,6 +84,9 @@ function SponsorDashboardContent() {
   const [sponsorshipFilter, setSponsorshipFilter] = useState<
     "all" | "pending" | "approved" | "rejected"
   >("all");
+  const [deadlineSort, setDeadlineSort] = useState<"soonest" | "latest">(
+    "soonest"
+  );
 
   const selectedTournamentId = selectedTournament?._id;
 
@@ -102,6 +106,24 @@ function SponsorDashboardContent() {
     }),
     [sponsorships]
   );
+
+  const availableTournaments = useMemo(() => {
+    const now = new Date();
+    const filtered = tournaments.filter((t) => {
+      try {
+        const d = new Date(t.registrationDeadline);
+        return !isNaN(d.getTime()) && d >= now;
+      } catch {
+        return false;
+      }
+    });
+    filtered.sort((a, b) => {
+      const da = new Date(a.registrationDeadline).getTime();
+      const db = new Date(b.registrationDeadline).getTime();
+      return deadlineSort === "soonest" ? da - db : db - da;
+    });
+    return filtered;
+  }, [tournaments, deadlineSort]);
 
   useEffect(() => {
     if (!token) return;
@@ -250,50 +272,15 @@ function SponsorDashboardContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
       <SportsDoodlesBackground />
-      <div className="max-w-6xl mx-auto p-6 relative z-10">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <img
-              src="/icon.png"
-              alt="Sportify"
-              className="w-12 h-12 rounded-xl shadow-lg"
-            />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-                Sponsor Dashboard
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 transition-colors">
-                Welcome, {user?.name}
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowProfile(true)}
-              className="bg-indigo-600 dark:bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 font-medium transition-colors flex items-center gap-2"
-            >
-              <img
-                src={
-                  user?.city &&
-                  user?.state &&
-                  user?.gender &&
-                  user?.phoneVerified
-                    ? "https://t4.ftcdn.net/jpg/15/25/88/35/360_F_1525883513_jKfrd0siKwgg0vdNFL10xafVcjIOjxel.jpg"
-                    : "https://t3.ftcdn.net/jpg/07/51/48/94/360_F_751489462_vwzozYQfB2rQXOYyOrU7sF2awHI2jTEg.jpg"
-                }
-                alt="Profile"
-                className="w-5 h-5 rounded"
-              />
-              Profile
-            </button>
-            <button
-              onClick={logout}
-              className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600 font-medium transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
+      <DashboardNavbar
+        title="Sponsor Dashboard"
+        userName={user?.name || "User"}
+        userProfileComplete={isProfileComplete}
+        userPhoneVerified={isPhoneVerified}
+        onProfileClick={() => setShowProfile(true)}
+        onLogout={logout}
+      />
+      <div className="pt-24 max-w-8xl mx-10 p-6 relative z-10">
         <ProfileModal
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
@@ -309,10 +296,10 @@ function SponsorDashboardContent() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Tournament Details
                 </h2>
@@ -325,7 +312,7 @@ function SponsorDashboardContent() {
               </div>
 
               {/* Content */}
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-6 overflow-y-auto flex-1">
                 {/* Tournament Info */}
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
@@ -385,10 +372,9 @@ function SponsorDashboardContent() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Participants
+                        Max Participants
                       </span>
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        {selectedTournamentDetails.currentParticipants} /{" "}
                         {selectedTournamentDetails.maxParticipants}
                       </span>
                     </div>
@@ -419,17 +405,7 @@ function SponsorDashboardContent() {
                   <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                     Contact Information
                   </h4>
-                  <div className="space-y-3">
-                    {selectedTournamentDetails.contactEmail && (
-                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                          Email
-                        </p>
-                        <p className="font-semibold text-gray-900 dark:text-white break-all">
-                          {selectedTournamentDetails.contactEmail}
-                        </p>
-                      </div>
-                    )}
+                  <div className="grid grid-cols-2 gap-4">
                     {selectedTournamentDetails.contactPhone && (
                       <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
@@ -437,6 +413,16 @@ function SponsorDashboardContent() {
                         </p>
                         <p className="font-semibold text-gray-900 dark:text-white">
                           {selectedTournamentDetails.contactPhone}
+                        </p>
+                      </div>
+                    )}
+                    {selectedTournamentDetails.contactEmail && (
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          Email
+                        </p>
+                        <p className="font-semibold text-gray-900 dark:text-white break-all">
+                          {selectedTournamentDetails.contactEmail}
                         </p>
                       </div>
                     )}
@@ -464,13 +450,29 @@ function SponsorDashboardContent() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-6 flex gap-3">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6 flex gap-3 flex-col md:flex-row">
                   <button
                     onClick={() => setSelectedTournamentDetails(null)}
                     className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
                   >
                     Close
                   </button>
+                  {selectedTournamentDetails.googleMapsLink && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        window.open(
+                          selectedTournamentDetails.googleMapsLink,
+                          "_blank"
+                        );
+                      }}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium shadow-lg flex items-center justify-center gap-2"
+                    >
+                      <MapPin size={18} />
+                      Get Directions
+                    </motion.button>
+                  )}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -493,8 +495,8 @@ function SponsorDashboardContent() {
             {error}
           </div>
         )}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors h-[82vh] overflow-visible">
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl">
+          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors h-[82vh] overflow-visible">
             {isProfileComplete && isPhoneVerified ? (
               <>
                 <h2 className="font-bold text-lg mb-4 text-gray-900 dark:text-white transition-colors bg-gradient-to-r from-blue-600 to-slate-600 bg-clip-text text-transparent">
@@ -510,7 +512,7 @@ function SponsorDashboardContent() {
                   </motion.div>
                 )}
                 {/* Stepper for sponsorship creation */}
-                <div className="flex-1 flex flex-col overflow-visible bg-white dark:bg-gray-800 rounded-xl">
+                <div className="flex-1 flex flex-col overflow-visible dark:bg-gray-800 rounded-xl">
                   <Stepper
                     initialStep={stepperStep}
                     onFinalStepCompleted={handleFinalSubmit}
@@ -772,31 +774,33 @@ function SponsorDashboardContent() {
                   <h2 className="font-semibold text-gray-900 dark:text-white transition-colors">
                     Available Tournaments
                   </h2>
-                  <button
-                    onClick={() => setShowTournamentsList(false)}
-                    className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                  >
-                    ✕ Back
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowTournamentsList(false)}
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                    >
+                      ✕ Back
+                    </button>
+                  </div>
                 </div>
                 {loading ? (
-                  <div className="text-gray-900 dark:text-white transition-colors">
+                  <div className="text-gray-900 dark:text-white transition-colors m-50">
                     Loading tournaments...
                   </div>
                 ) : (
-                  <div className="grid md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto p-2">
-                    {tournaments.length === 0 ? (
-                      <div className="col-span-2 text-center py-8 text-gray-600 dark:text-gray-400">
+                  <div className="grid grid-cols-1 gap-5 max-h-[600px] overflow-y-auto p-2">
+                    {availableTournaments.length === 0 ? (
+                      <div className="col-span-1 text-center py-8 text-gray-600 dark:text-gray-400">
                         <p className="text-lg">📭 No tournaments available</p>
                         <p className="text-sm mt-2">
                           Check back later for new tournaments
                         </p>
                       </div>
                     ) : (
-                      tournaments.map((t) => (
+                      availableTournaments.map((t) => (
                         <motion.div
                           key={t._id}
-                          className={`border rounded-2xl p-5 shadow-md hover:shadow-xl transition-all cursor-pointer ${
+                          className={`border rounded-2xl p-6 shadow-md hover:shadow-xl transition-all cursor-pointer ${
                             selectedTournamentId === t._id
                               ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-400"
                               : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-500"
@@ -830,7 +834,7 @@ function SponsorDashboardContent() {
                               {new Date(t.startDate).toLocaleDateString()}
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-2 mt-3">
+                          <div className="grid grid-cols-2 gap-3 mt-4">
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
@@ -966,7 +970,7 @@ function SponsorDashboardContent() {
                                   ).toLocaleDateString()}
                                 </div>
                               </div>
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="grid grid-cols-2 gap-3 mt-2">
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -999,20 +1003,22 @@ function SponsorDashboardContent() {
                               <h2 className="font-semibold text-gray-900 dark:text-white transition-colors">
                                 Available Tournaments
                               </h2>
-                              <button
-                                onClick={() => setShowTournamentsList(false)}
-                                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                              >
-                                ✕ Back
-                              </button>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => setShowTournamentsList(false)}
+                                  className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                >
+                                  ✕ Back
+                                </button>
+                              </div>
                             </div>
                             {loading ? (
                               <div className="text-gray-900 dark:text-white transition-colors">
                                 Loading tournaments...
                               </div>
                             ) : (
-                              <div className="grid md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto p-2">
-                                {tournaments.length === 0 ? (
+                              <div className="grid grid-cols-1 gap-5 max-h-[600px] overflow-y-auto p-2">
+                                {availableTournaments.length === 0 ? (
                                   <div className="col-span-2 text-center py-8 text-gray-600 dark:text-gray-400">
                                     <p className="text-lg">
                                       📭 No tournaments available
@@ -1022,7 +1028,7 @@ function SponsorDashboardContent() {
                                     </p>
                                   </div>
                                 ) : (
-                                  tournaments.map((t) => (
+                                  availableTournaments.map((t) => (
                                     <motion.div
                                       key={t._id}
                                       className={`border rounded-2xl p-5 shadow-md hover:shadow-xl transition-all cursor-pointer ${
@@ -1061,7 +1067,7 @@ function SponsorDashboardContent() {
                                           ).toLocaleDateString()}
                                         </div>
                                       </div>
-                                      <div className="grid grid-cols-2 gap-2 mt-3">
+                                      <div className="grid grid-cols-2 gap-3 mt-4">
                                         <motion.button
                                           whileHover={{ scale: 1.05 }}
                                           whileTap={{ scale: 0.95 }}
@@ -1112,11 +1118,11 @@ function SponsorDashboardContent() {
                         Loading...
                       </div>
                     ) : (
-                      <div className="grid md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto p-2">
-                        {tournaments.map((t) => (
+                      <div className="grid grid-cols-1 gap-5 max-h-[600px] overflow-y-auto p-2">
+                        {availableTournaments.map((t) => (
                           <motion.div
                             key={t._id}
-                            className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all cursor-pointer"
+                            className="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all cursor-pointer"
                             whileHover={{ scale: 1.02, y: -2 }}
                             onClick={() => {
                               setSelectedTournament(t);
@@ -1208,7 +1214,7 @@ function SponsorDashboardContent() {
                             </button>
                           </motion.div>
                         ))}
-                        {tournaments.length === 0 && (
+                        {availableTournaments.length === 0 && (
                           <div className="text-gray-600 dark:text-gray-300 transition-colors">
                             No tournaments available.
                           </div>
@@ -1266,7 +1272,7 @@ function SponsorDashboardContent() {
                           Available Tournaments
                         </div>
                         <div className="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">
-                          {tournaments.length}
+                          {availableTournaments.length}
                         </div>
                       </div>
                     </div>
@@ -1308,11 +1314,11 @@ function SponsorDashboardContent() {
                         Loading...
                       </div>
                     ) : (
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 gap-4 max-w-[780px] mx-auto">
                         {filteredSponsorships.map((s) => (
                           <div
                             key={s._id}
-                            className="border border-gray-200 dark:border-gray-700 p-4 rounded bg-white dark:bg-gray-800 shadow transition-colors"
+                            className="border border-gray-200 dark:border-gray-700 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-colors"
                           >
                             <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
                               {s.tournament.sport
