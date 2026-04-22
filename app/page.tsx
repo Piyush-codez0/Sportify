@@ -262,10 +262,11 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-4 sm:pb-24 relative z-10 min-h-[90dvh] sm:min-h-0 flex flex-col justify-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
           {/* Super soft hero gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-950/10 dark:via-gray-950/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
 
+          {/* Main Content Wrapper */}
           <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm relative overflow-hidden group shadow-[0_0_15px_rgba(168,85,247,0.15)]">
@@ -281,12 +282,17 @@ export default function Home() {
             </div>
 
             {/* Main Headline with Animated Taglines */}
-            <div className="mb-2 sm:mb-6 h-[90px] sm:h-[200px] md:h-[240px] flex items-center justify-center">
-              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight">
+            <div className="mb-4 sm:mb-6 relative flex items-center justify-center">
+              <h1 className="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight">
+                {/* Invisible placeholder for natural height scaling */}
+                <div className="invisible pointer-events-none px-2" aria-hidden="true">
+                  Building Tomorrow's Champions Today
+                </div>
+                
                 {taglines.map((tagline, index) => (
                   <div
                     key={index}
-                    className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out ${
+                    className={`absolute inset-0 flex items-center justify-center px-2 transition-all duration-1000 ease-in-out ${
                       currentTagline === index
                         ? "opacity-100 translate-y-0"
                         : "opacity-0 translate-y-8"
@@ -301,7 +307,7 @@ export default function Home() {
             </div>
 
             {/* Subheadline */}
-            <p className="text-sm sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-6 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               Organize, discover, and participate in local sports tournaments
               across India.
               <span className="text-purple-600 dark:text-purple-300 font-semibold">
@@ -312,10 +318,10 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-4 sm:mb-16 px-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 mb-8 sm:mb-16 px-2">
               <Link
                 href="/auth/register"
-                className="group relative px-6 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-base sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
+                className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
               >
                 {/* Button content */}
                 <span className="relative z-10 flex items-center gap-2">
@@ -337,7 +343,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/tournaments"
-                className="px-6 sm:px-10 py-3 sm:py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-base sm:text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
+                className="px-6 sm:px-10 py-4 sm:py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-lg sm:text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
               >
                 Explore Tournaments
               </Link>
@@ -345,7 +351,7 @@ export default function Home() {
           </div>
 
           {/* Kinetic Light Pipe Separator */}
-          <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
+          <div className="w-full max-w-5xl mx-auto py-12 sm:py-24 relative flex items-center justify-center">
             <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
             <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
             <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
@@ -658,7 +664,7 @@ export default function Home() {
           {/* Key Features - 2x2 Grid with Sport Icons */}
           <div>
             <div className="text-center mb-8 sm:mb-16">
-              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">9                Powerful Features
+              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">Powerful Features
               </h2>
               <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
                 Everything you need to revolutionize sports tournaments
