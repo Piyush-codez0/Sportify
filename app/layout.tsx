@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import ClickSparkWrapper from "@/components/ClickSparkWrapper";
 
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,6 +63,7 @@ export default function RootLayout({
             <ClickSparkWrapper>
               {children}
               <SpeedInsights />
+              <Analytics />
             </ClickSparkWrapper>
           </AuthProvider>
         </ThemeProvider>
