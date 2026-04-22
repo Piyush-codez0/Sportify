@@ -31,6 +31,11 @@ export function Pointer({
 
   useEffect(() => {
     if (typeof window !== "undefined" && containerRef.current) {
+      // Disable on touch devices
+      if (window.matchMedia && !window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+        return;
+      }
+
       // Get the parent element directly from the ref
       const parentElement = containerRef.current.parentElement;
 

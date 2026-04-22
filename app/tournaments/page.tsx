@@ -19,6 +19,7 @@ interface Tournament {
   status?: string;
   entryFee: number;
   prizePool?: number;
+  createdAt?: string;
   location?: {
     coordinates: [number, number]; // [lng, lat]
   };
@@ -111,6 +112,7 @@ export default function TournamentsBrowse() {
     sport: "",
     useRadius: false,
     radiusKm: "10",
+    showOnlyActive: false,
   });
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null
@@ -135,7 +137,11 @@ export default function TournamentsBrowse() {
       const res = await fetch(`/api/tournaments?${params.toString()}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
-      setTournaments(data.tournaments);
+      
+      const sortedTournaments = data.tournaments.sort((a: Tournament, b: Tournament) => {
+        return b._id.localeCompare(a._id);
+      });
+      setTournaments(sortedTournaments);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -172,6 +178,10 @@ export default function TournamentsBrowse() {
     (t) => getTournamentStatus(t).isActive
   ).length;
 
+  const displayedTournaments = filters.showOnlyActive
+    ? tournaments.filter((t) => getTournamentStatus(t).isActive)
+    : tournaments;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 relative transition-colors">
       <SportsDoodlesBackground />
@@ -195,10 +205,7 @@ export default function TournamentsBrowse() {
         {/* Page Header */}
         {!token && (
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100/50 dark:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/50 backdrop-blur-sm mb-4">
-              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-              <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">Active Events</span>
-            </div>
+            
             <h1 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
               Discover Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Challenges</span>
             </h1>
@@ -297,31 +304,48 @@ export default function TournamentsBrowse() {
           {/* Stats & Reset Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50 relative z-10">
             {!loading && (
-              <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
-                  {tournaments.length}
-                </span>
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                  results found
-                </span>
-                {activeCount > 0 && activeCount < tournaments.length && (
-                  <>
-                    <span className="text-gray-300 dark:text-gray-600">•</span>
-                    <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                      {activeCount} active
-                    </span>
-                  </>
-                )}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs font-bold">
+                    {displayedTournaments.length}
+                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                    results found
+                  </span>
+                  {activeCount > 0 && activeCount < tournaments.length && !filters.showOnlyActive && (
+                    <>
+                      <span className="text-gray-300 dark:text-gray-600">•</span>
+                      <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        {activeCount} active
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex bg-gray-100/50 dark:bg-gray-800/50 p-1 rounded-xl sm:ml-auto">
+                  <button
+                    onClick={() => setFilters({ ...filters, showOnlyActive: false })}
+                    className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${!filters.showOnlyActive ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                  >
+                    All Tournaments
+                  </button>
+                  <button
+                    onClick={() => setFilters({ ...filters, showOnlyActive: true })}
+                    className={`px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${filters.showOnlyActive ? 'bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                  >
+                    Available Only
+                  </button>
+                </div>
               </div>
             )}
             
             <button
               onClick={() => {
-                setFilters({ district: "", state: "", sport: "", useRadius: false, radiusKm: "10" });
+                setFilters({ district: "", state: "", sport: "", useRadius: false, radiusKm: "10", showOnlyActive: false });
                 setLocation(null);
               }}
-              className="flex items-center justify-center gap-2 text-sm bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all font-semibold shadow-sm hover:shadow active:scale-95"
+              className="flex items-center justify-center gap-2 text-sm bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all font-semibold shadow-sm hover:shadow active:scale-95 flex-shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -433,7 +457,7 @@ export default function TournamentsBrowse() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-            {tournaments.map((t) => {
+            {displayedTournaments.map((t) => {
               const status = getTournamentStatus(t);
               const isInactive = !status.isActive;
 

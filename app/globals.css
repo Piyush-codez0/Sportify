@@ -44,7 +44,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-geist-mono);
   /* Enable class-based dark mode for Tailwind v4 */
   --dark: ".dark";
   --color-sidebar-ring: var(--sidebar-ring);

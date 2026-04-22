@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Pointer } from "@/components/ui/pointer";
 import SmoothScroll from "@/components/SmoothScroll";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 // FAQ Item Component
 interface FAQItemProps {
@@ -83,6 +83,15 @@ export default function Home() {
 
   const [mounted, setMounted] = useState(false);
   const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
+  const [isNavHidden, setIsNavHidden] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start center", "end center"]
+  });
+  const dotPosition = useTransform(scrollYProgress, [0, 0.8, 1], ["0%", "100%", "100%"]);
 
   const taglines = [
     "Empowering India's Grassroots Sports",
@@ -91,6 +100,21 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      // Hide if scrolling down and past the first view window
+      if (currentScrollY > window.innerHeight * 0.5 && currentScrollY > lastScrollY) {
+        setIsNavHidden(true);
+      } else {
+        setIsNavHidden(false);
+      }
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
@@ -125,8 +149,27 @@ export default function Home() {
 
         <SportsDoodlesBackground />
 
+        {/* Mobile Menu Backdrop Blur Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              key="mobile-menu-overlay-global"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="sm:hidden fixed inset-0 top-[56px] bg-white/30 dark:bg-black/40 backdrop-blur-lg z-30"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Modern Navigation */}
-        <nav className="bg-white/80 dark:bg-gray-900/90 backdrop-blur-lg shadow-sm fixed inset-x-0 top-0 z-40 border-b border-purple-200/20 dark:border-purple-500/30 transition-colors">
+        <nav
+          className={`bg-white/70 dark:bg-black/20 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-white/20 dark:border-white/5 transition-all duration-300 ${
+            isNavHidden ? "-translate-y-full" : "translate-y-0"
+          }`}
+        >
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
             <div className="flex justify-between h-14 sm:h-20 items-center">
               <div className="flex items-center">
@@ -138,42 +181,108 @@ export default function Home() {
                   />
                 </Link>
               </div>
-              <div className="flex gap-1.5 sm:gap-3 items-center">
+              <div className="flex gap-2 sm:gap-3 items-center">
                 {mounted && <ThemeToggle />}
-                <Link
-                  href="/auth/login"
-                  className="px-3 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
+                
+                {/* Desktop Links */}
+                <div className="hidden sm:flex gap-3 items-center">
+                  <Link
+                    href="/auth/login"
+                    className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="px-6 py-2.5 text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+
+                {/* Mobile Hamburger Button */}
+                <button 
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="sm:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                  aria-label="Toggle mobile menu"
                 >
-                  Login
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
-                >
-                  Sign Up
-                </Link>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {isMobileMenuOpen ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    )}
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
+
+          {/* Mobile Menu Dropdown */}
+          <AnimatePresence>
+            {isMobileMenuOpen && (
+              <motion.div
+                key="mobile-menu-content"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="sm:hidden overflow-hidden border-t border-purple-200/50 dark:border-purple-500/20 bg-gradient-to-b from-white/90 to-white/80 dark:from-gray-900/80 dark:to-black/80 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(168,85,247,0.15)] relative z-40"
+              >
+                  <div className="px-4 py-6 flex flex-col gap-4 relative">
+                  {/* Subtle inner glow */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none" />
+                  
+                  <Link
+                    href="/tournaments"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 relative z-10 px-2"
+                  >
+                    Explore Tournaments
+                  </Link>
+                  <div className="h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-800/50 to-transparent my-2 relative z-10" />
+                  <Link
+                    href="/auth/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-center py-3 rounded-xl border-2 border-purple-200 dark:border-purple-800 font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-center py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-12 sm:pb-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-4 sm:pb-24 relative z-10 min-h-[90dvh] sm:min-h-0 flex flex-col justify-center">
           {/* Super soft hero gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-950/10 dark:via-gray-950/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
 
           <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
-              <span className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full animate-pulse" />
-              <span className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-300">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm relative overflow-hidden group shadow-[0_0_15px_rgba(168,85,247,0.15)]">
+              {/* Shimmer Overlay - Seamless & Linear */}
+              <div className="absolute inset-0 z-0 pointer-events-none animate-[shimmer_2s_linear_infinite]">
+                <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/90 dark:via-purple-200/50 to-transparent -skew-x-12" />
+              </div>
+              
+              <span className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full animate-pulse relative z-10" />
+              <span className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 relative z-10">
                 India's Premier Sports Tournament Platform
               </span>
             </div>
 
             {/* Main Headline with Animated Taglines */}
-            <div className="mb-4 sm:mb-6 h-[120px] sm:h-[200px] md:h-[240px] flex items-center justify-center">
-              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center">
+            <div className="mb-2 sm:mb-6 h-[90px] sm:h-[200px] md:h-[240px] flex items-center justify-center">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight">
                 {taglines.map((tagline, index) => (
                   <div
                     key={index}
@@ -192,7 +301,7 @@ export default function Home() {
             </div>
 
             {/* Subheadline */}
-            <p className="text-base sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-6 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
+            <p className="text-sm sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-6 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
               Organize, discover, and participate in local sports tournaments
               across India.
               <span className="text-purple-600 dark:text-purple-300 font-semibold">
@@ -203,10 +312,10 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-10 sm:mb-16 px-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-4 sm:mb-16 px-2">
               <Link
                 href="/auth/register"
-                className="group relative px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
+                className="group relative px-6 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-base sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
               >
                 {/* Button content */}
                 <span className="relative z-10 flex items-center gap-2">
@@ -228,16 +337,209 @@ export default function Home() {
               </Link>
               <Link
                 href="/tournaments"
-                className="px-10 py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
+                className="px-6 sm:px-10 py-3 sm:py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-base sm:text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
               >
                 Explore Tournaments
               </Link>
             </div>
           </div>
 
+          {/* Kinetic Light Pipe Separator */}
+          <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
+            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
+              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
+            </div>
+          </div>
+
+          {/* How It Works Section */}
+          <div className="max-w-5xl mx-auto py-12 sm:py-20 relative z-10">
+            <div className="text-center mb-16 sm:mb-24">
+              <motion.h2 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, margin: "-100px" }}
+                className="font-display text-2xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent tracking-tight"
+              >
+                How It Works
+              </motion.h2>
+            </div>
+
+            <div ref={timelineRef} className="relative max-w-4xl mx-auto pb-12">
+              {/* Vertical Light Pipe Timeline */}
+              <div 
+                className="absolute left-8 sm:left-1/2 top-0 w-[2px] sm:-ml-[1px] bg-purple-500/10 dark:bg-purple-500/10 rounded-full"
+                style={{ height: "83%" }}
+              >
+                {/* The filled part of the pipe */}
+                <motion.div 
+                  className="absolute top-0 w-full bg-gradient-to-b from-purple-500/50 to-pink-500 shadow-[0_0_10px_#ec4899] rounded-full"
+                  style={{ height: dotPosition }}
+                />
+                {/* The moving dot */}
+                <motion.div
+                  className="absolute left-1/2 -translate-x-1/2 w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-background border-2 border-pink-500 shadow-[0_0_20px_#ec4899] flex items-center justify-center z-20"
+                  style={{ top: dotPosition, y: '-50%' }}
+                >
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-500 animate-pulse" />
+                </motion.div>
+              </div>
+
+              {/* Steps */}
+              <div className="space-y-16 sm:space-y-24 relative">
+                {[
+                  {
+                    step: '01',
+                    title: 'Create Your Profile',
+                    desc: 'Begin your journey by establishing your digital identity. Create a specialized profile as a Player, Organizer, or Sponsor.',
+                    icon: (
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    ),
+                    visual: (
+                      <div className="mt-6 relative h-32 bg-gradient-to-br from-purple-500/5 to-transparent dark:from-purple-900/20 rounded-2xl border border-purple-500/10 dark:border-purple-500/20 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
+                        <div className="w-3/4 h-20 bg-white/50 dark:bg-black/40 backdrop-blur-md rounded-xl border border-white/40 dark:border-white/10 flex items-center p-3 gap-3 shadow-xl relative z-10">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0 shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
+                          <div className="space-y-2 w-full">
+                            <div className="h-2 w-1/2 bg-purple-300 dark:bg-purple-900/60 rounded-full" />
+                            <div className="h-1.5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded-full" />
+                            <div className="h-1.5 w-1/3 bg-gray-300 dark:bg-gray-700 rounded-full" />
+                          </div>
+                        </div>
+                        <div className="absolute w-24 h-24 bg-purple-500/20 blur-2xl rounded-full" />
+                      </div>
+                    )
+                  },
+                  {
+                    step: '02',
+                    title: 'Organize Tournaments',
+                    desc: 'Organizers take the lead by creating and managing local tournaments, setting the stage and rules for the competition.',
+                    icon: (
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                    ),
+                    visual: (
+                      <div className="mt-6 relative h-32 bg-gradient-to-br from-pink-500/5 to-transparent dark:from-pink-900/20 rounded-2xl border border-pink-500/10 dark:border-pink-500/20 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
+                        <div className="flex items-center gap-3 relative z-10 w-full px-8">
+                          <div className="flex flex-col gap-4 w-[40%]">
+                            <div className="h-6 w-full bg-white/50 dark:bg-black/40 backdrop-blur-md rounded border border-white/40 dark:border-white/10" />
+                            <div className="h-6 w-full bg-white/50 dark:bg-black/40 backdrop-blur-md rounded border border-white/40 dark:border-white/10" />
+                          </div>
+                          <div className="w-6 h-10 border-t-2 border-r-2 border-b-2 border-pink-400/50 rounded-r-lg" />
+                          <div className="w-3 border-t-2 border-pink-400/50" />
+                          <div className="h-7 w-[30%] bg-gradient-to-r from-purple-500 to-pink-500 rounded border border-white/30 shadow-[0_0_15px_rgba(236,72,153,0.4)]" />
+                        </div>
+                        <div className="absolute w-24 h-24 bg-pink-500/20 blur-2xl rounded-full" />
+                      </div>
+                    )
+                  },
+                  {
+                    step: '03',
+                    title: 'Join & Compete',
+                    desc: 'Players discover nearby tournaments, register their teams, and step onto the real ground to compete and showcase their skills.',
+                    icon: (
+                      <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                      </svg>
+                    ),
+                    visual: (
+                      <div className="mt-6 relative h-32 bg-gradient-to-br from-blue-500/5 to-transparent dark:from-blue-900/20 rounded-2xl border border-blue-500/10 dark:border-blue-500/20 flex items-end justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 px-6 pt-6">
+                        <div className="flex items-end gap-2 h-full relative z-10 w-full justify-center pb-3">
+                          <div className="w-[12%] h-[30%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
+                          <div className="w-[12%] h-[45%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
+                          <div className="w-[12%] h-[35%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
+                          <div className="w-[12%] h-[60%] bg-purple-400/50 dark:bg-white/20 rounded-t-sm" />
+                          <div className="w-[12%] h-[85%] bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-sm shadow-[0_0_15px_rgba(168,85,247,0.4)] relative">
+                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-black text-pink-500">#1</div>
+                          </div>
+                        </div>
+                        <div className="absolute bottom-0 w-32 h-16 bg-blue-500/20 blur-2xl rounded-full" />
+                      </div>
+                    )
+                  }
+                ].map((item, index) => (
+                  <motion.div 
+                    key={index}
+                    className={`relative flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-16 ${index % 2 === 1 ? 'sm:flex-row-reverse' : ''}`}
+                    style={{
+                      opacity: useTransform(
+                        scrollYProgress,
+                        [index * 0.35 + 0.1, index * 0.35 + 0.2],
+                        [0, 1]
+                      ),
+                      y: useTransform(
+                        scrollYProgress,
+                        [index * 0.35 + 0.1, index * 0.35 + 0.2],
+                        [50, 0]
+                      )
+                    }}
+                  >
+                    {/* The Timeline Node */}
+                    <div className="absolute left-8 sm:left-1/2 -ml-2 sm:-ml-2.5 mt-8 sm:mt-0 sm:top-1/2 sm:-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white dark:bg-gray-200 border-2 border-white dark:border-gray-200 flex items-center justify-center z-10 overflow-hidden shadow-sm">
+                      <motion.div 
+                        className="w-full h-full bg-pink-500 shadow-[0_0_10px_#ec4899]"
+                        style={{
+                          opacity: useTransform(
+                            scrollYProgress,
+                            [index * 0.35 + 0.1, index * 0.35 + 0.2],
+                            [0, 1]
+                          )
+                        }}
+                      />
+                    </div>
+
+                    {/* Content Card */}
+                    <div className={`w-full sm:w-1/2 pl-16 sm:pl-0 ${index % 2 === 0 ? 'sm:pr-16 sm:text-right' : 'sm:pl-16 sm:text-left'}`}>
+                      <div className="group relative p-6 sm:p-8 rounded-3xl bg-white/5 dark:bg-gray-900/40 border border-purple-200/30 dark:border-purple-800/30 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(168,85,247,0.05)] hover:bg-white/10 dark:hover:bg-gray-900/60 transition-all duration-500 overflow-hidden">
+                        {/* Hover Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        
+                        <div className={`flex items-center gap-4 mb-4 ${index % 2 === 0 ? 'sm:flex-row-reverse' : ''}`}>
+                          <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+                            {item.icon}
+                          </div>
+                          <span className="font-display text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-purple-300 to-purple-100 dark:from-gray-700 dark:to-gray-900 opacity-60">
+                            {item.step}
+                          </span>
+                        </div>
+                        
+                        <h3 className="font-display text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors duration-300">
+                          {item.title}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed relative z-10">
+                          {item.desc}
+                        </p>
+                        
+                        <div className="relative z-10">
+                          {item.visual}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Kinetic Light Pipe Separator */}
+          <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
+            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
+              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
+            </div>
+          </div>
+
           {/* How Sportify Can Help You Section */}
-          <div className="mt-16 sm:mt-32">
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
+          <div>
+            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
               <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 How Sportify Can Help You
               </span>
@@ -266,7 +568,7 @@ export default function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     For Organizers
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -298,7 +600,7 @@ export default function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     For Players
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -329,7 +631,7 @@ export default function Home() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                  <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
                     For Sponsors
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
@@ -342,11 +644,21 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Kinetic Light Pipe Separator */}
+          <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
+            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
+              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_3s_infinite]" />
+            </div>
+          </div>
+
           {/* Key Features - 2x2 Grid with Sport Icons */}
-          <div className="mt-16 sm:mt-32">
+          <div>
             <div className="text-center mb-8 sm:mb-16">
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
-                Powerful Features
+              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">9                Powerful Features
               </h2>
               <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
                 Everything you need to revolutionize sports tournaments
@@ -487,8 +799,19 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Kinetic Light Pipe Separator */}
+        <div className="w-full max-w-5xl mx-auto py-10 sm:py-16 relative flex items-center justify-center z-10">
+          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+          <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+          <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+          <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
+            <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_4s_infinite]" />
+          </div>
+        </div>
+
         {/* FAQ Section */}
-        <div className="mt-16 sm:mt-32 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-16 sm:pb-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-16 sm:pb-32">
           <div className="text-center mb-8 sm:mb-16">
             <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
               <svg
@@ -508,8 +831,8 @@ export default function Home() {
                 Frequently Asked Questions
               </span>
             </div>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
-              Got Questions? We've Got Answers
+            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              Got Questions? 
             </h2>
             <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
               Everything you need to know about Sportify
@@ -564,7 +887,7 @@ export default function Home() {
 
           {/* Contact CTA */}
           <div className="mt-12 text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50/50 via-white/30 to-blue-50/50 dark:from-purple-900/20 dark:via-gray-800/30 dark:to-blue-900/20 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50">
-            <h3 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+            <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white">
               Still have questions?
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-5">
@@ -604,7 +927,7 @@ export default function Home() {
                     alt="Sportify"
                     className="w-10 h-10 rounded-xl shadow-lg"
                   />
-                  <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+                  <h3 className="font-display text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
                     Sportify
                   </h3>
                 </div>
@@ -723,7 +1046,7 @@ export default function Home() {
             {/* Bottom Bar */}
             <div className="pt-6 sm:pt-8 border-t border-purple-200/30 dark:border-purple-800/30 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
               <p className="text-gray-600 dark:text-gray-400 text-sm">
-                © 2025 Sportify. Revolutionizing local sports in India.
+                © 2026 Sportify
               </p>
               <div className="flex gap-6 text-sm">
                 <a
