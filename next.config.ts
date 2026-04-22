@@ -2,8 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  trailingSlash: true,
   reactCompiler: true,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -17,11 +19,6 @@ const nextConfig: NextConfig = {
   },
   typescript: {
     ignoreBuildErrors: false,
-  },
-  // Optimize for Vercel Hobby plan (max 12 serverless functions)
-  experimental: {
-    // Enable incremental static regeneration
-    isrMemoryCacheSize: 50 * 1024 * 1024,
   },
 };
 

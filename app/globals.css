@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -35,6 +36,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --scrollbar-thumb: oklch(0.3 0 0);
+  --scrollbar-thumb-hover: oklch(0.4 0 0);
 }
 
 @theme inline {
@@ -112,6 +115,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -144,50 +148,45 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --scrollbar-thumb: oklch(0.8 0 0);
+  --scrollbar-thumb-hover: oklch(0.7 0 0);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    scrollbar-width: thin;
-    scrollbar-color: oklch(0.8 0 0) var(--background);
-  }
-
-  .dark * {
-    scrollbar-color: oklch(0.3 0 0) var(--background);
   }
 
   body {
     @apply bg-background text-foreground;
   }
-
-  /* Webkit browsers (Chrome, Safari, Edge) */
-  ::-webkit-scrollbar {
-    width: 12px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--background);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background-color: oklch(0.8 0 0);
-    border-radius: 20px;
-    border: 3px solid var(--background);
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    background-color: oklch(0.3 0 0);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: oklch(0.7 0 0);
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background-color: oklch(0.4 0 0);
-  }
 }
+
+/* Scrollbar Styles */
+html, body, * {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--scrollbar-thumb) var(--background) !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+  border-radius: 20px !important;
+  border: 3px solid var(--background) !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover) !important;
+}
+
 
 @layer utilities {
   @keyframes pulse-ring {
