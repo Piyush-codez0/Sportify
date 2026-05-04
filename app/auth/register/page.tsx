@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
@@ -24,6 +24,9 @@ function RegisterContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
+  
+  // 3D Card Ref
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,11 +70,105 @@ function RegisterContent() {
     }
   }, [searchParams]);
 
+  // Handle 3D Tilt
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    // max +-10deg
+    const rotateX = ((centerY - y) / centerY) * 10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+    
+    cardRef.current.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-8 relative transition-colors">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-8 relative transition-colors overflow-hidden">
+      <style>{`
+        .card-container {
+          perspective: 1200px;
+        }
+        .glass-card {
+          background: rgba(10, 20, 45, 0.82) !important;
+          backdrop-filter: blur(28px) saturate(160%) !important;
+          -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
+          border: 1px solid rgba(0, 245, 160, 0.18) !important;
+          border-radius: 28px !important;
+          box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+          transform-style: preserve-3d;
+          transition: transform 0.08s ease-out;
+        }
+        @media (hover: none) {
+          .glass-card { transform: none !important; }
+        }
+        .glass-card::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(0,245,160,0.5), rgba(0,217,245,0.5), transparent);
+          border-top-left-radius: 28px;
+          border-top-right-radius: 28px;
+          pointer-events: none;
+          z-index: 10;
+        }
+        .neon-input { transition: all 0.2s ease-out !important; }
+        .neon-input:focus {
+          border-color: rgba(0, 245, 160, 0.45) !important;
+          box-shadow: 0 0 0 3px rgba(0,245,160,0.1), 0 0 20px rgba(0,245,160,0.08) !important;
+          transform: translateY(-1px) !important;
+          outline: none !important;
+        }
+        .neon-button {
+          background: linear-gradient(135deg, #00f5a0, #00d9f5) !important;
+          box-shadow: 0 8px 24px rgba(0,245,160,0.3) !important;
+          transition: all 0.2s ease-out !important;
+          color: #0a142d !important;
+          border: none !important;
+        }
+        .neon-button:hover {
+          transform: translateY(-2px) scale(1.01) !important;
+          box-shadow: 0 14px 36px rgba(0,245,160,0.4) !important;
+        }
+        .orbs-container {
+          position: absolute; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .orb {
+          position: absolute; border-radius: 50%;
+          animation: drift 12s infinite alternate ease-in-out;
+        }
+        .orb1 { width: 520px; height: 520px; top: -10%; left: -10%; background-color: #00f5a0; filter: blur(80px); opacity: 0.18; }
+        .orb2 { width: 400px; height: 400px; bottom: -10%; right: -10%; background-color: #00d9f5; filter: blur(80px); opacity: 0.18; animation-delay: -5s; }
+        .orb3 { width: 280px; height: 280px; top: 40%; right: -5%; background-color: #7b61ff; filter: blur(80px); opacity: 0.18; animation-delay: -9s; }
+        @keyframes drift {
+          from { transform: translate(0, 0) scale(1); }
+          to { transform: translate(40px, 30px) scale(1.08); }
+        }
+      `}</style>
+      
+      <div className="orbs-container">
+        <div className="orb orb1"></div>
+        <div className="orb orb2"></div>
+        <div className="orb orb3"></div>
+      </div>
+
       <SportsDoodlesBackground />
-      <div className="max-w-2xl w-full relative z-10">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-4 sm:p-6 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
+      <div className="max-w-2xl w-full relative z-10 card-container">
+        <div 
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="glass-card bg-white dark:bg-gray-800 p-4 sm:p-6 transition-colors relative overflow-hidden"
+        >
           <BorderBeam
             size={150}
             duration={14}
@@ -93,9 +190,6 @@ function RegisterContent() {
           <div className="text-center mb-4">
             <Link href="/" className="inline-flex flex-col items-center gap-2">
               <img src="/icon.png" alt="Sportify" className="w-16 h-16 " />
-              {/* <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
-                Sportify
-              </span> */}
             </Link>
             <h2 className="mt-3 text-xl font-bold text-gray-900 dark:text-white transition-colors">
               Create Account
@@ -268,7 +362,7 @@ function RegisterContent() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      className="neon-input w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                       placeholder="Enter your full name"
                     />
                   </div>
@@ -296,7 +390,7 @@ function RegisterContent() {
                           phone: "+91 " + cleanedNumber,
                         });
                       }}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                      className="neon-input w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                       placeholder="10-digit mobile number"
                     />
                   </div>
@@ -313,7 +407,7 @@ function RegisterContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    className="neon-input w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                     placeholder="Enter your email address"
                   />
                 </div>
@@ -330,7 +424,7 @@ function RegisterContent() {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
+                    className="neon-input w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
                     placeholder="Min 6 characters"
                   />
                 </div>
@@ -345,7 +439,7 @@ function RegisterContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
+                  className="neon-button w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
                 >
                   {loading ? "Creating Account..." : "Sign Up"}
                 </button>

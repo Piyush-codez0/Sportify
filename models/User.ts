@@ -39,6 +39,10 @@ export interface IUser extends Document {
   brandLogo?: string;
   sponsorshipBudget?: number;
 
+  // Password reset
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
+
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -121,6 +125,10 @@ const UserSchema = new Schema<IUser>(
     companyWebsite: String,
     brandLogo: String,
     sponsorshipBudget: Number,
+
+    // Password reset fields
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
   },
   {
     timestamps: true,
