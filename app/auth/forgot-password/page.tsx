@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import { BorderBeam } from "@/components/ui/border-beam";
 
 export default function ForgotPasswordPage() {
@@ -37,8 +37,8 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 relative transition-colors">
-      <SportsDoodlesBackground />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center px-4 relative transition-colors">
+
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
           <BorderBeam

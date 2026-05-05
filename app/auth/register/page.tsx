@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import { BorderBeam } from "@/components/ui/border-beam";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "motion/react";
@@ -93,20 +93,25 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 flex items-center justify-center px-4 py-8 relative transition-colors overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center px-4 py-8 relative transition-colors overflow-hidden">
       <style>{`
         .card-container {
           perspective: 1200px;
         }
         .glass-card {
-          background: rgba(10, 20, 45, 0.82) !important;
-          backdrop-filter: blur(28px) saturate(160%) !important;
-          -webkit-backdrop-filter: blur(28px) saturate(160%) !important;
-          border: 1px solid rgba(0, 245, 160, 0.18) !important;
-          border-radius: 28px !important;
-          box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(28px) saturate(160%);
+          -webkit-backdrop-filter: blur(28px) saturate(160%);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          border-radius: 28px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
           transform-style: preserve-3d;
           transition: transform 0.08s ease-out;
+        }
+        :is(.dark) .glass-card {
+          background: rgba(10, 20, 45, 0.82);
+          border: 1px solid rgba(0, 245, 160, 0.18);
+          box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
         }
         @media (hover: none) {
           .glass-card { transform: none !important; }
@@ -115,29 +120,55 @@ function RegisterContent() {
           content: "";
           position: absolute;
           top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(0,245,160,0.5), rgba(0,217,245,0.5), transparent);
+          background: transparent;
           border-top-left-radius: 28px;
           border-top-right-radius: 28px;
           pointer-events: none;
           z-index: 10;
         }
+        :is(.dark) .glass-card::before {
+          background: linear-gradient(90deg, transparent, rgba(0,245,160,0.5), rgba(0,217,245,0.5), transparent);
+        }
         .neon-input { transition: all 0.2s ease-out !important; }
         .neon-input:focus {
-          border-color: rgba(0, 245, 160, 0.45) !important;
-          box-shadow: 0 0 0 3px rgba(0,245,160,0.1), 0 0 20px rgba(0,245,160,0.08) !important;
+          border-color: rgba(99, 102, 241, 0.5) !important;
+          box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
           transform: translateY(-1px) !important;
           outline: none !important;
+        }
+        :is(.dark) .neon-input:focus {
+          border-color: rgba(0, 245, 160, 0.45) !important;
+          box-shadow: 0 0 0 3px rgba(0,245,160,0.1), 0 0 20px rgba(0,245,160,0.08) !important;
         }
         .neon-button {
           background: linear-gradient(135deg, #00f5a0, #00d9f5) !important;
           box-shadow: 0 8px 24px rgba(0,245,160,0.3) !important;
-          transition: all 0.2s ease-out !important;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
           color: #0a142d !important;
           border: none !important;
+          position: relative;
+          overflow: visible;
+        }
+        .neon-button::after {
+          content: "";
+          position: absolute;
+          inset: -2px;
+          border-radius: inherit;
+          background: linear-gradient(135deg, #00f5a0, #00d9f5);
+          opacity: 0;
+          filter: blur(16px);
+          transition: opacity 0.3s ease-out;
+          z-index: -1;
         }
         .neon-button:hover {
-          transform: translateY(-2px) scale(1.01) !important;
-          box-shadow: 0 14px 36px rgba(0,245,160,0.4) !important;
+          transform: translateY(-3px) scale(1.02) !important;
+          box-shadow: 0 16px 48px rgba(0,245,160,0.5), 0 0 60px rgba(0,217,245,0.2) !important;
+        }
+        .neon-button:hover::after {
+          opacity: 0.6;
+        }
+        .neon-button:active {
+          transform: translateY(-1px) scale(0.99) !important;
         }
         .orbs-container {
           position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -145,10 +176,12 @@ function RegisterContent() {
         .orb {
           position: absolute; border-radius: 50%;
           animation: drift 12s infinite alternate ease-in-out;
+          opacity: 0;
         }
-        .orb1 { width: 520px; height: 520px; top: -10%; left: -10%; background-color: #00f5a0; filter: blur(80px); opacity: 0.18; }
-        .orb2 { width: 400px; height: 400px; bottom: -10%; right: -10%; background-color: #00d9f5; filter: blur(80px); opacity: 0.18; animation-delay: -5s; }
-        .orb3 { width: 280px; height: 280px; top: 40%; right: -5%; background-color: #7b61ff; filter: blur(80px); opacity: 0.18; animation-delay: -9s; }
+        :is(.dark) .orb { opacity: 0.18; }
+        .orb1 { width: 520px; height: 520px; top: -10%; left: -10%; background-color: #00f5a0; filter: blur(80px); }
+        .orb2 { width: 400px; height: 400px; bottom: -10%; right: -10%; background-color: #00d9f5; filter: blur(80px); animation-delay: -5s; }
+        .orb3 { width: 280px; height: 280px; top: 40%; right: -5%; background-color: #7b61ff; filter: blur(80px); animation-delay: -9s; }
         @keyframes drift {
           from { transform: translate(0, 0) scale(1); }
           to { transform: translate(40px, 30px) scale(1.08); }
@@ -161,13 +194,14 @@ function RegisterContent() {
         <div className="orb orb3"></div>
       </div>
 
-      <SportsDoodlesBackground />
+
       <div className="max-w-2xl w-full relative z-10 card-container">
         <div 
           ref={cardRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
+          onMouseMove={!role ? handleMouseMove : undefined}
+          onMouseLeave={!role ? handleMouseLeave : undefined}
           className="glass-card bg-white dark:bg-gray-800 p-4 sm:p-6 transition-colors relative overflow-hidden"
+          style={role ? { transform: 'none' } : undefined}
         >
           <BorderBeam
             size={150}

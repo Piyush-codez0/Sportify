@@ -3,9 +3,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import ThemeToggle from "@/components/ThemeToggle";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
-import MapDisplay from "@/components/MapDisplay";
 
 interface Tournament {
   _id: string;
@@ -43,6 +43,11 @@ export default function TournamentDetailPage() {
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Registration state
   const [registrationType, setRegistrationType] = useState<
@@ -302,8 +307,8 @@ export default function TournamentDetailPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 p-6">
-        <SportsDoodlesBackground />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+
         <div className="relative z-10 text-gray-900 dark:text-white">
           Loading...
         </div>
@@ -311,8 +316,8 @@ export default function TournamentDetailPage() {
     );
   if (error)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 p-6">
-        <SportsDoodlesBackground />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+
         <div className="relative z-10 text-red-600 dark:text-red-400">
           {error}
         </div>
@@ -320,8 +325,8 @@ export default function TournamentDetailPage() {
     );
   if (!tournament)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 p-6">
-        <SportsDoodlesBackground />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+
         <div className="relative z-10 text-gray-900 dark:text-white">
           Not found
         </div>
@@ -329,9 +334,9 @@ export default function TournamentDetailPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
-      <SportsDoodlesBackground />
-      {token && (
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
+
+      {token ? (
         <DashboardNavbar
           title={tournament ? `${tournament.sport} Tournament` : "Tournament Details"}
           userName={user?.name || "User"}
@@ -342,11 +347,42 @@ export default function TournamentDetailPage() {
           onProfileClick={() => {}}
           onLogout={() => {}}
         />
+      ) : (
+        <nav className="bg-white/70 dark:bg-[#040812]/60 backdrop-blur-[10px] dark:backdrop-blur-2xl shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-black/5 dark:border-white/10 transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-14 sm:h-20 items-center">
+              <div className="flex items-center">
+                <Link href="/" className="flex items-center gap-2">
+                  <img
+                    src="/icon.png"
+                    alt="Sportify"
+                    className="w-10 h-10 sm:w-16 sm:h-16 rounded-xl"
+                  />
+                </Link>
+              </div>
+              <div className="flex gap-2 sm:gap-3 items-center">
+                {mounted && <ThemeToggle />}
+                <div className="hidden sm:flex gap-3 items-center">
+                  <Link
+                    href="/auth/login"
+                    className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-all"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="px-6 py-2.5 text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
       )}
       <div
-        className={`${
-          token ? "pt-24" : ""
-        } py-8 max-w-5xl mx-auto px-6 relative z-10`}
+        className={`pt-24 sm:pt-28 py-8 max-w-5xl mx-auto px-6 relative z-10`}
       >
         <div className="bg-white/90 dark:bg-[#1E2939]/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-colors overflow-hidden">
           {/* Header with gradient background */}
@@ -596,40 +632,53 @@ export default function TournamentDetailPage() {
                 </div>
               </div>
             )}
-            {/* Location Map */}
-            {tournament.location?.coordinates && (
-              <div className="mb-6">
-                <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
-                  <svg
-                    className="w-6 h-6 text-green-600 dark:text-green-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Venue Location
-                </h2>
-                <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg">
-                  <MapDisplay
-                    lat={tournament.location.coordinates[1]}
-                    lng={tournament.location.coordinates[0]}
-                    popupText={`<strong>${tournament.name}</strong><br/>${tournament.venue}<br/>${tournament.city}, ${tournament.state}`}
-                    height="350px"
-                    zoom={15}
-                  />
+            {/* Location Link Button */}
+            {(tournament.location?.coordinates || tournament.googleMapsLink) && (
+              <div className="mb-6 p-6 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/10 dark:to-teal-900/10 rounded-xl border border-emerald-200 dark:border-emerald-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-white flex items-center gap-2">
+                    <svg
+                      className="w-6 h-6 text-emerald-600 dark:text-emerald-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    Venue Location
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm pl-8">
+                    {tournament.venue}, {tournament.city}, {tournament.state}
+                  </p>
                 </div>
+                
+                <a
+                  href={
+                    tournament.googleMapsLink ||
+                    (tournament.location?.coordinates
+                      ? `https://www.google.com/maps/dir/?api=1&destination=${tournament.location.coordinates[1]},${tournament.location.coordinates[0]}`
+                      : "#")
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 rounded-xl font-bold hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:scale-105 transition-all shadow-sm"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Get Directions
+                </a>
               </div>
             )}
 

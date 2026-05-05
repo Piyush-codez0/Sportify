@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
 
 interface Registration {
@@ -244,8 +244,8 @@ export default function TournamentRegistrations() {
     );
 
   return (
-    <div className="relative min-h-screen bg-white dark:bg-gray-900 transition-colors">
-      <SportsDoodlesBackground />
+    <div className="relative min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors">
+
       <DashboardNavbar
         title={
           `${sport} Tournament Registrations` || "Tournament Registrations"

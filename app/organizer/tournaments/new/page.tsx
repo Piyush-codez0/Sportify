@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
 import LocationPicker from "@/components/LocationPicker";
 import { INDIAN_STATES } from "@/lib/indianStates";
@@ -235,8 +235,8 @@ export default function NewTournamentPage() {
   // Show verification warning if not verified
   if (!isVerified) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 transition-colors relative">
-        <SportsDoodlesBackground />
+      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors relative">
+
         <div className="max-w-3xl mx-auto p-6 relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <img
@@ -382,8 +382,8 @@ export default function NewTournamentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-gray-950 dark:via-slate-900 dark:to-gray-900 transition-colors relative overflow-hidden">
-      <SportsDoodlesBackground />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors relative overflow-hidden">
+
       <DashboardNavbar
         title="Create a Tournament"
         userName={user?.name || "User"}

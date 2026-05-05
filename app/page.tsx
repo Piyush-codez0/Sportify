@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import ThemeToggle from "@/components/ThemeToggle";
 import { Pointer } from "@/components/ui/pointer";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -76,10 +76,44 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
   );
 }
 
+function HoverGif({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleLoad = () => {
+    if (canvasRef.current && imgRef.current) {
+      const img = imgRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+      }
+    }
+  };
+
+  return (
+    <div className={className} style={{ position: 'relative' }}>
+      <img 
+        ref={imgRef}
+        src={src} 
+        alt={alt} 
+        className="absolute inset-0 w-full h-full object-contain filter drop-shadow-sm transition-opacity duration-300 opacity-0 group-hover:opacity-100" 
+        onLoad={handleLoad}
+      />
+      <canvas 
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full object-contain filter drop-shadow-sm transition-opacity duration-300 opacity-100 group-hover:opacity-0 pointer-events-none" 
+      />
+    </div>
+  );
+}
+
 export default function Home() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [currentTagline, setCurrentTagline] = useState(0);
+
 
   const [mounted, setMounted] = useState(false);
   const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(null);
@@ -89,14 +123,11 @@ export default function Home() {
   const timelineRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: timelineRef,
-    offset: ["start center", "end center"]
+    offset: ["start center", "end 60%"]
   });
-  const dotPosition = useTransform(scrollYProgress, [0, 0.8, 1], ["0%", "100%", "100%"]);
+  const dotPosition = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
-  const taglines = [
-    "Empowering India's Grassroots Sports",
-    "Building Tomorrow's Champions Today",
-  ];
+
 
   useEffect(() => {
     setMounted(true);
@@ -117,13 +148,7 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTagline((prev) => (prev + 1) % taglines.length);
-    }, 4000); // Switch every 4 seconds
 
-    return () => clearInterval(interval);
-  }, []);
 
 
 
@@ -142,12 +167,20 @@ export default function Home() {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-blue-50 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950 relative overflow-hidden transition-colors">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative overflow-hidden transition-colors">
         {/* Mesh gradient background */}
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300/10 via-transparent to-transparent dark:from-purple-500/[0.07]" />
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-blue-300/10 via-transparent to-transparent dark:from-blue-500/[0.07]" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
 
-        <SportsDoodlesBackground />
+        {/* Subtle Noise Texture Overlay */}
+        <div className="absolute inset-0 pointer-events-none -z-10 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay">
+          <svg className="w-full h-full">
+            <filter id="noiseFilter">
+              <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#noiseFilter)" />
+          </svg>
+        </div>
 
         {/* Mobile Menu Backdrop Blur Overlay */}
         <AnimatePresence>
@@ -166,7 +199,7 @@ export default function Home() {
 
         {/* Modern Navigation */}
         <nav
-          className={`bg-white/70 dark:bg-black/20 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-white/20 dark:border-white/5 transition-all duration-300 ${
+          className={`bg-white/70 dark:bg-[#040812]/60 backdrop-blur-[10px] dark:backdrop-blur-2xl shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-black/5 dark:border-white/10 transition-all duration-300 ${
             isNavHidden ? "-translate-y-full" : "translate-y-0"
           }`}
         >
@@ -262,47 +295,60 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
-          {/* Super soft hero gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-100/20 via-blue-50/15 to-white/10 dark:from-purple-950/10 dark:via-gray-950/5 dark:to-transparent -z-10 rounded-3xl blur-xl" />
+        <div className="relative z-10">
+          {/* Hero Background Image with Blur & Dark Overlay */}
+          <div className="absolute inset-0 z-0 overflow-hidden">
+            {/* Mobile Hero Image (High Impact for small screens) */}
+            <img
+              src="/icons/hero-image-mobile.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-105 blur-[1px] block sm:hidden"
+            />
+            {/* Desktop Light Mode Image */}
+            <img
+              src="/icons/hero-image-light.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-[2px] hidden sm:block dark:sm:hidden"
+            />
+            {/* Desktop Dark Mode Image */}
+            <img
+              src="/icons/hero-image.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-[2px] hidden sm:dark:block"
+            />
+            {/* Overlay to ensure text readability */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/40 to-white/10 dark:bg-none dark:bg-black/30" />
+            {/* Gradient fade to page background at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-[#040812] dark:via-[#040812]/80 dark:to-transparent" />
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
 
           {/* Main Content Wrapper */}
           <div className="text-center max-w-5xl mx-auto">
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm relative overflow-hidden group shadow-[0_0_15px_rgba(168,85,247,0.15)]">
-              {/* Shimmer Overlay - Seamless & Linear */}
-              <div className="absolute inset-0 z-0 pointer-events-none animate-[shimmer_2s_linear_infinite]">
-                <div className="absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/90 dark:via-purple-200/50 to-transparent -skew-x-12" />
-              </div>
-              
-              <span className="w-2 h-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full animate-pulse relative z-10" />
-              <span className="text-xs sm:text-sm font-bold text-purple-700 dark:text-purple-300 relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm shadow-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              <span className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
                 India's Premier Sports Tournament Platform
               </span>
             </div>
 
-            {/* Main Headline with Animated Taglines */}
-            <div className="mb-4 sm:mb-6 relative flex items-center justify-center">
-              <h1 className="font-display text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight">
-                {/* Invisible placeholder for natural height scaling */}
-                <div className="invisible pointer-events-none px-2" aria-hidden="true">
-                  Building Tomorrow's Champions Today
-                </div>
-                
-                {taglines.map((tagline, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 flex items-center justify-center px-2 transition-all duration-1000 ease-in-out ${
-                      currentTagline === index
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-8"
-                    }`}
-                  >
-                    <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
-                      {tagline}
-                    </span>
-                  </div>
-                ))}
+            {/* Main Headline */}
+            <div className="mb-6 sm:mb-8 relative">
+              <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight text-gray-900 dark:text-white">
+                Build Tomorrow's <br className="sm:hidden" />
+                <span className="relative inline-block">
+                  <span className="relative z-10 bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">Champions</span>
+                  {/* Subtle underline/highlight effect behind the text */}
+                  <span className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500/40 to-pink-500/40 -z-10 -rotate-1 rounded-sm blur-[0.5px]"></span>
+                </span>
               </h1>
             </div>
 
@@ -318,7 +364,7 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 mb-8 sm:mb-16 px-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 mb-6 sm:mb-8 px-2 pt-16   ">
               <Link
                 href="/auth/register"
                 className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
@@ -343,27 +389,56 @@ export default function Home() {
               </Link>
               <Link
                 href="/tournaments"
-                className="px-6 sm:px-10 py-4 sm:py-4 bg-white/80 dark:bg-gray-900/90 backdrop-blur-sm text-gray-800 dark:text-white border-2 border-purple-300 dark:border-purple-700 rounded-2xl text-lg sm:text-lg font-bold hover:bg-purple-50 dark:hover:bg-purple-900/50 hover:border-purple-500 dark:hover:border-purple-500 hover:scale-105 transition-all duration-300"
+                className="px-6 sm:px-10 py-4 sm:py-4 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm text-slate-800 dark:text-white border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-lg sm:text-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 hover:scale-105 transition-all duration-300"
               >
                 Explore Tournaments
               </Link>
             </div>
-          </div>
 
-          {/* Kinetic Light Pipe Separator */}
-          <div className="w-full max-w-5xl mx-auto py-12 sm:py-24 relative flex items-center justify-center">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
-            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
-              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
+            {/* Real Product Signals */}
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mt-2 mb-8 sm:mb-12">
+              {/* Trending (Orange) */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-orange-50/80 dark:bg-orange-500/10 backdrop-blur-md rounded-full border border-orange-200 dark:border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.1)] hover:scale-105 hover:shadow-[0_0_20px_rgba(249,115,22,0.2)] transition-all duration-300">
+                <span className="text-sm font-semibold text-orange-700 dark:text-orange-400">🔥 20+ tournaments this month</span>
+              </div>
+              
+              {/* Active (Green) */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50/80 dark:bg-emerald-500/10 backdrop-blur-md rounded-full border border-emerald-200 dark:border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:scale-105 hover:shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all duration-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">Active in 20+ cities</span>
+              </div>
+
+              {/* Info (Blue) */}
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50/80 dark:bg-blue-500/10 backdrop-blur-md rounded-full border border-blue-200 dark:border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300">
+                <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">👥 1000+ players joined</span>
+              </div>
             </div>
           </div>
+        </div>
+
+        {/* Kinetic Light Pipe Separator */}
+        <div className="w-full max-w-5xl mx-auto py-12 sm:pb-24 pt-4 relative flex items-center justify-center z-20">
+          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-slate-400/30 dark:via-slate-500/30 to-transparent" />
+          <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-slate-500/30 dark:via-slate-400/30 to-transparent blur-[1px]" />
+          <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-slate-400/20 dark:via-slate-300/20 to-transparent blur-md animate-pulse" />
+          <div className="relative w-8 h-8 bg-white/40 dark:bg-slate-800/50 backdrop-blur-xl border border-slate-300/40 dark:border-slate-600/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(34,197,94,0.1)]">
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-200/20 to-slate-300/20 dark:from-slate-700/20 dark:to-slate-600/20" />
+            {/* Sports Accent Pulse */}
+            <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse" />
+          </div>
+        </div>
+        </div>
+
+        {/* Rest of the Page Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-24 relative z-10">
+
 
           {/* How It Works Section */}
-          <div className="max-w-5xl mx-auto py-12 sm:py-20 relative z-10">
-            <div className="text-center mb-16 sm:mb-24">
+          <div className="max-w-5xl mx-auto py-8 sm:py-12 relative z-10">
+            <div className="text-center mb-10 sm:mb-14">
               <motion.h2 
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -374,7 +449,7 @@ export default function Home() {
               </motion.h2>
             </div>
 
-            <div ref={timelineRef} className="relative max-w-4xl mx-auto pb-12">
+            <div ref={timelineRef} className="relative max-w-4xl mx-auto pb-6">
               {/* Vertical Light Pipe Timeline */}
               <div 
                 className="absolute left-8 sm:left-1/2 top-0 w-[2px] sm:-ml-[1px] bg-purple-500/10 dark:bg-purple-500/10 rounded-full"
@@ -395,7 +470,7 @@ export default function Home() {
               </div>
 
               {/* Steps */}
-              <div className="space-y-16 sm:space-y-24 relative">
+              <div className="space-y-5 sm:space-y-12 relative">
                 {[
                   {
                     step: '01',
@@ -407,16 +482,12 @@ export default function Home() {
                       </svg>
                     ),
                     visual: (
-                      <div className="mt-6 relative h-32 bg-gradient-to-br from-purple-500/5 to-transparent dark:from-purple-900/20 rounded-2xl border border-purple-500/10 dark:border-purple-500/20 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
-                        <div className="w-3/4 h-20 bg-white/50 dark:bg-black/40 backdrop-blur-md rounded-xl border border-white/40 dark:border-white/10 flex items-center p-3 gap-3 shadow-xl relative z-10">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex-shrink-0 shadow-[0_0_10px_rgba(168,85,247,0.4)]" />
-                          <div className="space-y-2 w-full">
-                            <div className="h-2 w-1/2 bg-purple-300 dark:bg-purple-900/60 rounded-full" />
-                            <div className="h-1.5 w-3/4 bg-gray-300 dark:bg-gray-700 rounded-full" />
-                            <div className="h-1.5 w-1/3 bg-gray-300 dark:bg-gray-700 rounded-full" />
-                          </div>
-                        </div>
-                        <div className="absolute w-24 h-24 bg-purple-500/20 blur-2xl rounded-full" />
+                      <div className="mt-6 relative h-48 sm:h-56 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 shadow-sm bg-white dark:bg-gray-800">
+                        <img 
+                          src="/icons/User.png" 
+                          alt="Create Your Profile" 
+                          className="w-full h-full object-cover scale-110 transition-all duration-500"
+                        />
                       </div>
                     )
                   },
@@ -430,17 +501,12 @@ export default function Home() {
                       </svg>
                     ),
                     visual: (
-                      <div className="mt-6 relative h-32 bg-gradient-to-br from-pink-500/5 to-transparent dark:from-pink-900/20 rounded-2xl border border-pink-500/10 dark:border-pink-500/20 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500">
-                        <div className="flex items-center gap-3 relative z-10 w-full px-8">
-                          <div className="flex flex-col gap-4 w-[40%]">
-                            <div className="h-6 w-full bg-white/50 dark:bg-black/40 backdrop-blur-md rounded border border-white/40 dark:border-white/10" />
-                            <div className="h-6 w-full bg-white/50 dark:bg-black/40 backdrop-blur-md rounded border border-white/40 dark:border-white/10" />
-                          </div>
-                          <div className="w-6 h-10 border-t-2 border-r-2 border-b-2 border-pink-400/50 rounded-r-lg" />
-                          <div className="w-3 border-t-2 border-pink-400/50" />
-                          <div className="h-7 w-[30%] bg-gradient-to-r from-purple-500 to-pink-500 rounded border border-white/30 shadow-[0_0_15px_rgba(236,72,153,0.4)]" />
-                        </div>
-                        <div className="absolute w-24 h-24 bg-pink-500/20 blur-2xl rounded-full" />
+                      <div className="mt-6 relative h-48 sm:h-56 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 shadow-sm bg-white dark:bg-gray-800">
+                        <img 
+                          src="/icons/organiser.png" 
+                          alt="Organize Tournaments" 
+                          className="w-full h-full object-cover  transition-all duration-500"
+                        />
                       </div>
                     )
                   },
@@ -454,17 +520,12 @@ export default function Home() {
                       </svg>
                     ),
                     visual: (
-                      <div className="mt-6 relative h-32 bg-gradient-to-br from-blue-500/5 to-transparent dark:from-blue-900/20 rounded-2xl border border-blue-500/10 dark:border-blue-500/20 flex items-end justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 px-6 pt-6">
-                        <div className="flex items-end gap-2 h-full relative z-10 w-full justify-center pb-3">
-                          <div className="w-[12%] h-[30%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
-                          <div className="w-[12%] h-[45%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
-                          <div className="w-[12%] h-[35%] bg-white/60 dark:bg-white/10 rounded-t-sm" />
-                          <div className="w-[12%] h-[60%] bg-purple-400/50 dark:bg-white/20 rounded-t-sm" />
-                          <div className="w-[12%] h-[85%] bg-gradient-to-t from-purple-500 to-pink-500 rounded-t-sm shadow-[0_0_15px_rgba(168,85,247,0.4)] relative">
-                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] font-black text-pink-500">#1</div>
-                          </div>
-                        </div>
-                        <div className="absolute bottom-0 w-32 h-16 bg-blue-500/20 blur-2xl rounded-full" />
+                      <div className="mt-6 relative h-48 sm:h-56 rounded-2xl border border-gray-200 dark:border-gray-700 flex items-center justify-center overflow-hidden group-hover:scale-[1.02] transition-transform duration-500 shadow-sm bg-white dark:bg-gray-800">
+                        <img 
+                          src="/icons/compete.png" 
+                          alt="Join & Compete" 
+                          className="w-full h-full object-cover transition-all duration-500"
+                        />
                       </div>
                     )
                   }
@@ -475,13 +536,13 @@ export default function Home() {
                     style={{
                       opacity: useTransform(
                         scrollYProgress,
-                        [index * 0.35 + 0.1, index * 0.35 + 0.2],
-                        [0, 1]
+                        [index * 0.33, index * 0.33 + 0.12, index * 0.33 + 0.28, Math.min(index * 0.33 + 0.4, 1.0)],
+                        [0, 1, 1, index === 2 ? 1 : 0]
                       ),
                       y: useTransform(
                         scrollYProgress,
-                        [index * 0.35 + 0.1, index * 0.35 + 0.2],
-                        [50, 0]
+                        [index * 0.33, index * 0.33 + 0.12],
+                        [30, 0]
                       )
                     }}
                   >
@@ -492,7 +553,7 @@ export default function Home() {
                         style={{
                           opacity: useTransform(
                             scrollYProgress,
-                            [index * 0.35 + 0.1, index * 0.35 + 0.2],
+                            [index * 0.33, index * 0.33 + 0.12],
                             [0, 1]
                           )
                         }}
@@ -501,7 +562,7 @@ export default function Home() {
 
                     {/* Content Card */}
                     <div className={`w-full sm:w-1/2 pl-16 sm:pl-0 ${index % 2 === 0 ? 'sm:pr-16 sm:text-right' : 'sm:pl-16 sm:text-left'}`}>
-                      <div className="group relative p-6 sm:p-8 rounded-3xl bg-white/5 dark:bg-gray-900/40 border border-purple-200/30 dark:border-purple-800/30 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(168,85,247,0.05)] hover:bg-white/10 dark:hover:bg-gray-900/60 transition-all duration-500 overflow-hidden">
+                      <div className="group relative p-6 sm:p-8 rounded-3xl bg-white/5 dark:bg-gray-900/40 border border-[rgba(255,255,255,0.5)] dark:border-[rgba(255,255,255,0.08)] backdrop-blur-xl saturate-150 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_8px_30px_rgba(168,85,247,0.05)] hover:bg-white/10 dark:hover:bg-gray-900/60 transition-all duration-500 overflow-hidden">
                         {/* Hover Gradient Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         
@@ -533,7 +594,7 @@ export default function Home() {
           </div>
 
           {/* Kinetic Light Pipe Separator */}
-          <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
+          <div className="w-full max-w-5xl mx-auto py-10 sm:py-24 relative flex items-center justify-center">
             <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
             <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
             <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
@@ -547,21 +608,25 @@ export default function Home() {
           <div>
             <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
               <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
-                How Sportify Can Help You
+                One Platform. Three Powerful Roles. 
               </span>
             </h2>
 
             {/* Role Cards - Glassmorphism */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="relative">
+              {/* Ambient Background Glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 dark:from-purple-500/5 dark:via-blue-500/5 dark:to-pink-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {/* Organizers Card */}
-              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-purple-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 rounded-3xl transition-all duration-500" />
 
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-purple-500/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
                     <svg
-                      className="w-8 h-8 text-white"
+                      className="w-8 h-8 text-purple-600 dark:text-purple-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -586,14 +651,14 @@ export default function Home() {
               </div>
 
               {/* Players Card */}
-              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-blue-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
                     <svg
-                      className="w-8 h-8 text-white"
+                      className="w-8 h-8 text-blue-600 dark:text-blue-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -617,14 +682,14 @@ export default function Home() {
               </div>
 
               {/* Sponsors Card */}
-              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500">
+              <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
                 <Pointer className="text-pink-600" />
                 <div className="absolute inset-0 bg-gradient-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
                 <div className="relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-pink-500/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                  <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
                     <svg
-                      className="w-8 h-8 text-white"
+                      className="w-8 h-8 text-pink-600 dark:text-pink-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -647,6 +712,7 @@ export default function Home() {
                   </p>
                 </div>
               </div>
+            </div>
             </div>
           </div>
 
@@ -676,26 +742,12 @@ export default function Home() {
               <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    <svg
-                      className="w-7 h-7 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                    <HoverGif
+                      src="/icons/location.gif"
+                      alt="Location Based Discovery"
+                      className="w-full h-full"
+                    />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -713,20 +765,12 @@ export default function Home() {
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-purple-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    <svg
-                      className="w-7 h-7 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                    <HoverGif
+                      src="/icons/registration.gif"
+                      alt="Digital Registration"
+                      className="w-full h-full"
+                    />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -740,24 +784,16 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Feature 2 */}
+              {/* Feature 3 */}
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    <svg
-                      className="w-7 h-7 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                    <HoverGif
+                      src="/icons/payments.gif"
+                      alt="Secure Payments"
+                      className="w-full h-full"
+                    />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -775,20 +811,12 @@ export default function Home() {
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-orange-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-pink-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                    <svg
-                      className="w-7 h-7 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                      />
-                    </svg>
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                    <HoverGif
+                      src="/icons/notifications.gif"
+                      alt="Real-time Notifications"
+                      className="w-full h-full"
+                    />
                   </div>
                   <div>
                     <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -922,8 +950,12 @@ export default function Home() {
         </div>
 
         {/* Professional Footer */}
-        <footer className="bg-gradient-to-b from-purple-100/80 to-slate-100/90 dark:from-gray-900/95 dark:to-gray-950/90 backdrop-blur-xl border-t border-purple-200/30 dark:border-purple-800/30 relative z-10 transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <footer className="relative z-10 transition-colors overflow-hidden border-t border-slate-200/50 dark:border-white/5">
+          {/* Subtle Top Glow & Depth */}
+          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-slate-300 dark:via-white/10 to-transparent" />
+          <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-slate-50 dark:from-white/[0.02] to-transparent pointer-events-none" />
+          
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
               {/* Brand */}
               <div className="col-span-2">
@@ -942,40 +974,28 @@ export default function Home() {
                   participating in local sports tournaments. Join thousands of
                   players and organizers today.
                 </p>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-slate-100/50 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 w-fit mt-2">
                   <a
                     href="#"
-                    className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm hover:shadow"
                   >
-                    <svg
-                      className="w-5 h-5 text-purple-600 dark:text-purple-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                   </a>
                   <a
                     href="#"
-                    className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm hover:shadow"
                   >
-                    <svg
-                      className="w-5 h-5 text-purple-600 dark:text-purple-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                     </svg>
                   </a>
                   <a
                     href="#"
-                    className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800/50 transition-colors"
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm hover:shadow"
                   >
-                    <svg
-                      className="w-5 h-5 text-purple-600 dark:text-purple-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z" />
                     </svg>
                   </a>
@@ -984,14 +1004,14 @@ export default function Home() {
 
               {/* Quick Links */}
               <div>
-                <h4 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+                <h4 className="text-sm font-bold tracking-wider uppercase mb-4 text-slate-900 dark:text-white">
                   Quick Links
                 </h4>
                 <ul className="space-y-2">
                   <li>
                     <Link
                       href="/tournaments"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       Browse Tournaments
                     </Link>
@@ -999,7 +1019,7 @@ export default function Home() {
                   <li>
                     <Link
                       href="/auth/register"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       Create Account
                     </Link>
@@ -1007,7 +1027,7 @@ export default function Home() {
                   <li>
                     <Link
                       href="/auth/login"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       Sign In
                     </Link>
@@ -1017,14 +1037,14 @@ export default function Home() {
 
               {/* For Users */}
               <div>
-                <h4 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">
+                <h4 className="text-sm font-bold tracking-wider uppercase mb-4 text-slate-900 dark:text-white">
                   For Users
                 </h4>
                 <ul className="space-y-2">
                   <li>
                     <Link
                       href="/auth/register?role=organizer"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       For Organizers
                     </Link>
@@ -1032,7 +1052,7 @@ export default function Home() {
                   <li>
                     <Link
                       href="/auth/register?role=player"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       For Players
                     </Link>
@@ -1040,7 +1060,7 @@ export default function Home() {
                   <li>
                     <Link
                       href="/auth/register?role=sponsor"
-                      className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                      className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                     >
                       For Sponsors
                     </Link>
@@ -1049,27 +1069,26 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="pt-6 sm:pt-8 border-t border-purple-200/30 dark:border-purple-800/30 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+            <div className="pt-6 sm:pt-8 border-t border-slate-200/50 dark:border-white/5 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
               <p className="text-gray-600 dark:text-gray-400 text-sm">
                 © 2026 Sportify
               </p>
               <div className="flex gap-6 text-sm">
                 <a
                   href="#"
-                  className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                 >
                   Privacy Policy
                 </a>
                 <a
                   href="#"
-                  className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                 >
                   Terms of Service
                 </a>
                 <a
                   href="#"
-                  className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                  className="text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
                 >
                   Contact Us
                 </a>

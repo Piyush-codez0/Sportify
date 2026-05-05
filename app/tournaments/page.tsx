@@ -2,7 +2,9 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+import ThemeToggle from "@/components/ThemeToggle";
+import { motion, AnimatePresence } from "framer-motion";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
 import { INDIAN_STATES } from "@/lib/indianStates";
 import { INDIAN_DISTRICTS } from "@/lib/indianDistricts";
@@ -19,6 +21,9 @@ interface Tournament {
   status?: string;
   entryFee: number;
   prizePool?: number;
+  venue?: string;
+  description?: string;
+  rules?: string;
   createdAt?: string;
   location?: {
     coordinates: [number, number]; // [lng, lat]
@@ -30,6 +35,21 @@ interface Tournament {
     organizationName?: string;
   };
 }
+
+// Sport image context for sports (higher res for banners)
+const SPORT_BANNER_IMAGES: Record<string, string> = {
+  football: "https://images.unsplash.com/photo-1518605368461-1ee511687286?w=800&q=80",
+  cricket: "https://images.unsplash.com/photo-1531415074968-03610062d88a?w=800&q=80",
+  chess: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=800&q=80",
+  badminton: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&q=80",
+  tennis: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&q=80",
+  kabaddi: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80",
+  basketball: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80",
+  volleyball: "https://images.unsplash.com/photo-1592656670411-591eef3073bc?w=800&q=80",
+  "table tennis": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&q=80",
+  athletics: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
+  "kho-kho": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
+};
 
 // Helper: get tournament status tag info
 function getTournamentStatus(t: Tournament): {
@@ -61,13 +81,13 @@ function getTournamentStatus(t: Tournament): {
     ((deadline && deadline < now) ||
       t.status === "closed");
 
-  if (isEnded) {
+  if (isEnded || isRegistrationClosed) {
     return {
-      label: t.status === "cancelled" ? "Cancelled" : "Tournament Ended",
-      emoji: "⚠️",
-      ribbonBg: "from-gray-500 to-gray-600",
-      tagBg: "bg-gray-100 dark:bg-gray-700",
-      tagText: "text-gray-600 dark:text-gray-300",
+      label: "Closed",
+      emoji: "🔴",
+      ribbonBg: "from-red-500 to-rose-600",
+      tagBg: "bg-red-100 dark:bg-red-900/40",
+      tagText: "text-red-700 dark:text-red-400",
       isActive: false,
     };
   }
@@ -83,20 +103,23 @@ function getTournamentStatus(t: Tournament): {
     };
   }
 
-  if (isRegistrationClosed) {
+  // Calculate days until deadline
+  const daysUntilDeadline = deadline ? Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)) : 10;
+
+  if (daysUntilDeadline <= 3) {
     return {
-      label: "Registration Closed",
-      emoji: "🔒",
-      ribbonBg: "from-red-500 to-orange-500",
-      tagBg: "bg-red-100 dark:bg-red-900/40",
-      tagText: "text-red-700 dark:text-red-400",
-      isActive: false,
+      label: "Filling Fast",
+      emoji: "🟡",
+      ribbonBg: "from-amber-400 to-orange-500",
+      tagBg: "bg-amber-100 dark:bg-amber-900/40",
+      tagText: "text-amber-700 dark:text-amber-400",
+      isActive: true,
     };
   }
 
   return {
     label: "Open",
-    emoji: "✅",
+    emoji: "🟢",
     ribbonBg: "",
     tagBg: "bg-green-100 dark:bg-green-900/40",
     tagText: "text-green-700 dark:text-green-400",
@@ -117,6 +140,11 @@ export default function TournamentsBrowse() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     null
   );
+  const [mounted, setMounted] = useState(false);
+  const [userCity, setUserCity] = useState<string | null>(null);
+  const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
+  const [fullTournamentData, setFullTournamentData] = useState<Tournament | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -161,14 +189,46 @@ export default function TournamentsBrowse() {
     location,
   ]);
 
+  useEffect(() => {
+    const fetchFullDetails = async () => {
+      if (!selectedTournament) {
+        setFullTournamentData(null);
+        return;
+      }
+      setLoadingDetails(true);
+      try {
+        const res = await fetch(`/api/tournaments/${selectedTournament._id}`);
+        const data = await res.json();
+        if (data.tournament) setFullTournamentData(data.tournament);
+      } catch (e) {
+        console.error("Failed to fetch tournament details");
+      } finally {
+        setLoadingDetails(false);
+      }
+    };
+    fetchFullDetails();
+  }, [selectedTournament]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const getLocation = () => {
     if (!navigator.geolocation) {
       setError("Geolocation not supported");
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&zoom=10`);
+          const data = await res.json();
+          const city = data.address.city || data.address.town || data.address.county || data.address.state_district;
+          if (city) setUserCity(city);
+        } catch (e) {
+          console.error("Failed to reverse geocode location");
+        }
       },
       () => setError("Failed to get location")
     );
@@ -183,9 +243,9 @@ export default function TournamentsBrowse() {
     : tournaments;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-900 dark:to-indigo-950 relative transition-colors">
-      <SportsDoodlesBackground />
-      {token && (
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
+
+      {token ? (
         <DashboardNavbar
           title="Browse Tournaments"
           userName={user?.name || "User"}
@@ -196,12 +256,41 @@ export default function TournamentsBrowse() {
           onProfileClick={() => {}}
           onLogout={() => {}}
         />
+      ) : (
+        <nav className="bg-white/70 dark:bg-[#040812]/60 backdrop-blur-[10px] dark:backdrop-blur-2xl shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-black/5 dark:border-white/10 transition-all duration-300">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-14 sm:h-20 items-center">
+              <div className="flex items-center">
+                <Link href="/" className="flex items-center gap-2">
+                  <img
+                    src="/icon.png"
+                    alt="Sportify"
+                    className="w-10 h-10 sm:w-16 sm:h-16 rounded-xl"
+                  />
+                </Link>
+              </div>
+              <div className="flex gap-2 sm:gap-3 items-center">
+                {mounted && <ThemeToggle />}
+                <div className="hidden sm:flex gap-3 items-center">
+                  <Link
+                    href="/auth/login"
+                    className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-all"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="px-6 py-2.5 text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
       )}
-      <div
-        className={`${
-          token ? "pt-24" : "pt-8"
-        } max-w-6xl mx-auto px-4 pb-12 relative z-10`}
-      >
+      <div className="pt-24 sm:pt-28 max-w-6xl mx-auto px-4 pb-12 relative z-10">
         {/* Page Header */}
         {!token && (
           <div className="text-center mb-10">
@@ -370,13 +459,34 @@ export default function TournamentsBrowse() {
 
           <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4">
             {/* Left: text */}
-            <div>
-              <p className="text-white font-bold text-lg leading-tight">
-                📍 Find Tournaments Near Me
-              </p>
-              <p className="text-white/75 text-xs mt-0.5">
-                Use your GPS location to discover nearby tournaments
-              </p>
+            <div className="flex items-center gap-4">
+              {/* Animated Location Pin Container */}
+              <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex-shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+                <svg className={`w-6 h-6 text-white ${filters.useRadius ? 'animate-bounce' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                {filters.useRadius && (
+                  <span className="absolute -bottom-1 w-5 h-1 bg-white/50 rounded-[100%] animate-pulse blur-[2px]"></span>
+                )}
+              </div>
+
+              <div>
+                <p className="text-white font-bold text-lg leading-tight flex items-center gap-2">
+                  {filters.useRadius ? (
+                    <span>
+                      Tournaments near <span className="text-emerald-100 underline decoration-emerald-200/50 underline-offset-4">{userCity || user?.city || "you"}</span>
+                    </span>
+                  ) : (
+                    "Find Tournaments Near Me"
+                  )}
+                </p>
+                <p className="text-white/80 text-xs mt-1 font-medium">
+                  {filters.useRadius 
+                    ? `Searching within ${filters.radiusKm}km radius of your location` 
+                    : "Use your GPS location to discover nearby tournaments"}
+                </p>
+              </div>
             </div>
 
             {/* Right: button + radius */}
@@ -495,12 +605,29 @@ export default function TournamentsBrowse() {
               };
               const sportEmoji = sportEmojis[sportKey] || "🏆";
 
+              // Real image context for sports
+              const sportImages: Record<string, string> = {
+                football: "https://images.unsplash.com/photo-1518605368461-1ee511687286?w=150&h=150&fit=crop&q=80",
+                cricket: "https://images.unsplash.com/photo-1531415074968-03610062d88a?w=150&h=150&fit=crop&q=80",
+                chess: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=150&h=150&fit=crop&q=80",
+                badminton: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=150&h=150&fit=crop&q=80",
+                tennis: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=150&h=150&fit=crop&q=80",
+                kabaddi: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=150&h=150&fit=crop&q=80",
+                basketball: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=150&h=150&fit=crop&q=80",
+                volleyball: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=150&h=150&fit=crop&q=80",
+                "table tennis": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=150&h=150&fit=crop&q=80",
+                athletics: "https://images.unsplash.com/photo-1552674605-171ff5ea5787?w=150&h=150&fit=crop&q=80",
+                "kho-kho": "https://images.unsplash.com/photo-1526676037777-05a232554f77?w=150&h=150&fit=crop&q=80",
+              };
+              const defaultImage = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=150&h=150&fit=crop&q=80";
+              const sportImage = sportImages[sportKey] || defaultImage;
+
               return (
                 <div
                   key={t._id}
                   className={`group relative rounded-3xl overflow-hidden bg-white/70 dark:bg-gray-800/60 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 shadow-xl transition-all duration-500 flex flex-col ${
                     isInactive
-                      ? "opacity-90 grayscale-[20%]"
+                      ? "opacity-50 grayscale-[60%] pointer-events-none"
                       : "hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-300/50 dark:hover:border-indigo-500/50 cursor-pointer"
                   }`}
                 >
@@ -508,25 +635,35 @@ export default function TournamentsBrowse() {
                   <div
                     className={`relative bg-gradient-to-br ${
                       isInactive ? "from-gray-400 to-gray-500" : headerGradient
-                    } px-6 pt-5 pb-12 overflow-hidden`}
+                    } px-6 pt-5 pb-10 overflow-hidden`}
                   >
                     {/* Decorative pattern overlay */}
                     <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "16px 16px" }}></div>
-                    {/* Sport name + emoji */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl">{sportEmoji}</span>
-                      <h2 className="text-white font-extrabold text-lg leading-tight drop-shadow">
-                        {t.sport} Tournament
-                      </h2>
-                    </div>
-
-                    {/* Location chip */}
-                    <div className="flex items-center gap-1 mt-1 text-white/80 text-xs">
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <span>{t.city}, {t.state}</span>
+                    
+                    {/* Top Content: Thumbnail + Details */}
+                    <div className="relative flex items-center gap-4 z-10">
+                      {/* Real Image Thumbnail */}
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex-shrink-0 bg-white/20">
+                        <img 
+                          src={sportImage} 
+                          alt={t.sport} 
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h2 className="text-white font-extrabold text-lg leading-tight drop-shadow truncate">
+                          {t.sport} Tournament
+                        </h2>
+                        {/* Location chip */}
+                        <div className="flex items-center gap-1 mt-0.5 text-white/90 text-xs font-medium">
+                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span className="truncate">{t.city}, {t.state}</span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Prize badge — top right corner */}
@@ -590,17 +727,23 @@ export default function TournamentsBrowse() {
                       )}
                     </div>
 
-                    {/* Entry fee */}
-                    <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border ${
-                      t.entryFee === 0
-                        ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50"
-                        : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50"
-                    }`}>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {t.entryFee === 0 ? "🎁 Free Entry" : `Entry: ₹${t.entryFee}`}
+                    {/* Entry Fee & Social Proof Row */}
+                    <div className="flex items-center justify-between mt-1 pt-1">
+                      {/* Entry fee */}
+                      <div className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl border ${
+                        t.entryFee === 0
+                          ? "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50"
+                          : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/50"
+                      }`}>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {t.entryFee === 0 ? "🎁 Free Entry" : `Entry: ₹${t.entryFee}`}
+                      </div>
+
+                      
                     </div>
+
 
                     <div className="flex-1"></div> {/* Spacer to push buttons to bottom */}
 
@@ -609,8 +752,8 @@ export default function TournamentsBrowse() {
 
                     {/* CTA Button */}
                     <div className="pt-2">
-                      <Link
-                        href={`/tournaments/${t._id}`}
+                      <button
+                        onClick={() => setSelectedTournament(t)}
                         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -618,7 +761,7 @@ export default function TournamentsBrowse() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                         View Details
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -639,6 +782,230 @@ export default function TournamentsBrowse() {
           </div>
         )}
       </div>
+
+      {/* Tournament Details Overlay */}
+      <AnimatePresence>
+        {selectedTournament && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedTournament(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="bg-white dark:bg-[#1E293B] w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedTournament(null)}
+                className="absolute top-4 right-4 z-50 p-2 bg-black/20 hover:bg-black/40 text-white rounded-full backdrop-blur-md transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Header Section (Constant/Sticky) */}
+              <div className="relative h-32 sm:h-44 bg-slate-900 flex items-end flex-shrink-0">
+                {/* Sport Background Image */}
+                <img 
+                  src={
+                    Object.entries(SPORT_BANNER_IMAGES).find(([key]) => 
+                      selectedTournament.sport.toLowerCase().includes(key)
+                    )?.[1] || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1000&q=80"
+                  }
+                  alt={selectedTournament.sport}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1000&q=80";
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle, white 1.5px, transparent 1.5px)", backgroundSize: "24px 24px" }} />
+                <div className="relative z-10 w-full p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-2xl sm:text-3xl font-black text-white mb-1 drop-shadow-md">
+                        {selectedTournament.sport} Tournament
+                      </h2>
+                      <div className="flex items-center gap-2 text-white/90 font-medium text-sm">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {selectedTournament.venue}, {selectedTournament.city}
+                      </div>
+                    </div>
+                    {selectedTournament.prizePool && (
+                      <div className="bg-white/20 backdrop-blur-md border border-white/30 px-6 py-2.5 rounded-2xl">
+                        <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Prize Pool</p>
+                        <p className="text-white text-2xl font-black">₹{selectedTournament.prizePool.toLocaleString()}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto flex-1 custom-scrollbar">
+                <div className="p-6 sm:p-8">
+                  {/* Grid Info */}
+                  {(() => {
+                    const overlayStatus = getTournamentStatus(selectedTournament);
+                    const infoItems = [
+                      { label: "Start Date", val: new Date(selectedTournament.startDate).toLocaleDateString("en-GB"), color: "indigo", icon: "📅" },
+                      { label: "Entry Fee", val: selectedTournament.entryFee === 0 ? "FREE" : `₹${selectedTournament.entryFee}`, color: "emerald", icon: "💳" },
+                      { label: "Status", val: overlayStatus.label, color: "violet", icon: overlayStatus.emoji },
+                      { label: "Deadline", val: selectedTournament.registrationDeadline ? new Date(selectedTournament.registrationDeadline).toLocaleDateString("en-GB") : "N/A", color: "amber", icon: "⏳" },
+                    ];
+
+                    const colorMap: Record<string, string> = {
+                      indigo: "bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400",
+                      emerald: "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+                      violet: "bg-violet-50 dark:bg-violet-500/10 border-violet-100 dark:border-violet-500/20 text-violet-600 dark:text-violet-400",
+                      amber: "bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400",
+                    };
+
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                        {infoItems.map((item, i) => (
+                          <div key={i} className={`p-4 rounded-2xl border transition-all hover:scale-[1.02] ${colorMap[item.color]}`}>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{item.label}</p>
+                              <span className="text-xs">{item.icon}</span>
+                            </div>
+                            <p className="text-sm font-black truncate">{item.val}</p>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
+                  <div className="space-y-8">
+                      {/* About */}
+                      {selectedTournament.description && (
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                            <span className="w-1.5 h-6 bg-indigo-500 rounded-full" />
+                            About the Tournament
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                            {selectedTournament.description}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Rules */}
+                      {selectedTournament.rules && (
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                            <span className="w-1 h-5 bg-purple-500 rounded-full" />
+                            Tournament Rules
+                          </h3>
+                          <div className="bg-gray-100/50 dark:bg-white/5 p-5 rounded-2xl border border-gray-200 dark:border-white/10">
+                            <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap text-sm">
+                              {selectedTournament.rules}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Organizer */}
+                      <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Organized By</p>
+                            <p className="font-bold text-gray-900 dark:text-white">
+                              {selectedTournament.organizer?.organizationName || selectedTournament.organizer?.name}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Venue & Directions */}
+                      <div className="p-5 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Venue Location</p>
+                            <p className="font-bold text-gray-900 dark:text-white text-sm">
+                              {selectedTournament.venue}, {selectedTournament.city}
+                            </p>
+                          </div>
+                        </div>
+                        <Link 
+                          href={fullTournamentData?.googleMapsLink || `https://www.google.com/maps/dir/?api=1&destination=${selectedTournament.location?.coordinates[1]},${selectedTournament.location?.coordinates[0]}`}
+                          target="_blank"
+                          className="w-full sm:w-auto px-6 py-2.5 bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-xs font-bold hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-all shadow-sm flex items-center justify-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                          </svg>
+                          Get Directions
+                        </Link>
+                      </div>
+                    </div>
+                </div>
+              </div>
+
+              {/* Action Footer */}
+              <div className="p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-col sm:flex-row gap-4">
+                <Link
+                  href={token ? `/tournaments/${selectedTournament._id}` : `/auth/register?role=player`}
+                  className="flex-[1.5] bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-4 px-8 rounded-2xl text-center shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
+                >
+                  {token ? "Proceed to Register" : "Register to Compete"}
+                </Link>
+                <Link
+                  href={`/auth/register?role=sponsor&tournamentId=${selectedTournament._id}`}
+                  className="flex-1 bg-white dark:bg-gray-800/50 text-indigo-600 dark:text-indigo-300 border-2 border-indigo-100 dark:border-indigo-500/20 font-bold py-4 px-8 rounded-2xl text-center hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all active:scale-95 shadow-sm"
+                >
+                  Sponsor
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #6366f1;
+          border-radius: 20px;
+          border: 3px solid transparent;
+          background-clip: content-box;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: #818cf8;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #4f46e5;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background-color: #a5b4fc;
+        }
+      `}</style>
     </div>
   );
 }

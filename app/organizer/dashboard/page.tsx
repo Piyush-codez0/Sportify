@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { MapPin, CalendarDays, Users, IndianRupee, Trophy } from "lucide-react";
 import Link from "next/link";
-import SportsDoodlesBackground from "@/components/SportsDoodlesBackground";
+
 import DashboardNavbar from "@/components/DashboardNavbar";
 import ProfileModal from "@/components/ProfileModal";
 
@@ -92,8 +92,8 @@ export default function OrganizerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950 relative transition-colors">
-      <SportsDoodlesBackground />
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
+
       <DashboardNavbar
         title="Organizer Dashboard"
         userName={user?.name || "User"}
