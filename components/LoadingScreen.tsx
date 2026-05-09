@@ -1,3 +1,7 @@
+/*
+ - Used on: various pages/components for loading states
+ - Features: Global loading indicator with dark mode support
+*/
 import React from "react";
 import styled from "styled-components";
 
@@ -54,6 +58,12 @@ const StyledWrapper = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+  }
 
   .loader {
     height: 240px;

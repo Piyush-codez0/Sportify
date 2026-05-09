@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: app-level authentication (login, register, pages needing user)
+ - Features: user state, login/logout helpers, refresh user data
+*/
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -34,26 +37,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Load token from localStorage
-    // Clear any legacy phoneVerified override
-    try {
-      localStorage.removeItem("phoneVerified");
-    } catch {}
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      fetchUser(storedToken);
-    } else {
-      setIsLoading(false);
-    }
+    fetchUser();
   }, []);
 
-  const fetchUser = async (authToken: string) => {
+  const fetchUser = async () => {
     try {
       const response = await fetch("/api/auth/me", {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+        credentials: "include",
         cache: "no-store",
       });
 
@@ -63,7 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Trust backend state; do not override phoneVerified client-side
         setUser(data.user);
       } else {
-        localStorage.removeItem("token");
         setToken(null);
       }
     } catch (error) {
@@ -77,6 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
@@ -88,7 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await response.json();
     setToken(data.token);
     setUser(data.user);
-    localStorage.setItem("token", data.token);
 
     // Redirect based on role
     if (data.user.role === "organizer") {
@@ -104,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify(userData),
     });
 
@@ -115,7 +105,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await response.json();
     setToken(data.token);
     setUser(data.user);
-    localStorage.setItem("token", data.token);
 
     // Redirect preference
     if (redirectTo) {
@@ -135,14 +124,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem("token");
+    fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => {});
     router.push("/");
   };
 
   const refreshUser = async () => {
-    if (token) {
-      await fetchUser(token);
-    }
+    await fetchUser();
   };
 
   const updateUser = (updates: Partial<User>) => {

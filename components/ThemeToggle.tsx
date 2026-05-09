@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: site header and settings
+ - Features: toggles light/dark theme across app
+*/
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ThemeToggle() {

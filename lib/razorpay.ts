@@ -1,3 +1,7 @@
+/*
+ - Used on: registration payment flows
+ - Features: Razorpay client instance for creating orders and payments
+*/
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({

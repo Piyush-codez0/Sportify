@@ -1,3 +1,7 @@
+/*
+ - Used on: sponsorship management and sponsor dashboards
+ - Features: sponsorship schema (amount, benefits, logo placement)
+*/
 import mongoose, { Schema, Model, Document, Types } from "mongoose";
 
 export interface ISponsorship extends Document {
@@ -83,7 +87,7 @@ const SponsorshipSchema = new Schema<ISponsorship>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Indexes

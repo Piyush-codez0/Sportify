@@ -23,18 +23,17 @@ interface Registration {
 }
 
 export default function PlayerDashboard() {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
-    if (!token) return;
     const load = async () => {
       try {
         const res = await fetch("/api/registrations/my-registrations", {
-          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed");
@@ -46,14 +45,13 @@ export default function PlayerDashboard() {
       }
     };
     load();
-  }, [token]);
+  }, []);
 
   if (!user || user.role !== "player")
     return <div className="p-6">Access denied.</div>;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
-
       <DashboardNavbar
         title="Player Dashboard"
         userName={user?.name || "User"}

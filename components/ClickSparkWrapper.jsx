@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: landing and auth pages
+ - Features: visual click spark effect wrapper used by interactive elements
+*/
 import { useRef, useEffect, useCallback } from "react";
 
 export default function ClickSparkWrapper({ children }) {
@@ -43,7 +46,7 @@ export default function ClickSparkWrapper({ children }) {
           return t * (2 - t);
       }
     },
-    [easing]
+    [easing],
   );
 
   useEffect(() => {

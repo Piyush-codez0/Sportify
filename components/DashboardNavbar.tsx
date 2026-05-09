@@ -1,4 +1,8 @@
 "use client";
+/*
+ - Used on: organizer dashboard and pages that show user actions
+ - Features: Profile button, logout, navigation controls
+*/
 import { LogOut, User } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -26,7 +30,10 @@ export default function DashboardNavbar({
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      if (currentScrollY > window.innerHeight * 0.5 && currentScrollY > lastScrollY) {
+      if (
+        currentScrollY > window.innerHeight * 0.5 &&
+        currentScrollY > lastScrollY
+      ) {
         setIsNavHidden(true);
       } else {
         setIsNavHidden(false);
@@ -38,7 +45,9 @@ export default function DashboardNavbar({
   }, []);
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-300 ${isNavHidden ? "-translate-y-full" : "translate-y-0"}`}>
+    <div
+      className={`fixed top-0 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 shadow-lg transition-all duration-300 ${isNavHidden ? "-translate-y-full" : "translate-y-0"}`}
+    >
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-4">
         <div className="flex justify-between items-center">
           {/* Left: Logo and Title */}

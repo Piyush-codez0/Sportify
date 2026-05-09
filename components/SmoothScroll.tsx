@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: layout and pages that require smooth scrolling
+ - Features: Lenis-based smooth scroll integration
+*/
 import { useEffect } from "react";
 import Lenis from "lenis";
 
@@ -10,10 +13,10 @@ interface SmoothScrollProps {
 export default function SmoothScroll({ children }: SmoothScrollProps) {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.2,        // scroll duration in seconds
+      duration: 1.2, // scroll duration in seconds
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // expo ease out
-      smoothWheel: true,    // smooth mouse wheel
-      touchMultiplier: 2,   // touch scroll speed
+      smoothWheel: true, // smooth mouse wheel
+      touchMultiplier: 2, // touch scroll speed
     });
 
     function raf(time: number) {

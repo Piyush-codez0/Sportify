@@ -1,3 +1,7 @@
+/*
+ - Used on: user accounts, auth flows, organizer/player/sponsor profiles
+ - Features: user schema, password hashing, verification flags
+*/
 import mongoose, { Schema, Model, Document, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -132,7 +136,7 @@ const UserSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Create geospatial index for location-based queries
@@ -152,7 +156,7 @@ UserSchema.pre("save", async function () {
 
 // Method to compare passwords
 UserSchema.methods.comparePassword = async function (
-  candidatePassword: string
+  candidatePassword: string,
 ): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password);
 };

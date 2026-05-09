@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import dbConnect from "@/lib/mongodb";
 import Tournament from "@/models/Tournament";
 import Registration from "@/models/Registration";
@@ -27,49 +28,36 @@ async function handler(request: AuthenticatedRequest) {
     if (!tournamentId || !registrationType) {
       return NextResponse.json(
         { error: "Tournament ID and registration type are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Check tournament exists
+    const user = await User.findById(request.user!.userId);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const tournament = await Tournament.findById(tournamentId);
     if (!tournament) {
       return NextResponse.json(
         { error: "Tournament not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    // Check if registration deadline passed
     if (new Date() > new Date(tournament.registrationDeadline)) {
       return NextResponse.json(
         { error: "Registration deadline has passed" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Check if tournament is full
-    if (tournament.currentParticipants >= tournament.maxParticipants) {
+    const registrationSlots =
+      registrationType === "team" ? teamMembers?.length || 0 : 1;
+    if (registrationSlots <= 0) {
       return NextResponse.json(
-        { error: "Tournament is full" },
-        { status: 400 }
-      );
-    }
-
-    // Check if already registered
-    const existingRegistration = await Registration.findOne({
-      tournament: tournamentId,
-      player: request.user!.userId,
-    });
-
-    if (existingRegistration) {
-      return NextResponse.json(
-        {
-          message: "You have already registered for this tournament",
-          alreadyRegistered: true,
-          registration: existingRegistration,
-        },
-        { status: 200 }
+        { error: "Invalid registration details" },
+        { status: 400 },
       );
     }
 
@@ -78,14 +66,14 @@ async function handler(request: AuthenticatedRequest) {
       if (!tournament.allowTeamRegistration) {
         return NextResponse.json(
           { error: "Team registration not allowed for this tournament" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (!teamName || !teamMembers || teamMembers.length === 0) {
         return NextResponse.json(
           { error: "Team name and team members are required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -93,7 +81,7 @@ async function handler(request: AuthenticatedRequest) {
       if (tournament.teamSize && teamMembers.length !== tournament.teamSize) {
         return NextResponse.json(
           { error: `Team must have exactly ${tournament.teamSize} members` },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -109,7 +97,7 @@ async function handler(request: AuthenticatedRequest) {
               error:
                 "All team members must upload Aadhar card (front and back)",
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -118,7 +106,7 @@ async function handler(request: AuthenticatedRequest) {
       if (!aadharNumber || !aadharDocument || !aadharBackDocument) {
         return NextResponse.json(
           { error: "Aadhar card (front and back) upload is mandatory" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -131,75 +119,128 @@ async function handler(request: AuthenticatedRequest) {
     if (tournament.entryFee > 0) {
       if (!hasRazorpayConfig) {
         console.warn(
-          "Razorpay not configured. Registration will be created with pending payment status."
+          "Razorpay not configured. Registration will be created with pending payment status.",
         );
-        // Allow registration without payment gateway - organizer can collect payment offline
       } else {
         try {
           razorpayOrder = await razorpay.orders.create({
-            amount: tournament.entryFee * 100, // Convert to paise
+            amount: tournament.entryFee * 100,
             currency: "INR",
             receipt: `reg_${tournamentId}_${request.user!.userId}`,
           });
         } catch (razorpayError: any) {
           console.error("Razorpay order creation failed:", razorpayError);
           console.warn(
-            "Continuing with registration. Payment can be collected offline."
+            "Continuing with registration. Payment can be collected offline.",
           );
-          // Don't fail registration if Razorpay fails - allow offline payment
         }
       }
     }
 
-    // Create registration
-    console.log("Creating registration with data:", {
-      tournament: tournamentId,
-      player: request.user!.userId,
-      registrationType,
-      aadharDocument,
-      aadharBackDocument,
-    });
-    const registration = await Registration.create({
-      tournament: tournamentId,
-      player: request.user!.userId,
-      registrationType,
-      teamName: registrationType === "team" ? teamName : undefined,
-      teamMembers: registrationType === "team" ? teamMembers : undefined,
-      aadharNumber:
-        registrationType === "individual" ? aadharNumber : undefined,
-      aadharDocument:
-        registrationType === "individual" ? aadharDocument : undefined,
-      aadharBackDocument:
-        registrationType === "individual" ? aadharBackDocument : undefined,
-      razorpayOrderId: razorpayOrder?.id,
-      amountPaid: tournament.entryFee,
-      paymentStatus: tournament.entryFee === 0 ? "paid" : "pending",
-      status: tournament.entryFee === 0 ? "confirmed" : "pending",
-    });
+    const session = await mongoose.startSession();
+    let registration;
+    let alreadyRegistered = false;
 
-    // Update tournament participant count
-    await Tournament.findByIdAndUpdate(tournamentId, {
-      $inc: {
-        currentParticipants:
-          registrationType === "team" ? teamMembers.length : 1,
-      },
-    });
+    try {
+      await session.withTransaction(async () => {
+        const existingRegistration = await Registration.findOne({
+          tournament: tournamentId,
+          player: request.user!.userId,
+        }).session(session);
 
-    // Send email notification
-    const user = await User.findById(request.user!.userId);
-    if (user) {
-      try {
-        await sendRegistrationConfirmation(
-          user.email,
-          user.name,
-          tournament.name,
-          new Date(tournament.startDate).toLocaleDateString("en-GB"),
-          registrationType
+        if (existingRegistration) {
+          registration = existingRegistration;
+          alreadyRegistered = true;
+          return;
+        }
+
+        const reservedTournament = await Tournament.findOneAndUpdate(
+          {
+            _id: tournamentId,
+            registrationDeadline: { $gte: new Date() },
+            $expr: {
+              $lte: [
+                { $add: ["$currentParticipants", registrationSlots] },
+                "$maxParticipants",
+              ],
+            },
+          },
+          {
+            $inc: { currentParticipants: registrationSlots },
+          },
+          {
+            new: true,
+            session,
+          },
         );
-      } catch (emailError: any) {
-        console.error("Email notification failed:", emailError);
-        // Don't fail the registration if email fails
-      }
+
+        if (!reservedTournament) {
+          throw new Error("Tournament is full");
+        }
+
+        registration = await Registration.create(
+          [
+            {
+              tournament: tournamentId,
+              player: request.user!.userId,
+              registrationType,
+              teamName: registrationType === "team" ? teamName : undefined,
+              teamMembers:
+                registrationType === "team" ? teamMembers : undefined,
+              aadharNumber:
+                registrationType === "individual" ? aadharNumber : undefined,
+              aadharDocument:
+                registrationType === "individual" ? aadharDocument : undefined,
+              aadharBackDocument:
+                registrationType === "individual"
+                  ? aadharBackDocument
+                  : undefined,
+              razorpayOrderId: razorpayOrder?.id,
+              amountPaid: tournament.entryFee,
+              paymentStatus: tournament.entryFee === 0 ? "paid" : "pending",
+              status: tournament.entryFee === 0 ? "confirmed" : "pending",
+            },
+          ],
+          { session },
+        );
+      });
+    } finally {
+      session.endSession();
+    }
+
+    if (Array.isArray(registration)) {
+      registration = registration[0];
+    }
+
+    if (!registration) {
+      return NextResponse.json(
+        { error: "Registration failed" },
+        { status: 500 },
+      );
+    }
+
+    if (alreadyRegistered) {
+      return NextResponse.json(
+        {
+          message: "You have already registered for this tournament",
+          alreadyRegistered: true,
+          registration,
+        },
+        { status: 200 },
+      );
+    }
+
+    // Send email notification after the transaction commits
+    try {
+      await sendRegistrationConfirmation(
+        user.email,
+        user.name,
+        tournament.name,
+        new Date(tournament.startDate).toLocaleDateString("en-GB"),
+        registrationType,
+      );
+    } catch (emailError: any) {
+      console.error("Email notification failed:", emailError);
     }
 
     return NextResponse.json(
@@ -215,7 +256,7 @@ async function handler(request: AuthenticatedRequest) {
             }
           : null,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error("Registration error details:", {
@@ -228,7 +269,7 @@ async function handler(request: AuthenticatedRequest) {
         error: error.message || "Registration failed",
         details: error.toString(),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

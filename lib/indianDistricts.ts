@@ -1,3 +1,7 @@
+/*
+ - Used on: profile & address forms (ProfileModal, tournament creation)
+ - Features: provides districts per state for dropdowns and validation
+*/
 // Indian Districts by State
 export const INDIAN_DISTRICTS: { [state: string]: string[] } = {
   "Andhra Pradesh": [

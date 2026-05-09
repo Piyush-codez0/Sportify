@@ -24,7 +24,7 @@ function RegisterContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
-  
+
   // 3D Card Ref
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -76,20 +76,20 @@ function RegisterContent() {
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    
+
     // max +-10deg
     const rotateX = ((centerY - y) / centerY) * 10;
     const rotateY = ((x - centerX) / centerX) * 10;
-    
+
     cardRef.current.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
   };
 
   const handleMouseLeave = () => {
     if (!cardRef.current) return;
-    cardRef.current.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    cardRef.current.style.transform = "rotateX(0deg) rotateY(0deg)";
   };
 
   return (
@@ -187,21 +187,20 @@ function RegisterContent() {
           to { transform: translate(40px, 30px) scale(1.08); }
         }
       `}</style>
-      
+
       <div className="orbs-container">
         <div className="orb orb1"></div>
         <div className="orb orb2"></div>
         <div className="orb orb3"></div>
       </div>
 
-
       <div className="max-w-2xl w-full relative z-10 card-container">
-        <div 
+        <div
           ref={cardRef}
           onMouseMove={!role ? handleMouseMove : undefined}
           onMouseLeave={!role ? handleMouseLeave : undefined}
           className="glass-card bg-white dark:bg-gray-800 p-4 sm:p-6 transition-colors relative overflow-hidden"
-          style={role ? { transform: 'none' } : undefined}
+          style={role ? { transform: "none" } : undefined}
         >
           <BorderBeam
             size={150}
@@ -220,7 +219,7 @@ function RegisterContent() {
             initialOffset={50}
             reverse={true}
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
+          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
           <div className="text-center mb-4">
             <Link href="/" className="inline-flex flex-col items-center gap-2">
               <img src="/icon.png" alt="Sportify" className="w-16 h-16 " />
@@ -266,12 +265,12 @@ function RegisterContent() {
                 >
                   {/* Animated gradient background */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 opacity-0 group-hover:opacity-10"
+                    className="absolute inset-0 bg-linear-to-br from-amber-400 via-orange-500 to-red-500 opacity-0 group-hover:opacity-10"
                     initial={{ scale: 0, rotate: 0 }}
                     whileHover={{ scale: 1.5, rotate: 180 }}
                     transition={{ duration: 0.6 }}
                   />
-                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
+                  <motion.div className="absolute -inset-1 bg-linear-to-r from-amber-500 to-orange-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
                   <div className="relative z-10">
                     <motion.div
                       className="flex justify-center mb-3"
@@ -304,12 +303,12 @@ function RegisterContent() {
                 >
                   {/* Animated gradient background */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-blue-400 via-cyan-500 to-teal-500 opacity-0 group-hover:opacity-30 rounded-xl"
+                    className="absolute inset-0 bg-linear-to-br from-blue-400 via-cyan-500 to-teal-500 opacity-0 group-hover:opacity-30 rounded-xl"
                     initial={{ scale: 0, rotate: 0 }}
                     whileHover={{ scale: 1.25, rotate: 0 }}
                     transition={{ duration: 0.5 }}
                   />
-                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl opacity-0 group-hover:opacity-35 blur-xl" />
+                  <motion.div className="absolute -inset-1 bg-linear-to-r from-cyan-500 to-blue-600 rounded-xl opacity-0 group-hover:opacity-35 blur-xl" />
                   <div className="relative z-10">
                     <motion.div
                       className="flex justify-center mb-3"
@@ -342,12 +341,12 @@ function RegisterContent() {
                 >
                   {/* Animated gradient background */}
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-purple-400 via-pink-500 to-rose-500 opacity-0 group-hover:opacity-10 rounded-xl"
+                    className="absolute inset-0 bg-linear-to-br from-purple-400 via-pink-500 to-rose-500 opacity-0 group-hover:opacity-10 rounded-xl"
                     initial={{ scale: 0 }}
                     whileHover={{ scale: 1.5, rotate: -90 }}
                     transition={{ duration: 0.6 }}
                   />
-                  <motion.div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
+                  <motion.div className="absolute -inset-1 bg-linear-to-r from-purple-500 to-pink-600 rounded-xl opacity-0 group-hover:opacity-20 blur-xl" />
                   <div className="relative z-10">
                     <motion.div
                       className="flex justify-center mb-3"
@@ -412,13 +411,15 @@ function RegisterContent() {
                       maxLength={14}
                       onChange={(e) => {
                         let value = e.target.value;
-                        // Ensure it always starts with +91 
+                        // Ensure it always starts with +91
                         if (!value.startsWith("+91 ")) {
                           value = "+91 ";
                         }
-                        // Only allow digits after +91 
+                        // Only allow digits after +91
                         const numberPart = value.slice(4);
-                        const cleanedNumber = numberPart.replace(/\D/g, "").slice(0, 10);
+                        const cleanedNumber = numberPart
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
                         setFormData({
                           ...formData,
                           phone: "+91 " + cleanedNumber,

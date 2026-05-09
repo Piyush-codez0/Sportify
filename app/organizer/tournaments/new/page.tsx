@@ -1,10 +1,13 @@
 "use client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import DashboardNavbar from "@/components/DashboardNavbar";
+import ProfileModal from "@/components/ProfileModal";
 import LocationPicker from "@/components/LocationPicker";
+import LoadingScreen from "@/components/LoadingScreen";
 import { INDIAN_STATES } from "@/lib/indianStates";
 import Stepper, { Step } from "@/components/Stepper";
 
@@ -22,8 +25,16 @@ const POPULAR_SPORTS = [
 ];
 
 export default function NewTournamentPage() {
-  const { user, token } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("editId");
+  const isEditMode = Boolean(editId);
+  const latestLocationRef = useRef({
+    city: "",
+    district: "",
+    state: "",
+  });
 
   // Check if organizer is verified
   const isProfileComplete = user?.city && user?.state && user?.gender;
@@ -36,6 +47,7 @@ export default function NewTournamentPage() {
     description: "",
     venue: "",
     city: "",
+    district: "",
     state: "",
     latitude: "",
     longitude: "",
@@ -53,98 +65,171 @@ export default function NewTournamentPage() {
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<string>("");
   const [stepError, setStepError] = useState<string>("");
+  const [showProfile, setShowProfile] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationModalKey, setLocationModalKey] = useState(0);
 
   // Local ISO date string (YYYY-MM-DD) without timezone issues
   const todayStr = new Date().toLocaleDateString("en-CA");
 
+  useEffect(() => {
+    const loadTournament = async () => {
+      if (!editId) return;
+
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/tournaments/${editId}`, {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to load tournament");
+
+        const tournament = data.tournament;
+        setForm((prev: any) => ({
+          ...prev,
+          sport: tournament.sport || "",
+          sportOther: "",
+          description: tournament.description || "",
+          venue: tournament.venue || "",
+          city: tournament.city || "",
+          district: tournament.district || tournament.city || "",
+          state: tournament.state || "",
+          latitude: tournament.location?.coordinates?.[1]?.toString() || "",
+          longitude: tournament.location?.coordinates?.[0]?.toString() || "",
+          registrationStartDate: tournament.registrationStartDate
+            ? new Date(tournament.registrationStartDate).toLocaleDateString(
+                "en-CA",
+              )
+            : tournament.startDate
+              ? new Date(tournament.startDate).toLocaleDateString("en-CA")
+              : prev.registrationStartDate,
+          registrationDeadline: tournament.registrationDeadline
+            ? new Date(tournament.registrationDeadline).toLocaleDateString(
+                "en-CA",
+              )
+            : "",
+          tournamentStartDate: tournament.startDate
+            ? new Date(tournament.startDate).toLocaleDateString("en-CA")
+            : "",
+          maxParticipants: tournament.maxParticipants?.toString() || "",
+          allowTeamRegistration: Boolean(tournament.allowTeamRegistration),
+          teamSize: tournament.teamSize?.toString() || "",
+          entryFee: tournament.entryFee?.toString() || "",
+          prizePool: tournament.prizePool?.toString() || "",
+          rules: tournament.rules || "",
+          ageGroup: tournament.ageGroup || "",
+        }));
+      } catch (error: any) {
+        setError(error.message || "Failed to load tournament");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTournament();
+  }, [editId]);
+
   // Validation functions for each step
-  const validateStep1 = (): boolean => {
-    setStepError("");
+  // NOTE: validation functions are pure and return [valid, message].
+  // Avoid calling setState during validation; setStepError is scheduled
+  const validateStep1 = (): [boolean, string] => {
     if (!form.sport) {
-      setStepError("Please select a sport");
-      return false;
+      return [false, "Please select a sport"];
     }
     if (form.sport === "Other" && !form.sportOther.trim()) {
-      setStepError("Please enter the sport name");
-      return false;
+      return [false, "Please enter the sport name"];
     }
     if (!form.venue.trim()) {
-      setStepError("Please enter the venue");
-      return false;
+      return [false, "Please enter the venue"];
     }
-    return true;
+    return [true, ""];
   };
 
-  const validateStep2 = (): boolean => {
-    setStepError("");
+  const validateStep2 = (): [boolean, string] => {
     if (!form.latitude || !form.longitude) {
-      setStepError("Please select a location on the map");
-      return false;
+      return [false, "Please select a location on the map"];
     }
-    if (!form.city) {
-      setStepError(
-        "City could not be detected from location. Please try a different location."
-      );
-      return false;
+    const latestLocation = latestLocationRef.current;
+    if (!form.city && !latestLocation.city) {
+      return [
+        false,
+        "City could not be detected from location. Please try a different location.",
+      ];
     }
-    if (!form.state) {
-      setStepError(
-        "State could not be detected from location. Please try a different location."
-      );
-      return false;
+    if (!form.district && !latestLocation.district) {
+      return [
+        false,
+        "District could not be detected from location. Please try a different location.",
+      ];
     }
-    return true;
+    if (!form.state && !latestLocation.state) {
+      return [
+        false,
+        "State could not be detected from location. Please try a different location.",
+      ];
+    }
+    return [true, ""];
   };
 
-  const validateStep3 = (): boolean => {
-    setStepError("");
+  const validateStep3 = (): [boolean, string] => {
     if (!form.registrationStartDate) {
-      setStepError("Please enter registration start date");
-      return false;
+      return [false, "Please enter registration start date"];
     }
     if (!form.registrationDeadline) {
-      setStepError("Please enter registration deadline");
-      return false;
+      return [false, "Please enter registration deadline"];
     }
     if (!form.tournamentStartDate) {
-      setStepError("Please enter tournament start date");
-      return false;
+      return [false, "Please enter tournament start date"];
     }
     if (!form.maxParticipants) {
-      setStepError("Please enter max participants");
-      return false;
+      return [false, "Please enter max participants"];
     }
     if (parseInt(form.maxParticipants) < 2) {
-      setStepError("Max participants must be at least 2");
-      return false;
+      return [false, "Max participants must be at least 2"];
     }
-    return true;
+    return [true, ""];
   };
 
-  const validateStep4 = (): boolean => {
-    setStepError("");
+  const validateStep4 = (): [boolean, string] => {
     // All fields in step 4 are optional, so validation passes
-    return true;
+    return [true, ""];
   };
 
-  const validateStep5 = (): boolean => {
-    setStepError("");
-    return true;
+  const validateStep5 = (): [boolean, string] => {
+    return [true, ""];
   };
 
   const handleStepChange = (step: number): boolean => {
-    if (step === 2) return validateStep1();
-    if (step === 3) return validateStep2();
-    if (step === 4) return validateStep3();
-    if (step === 5) return validateStep4();
-    return true;
+    let result: [boolean, string] = [true, ""];
+    if (step === 2) result = validateStep1();
+    else if (step === 3) result = validateStep2();
+    else if (step === 4) result = validateStep3();
+    else if (step === 5) result = validateStep4();
+
+    // Schedule setting stepError asynchronously to avoid setState during render
+    setTimeout(() => {
+      setStepError(result[0] ? "" : result[1]);
+    }, 0);
+
+    return result[0];
   };
 
   const handleLocationChange = async (
     lat: number,
     lng: number,
-    address?: string
+    address?: string,
+    locationDetails?: {
+      city?: string;
+      district?: string;
+      state?: string;
+    },
   ) => {
+    latestLocationRef.current = {
+      city: locationDetails?.city || "",
+      district: locationDetails?.district || "",
+      state: locationDetails?.state || "",
+    };
+
     setForm((prev: any) => ({
       ...prev,
       latitude: lat.toString(),
@@ -154,26 +239,48 @@ export default function NewTournamentPage() {
       setSelectedLocation(address);
     }
 
+    if (
+      locationDetails?.city ||
+      locationDetails?.district ||
+      locationDetails?.state
+    ) {
+      setForm((prev: any) => ({
+        ...prev,
+        city: locationDetails.city || prev.city,
+        district: locationDetails.district || prev.district,
+        state: locationDetails.state || prev.state,
+      }));
+      return;
+    }
+
     // Extract city and state from coordinates using reverse geocoding
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `/api/location/reverse?lat=${lat}&lng=${lng}`,
       );
       const data = await response.json();
-      if (data.address) {
-        const city =
-          data.address.city || data.address.town || data.address.village || "";
-        const state = data.address.state || "";
+      if (data.result) {
+        latestLocationRef.current = {
+          city: data.result.city || "",
+          district: data.result.district || "",
+          state: data.result.state || "",
+        };
         setForm((prev: any) => ({
           ...prev,
-          city,
-          state,
+          city: data.result.city || prev.city,
+          district: data.result.district || prev.district,
+          state: data.result.state || prev.state,
         }));
       }
     } catch (err) {
-      console.log("Could not extract city/state from location");
+      console.log("Could not extract city/district/state from location");
     }
   };
+
+  // Show loading screen while auth context is initializing
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   if (!user || user.role !== "organizer")
     return <div className="p-6">Access denied.</div>;
@@ -198,30 +305,33 @@ export default function NewTournamentPage() {
         throw new Error("Please select a location on the map");
       }
 
-      const res = await fetch("/api/tournaments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const res = await fetch(
+        isEditMode ? `/api/tournaments/${editId}` : "/api/tournaments",
+        {
+          method: isEditMode ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...form,
+            sport: form.sport === "Other" ? form.sportOther : form.sport,
+            // Use the sport as the tournament display name per requirements
+            name: form.sport === "Other" ? form.sportOther : form.sport,
+            contactEmail: user.email,
+            contactPhone: user.phone,
+            latitude: parseFloat(form.latitude),
+            longitude: parseFloat(form.longitude),
+            startDate: form.tournamentStartDate,
+            endDate: form.tournamentStartDate, // Same as start for single-day tournaments
+            registrationDeadline: form.registrationDeadline,
+            maxParticipants: parseInt(form.maxParticipants, 10),
+            teamSize: form.teamSize ? parseInt(form.teamSize, 10) : undefined,
+            entryFee: parseFloat(form.entryFee || "0"),
+            prizePool: form.prizePool ? parseFloat(form.prizePool) : undefined,
+          }),
         },
-        body: JSON.stringify({
-          ...form,
-          sport: form.sport === "Other" ? form.sportOther : form.sport,
-          // Use the sport as the tournament display name per requirements
-          name: form.sport === "Other" ? form.sportOther : form.sport,
-          contactEmail: user.email,
-          contactPhone: user.phone,
-          latitude: parseFloat(form.latitude),
-          longitude: parseFloat(form.longitude),
-          startDate: form.tournamentStartDate,
-          endDate: form.tournamentStartDate, // Same as start for single-day tournaments
-          registrationDeadline: form.registrationDeadline,
-          maxParticipants: parseInt(form.maxParticipants, 10),
-          teamSize: form.teamSize ? parseInt(form.teamSize, 10) : undefined,
-          entryFee: parseFloat(form.entryFee || "0"),
-          prizePool: form.prizePool ? parseFloat(form.prizePool) : undefined,
-        }),
-      });
+      );
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
       router.push("/organizer/dashboard");
@@ -236,7 +346,6 @@ export default function NewTournamentPage() {
   if (!isVerified) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors relative">
-
         <div className="max-w-3xl mx-auto p-6 relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <img
@@ -383,20 +492,94 @@ export default function NewTournamentPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors relative overflow-hidden">
-
       <DashboardNavbar
-        title="Create a Tournament"
+        title={isEditMode ? "Edit Tournament" : "Organise a Tournament"}
         userName={user?.name || "User"}
         userProfileComplete={isProfileComplete}
         userPhoneVerified={isPhoneVerified}
-        onProfileClick={() => {}}
-        onLogout={() => {}}
+        onProfileClick={() => setShowProfile(true)}
+        onLogout={logout}
       />
-      <div className="pt-24 px-6 py-6 relative z-10 flex flex-col h-[calc(100vh-6rem)]">
+      <ProfileModal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
+      />
+
+      {/* Location Selection Modal */}
+      {showLocationModal && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowLocationModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-linear-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500">
+              <h3 className="text-2xl font-bold text-white flex items-center gap-3">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                  />
+                </svg>
+                Select Tournament Location
+              </h3>
+              <button
+                onClick={() => setShowLocationModal(false)}
+                className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-auto p-6">
+              <LocationPicker
+                key={`location-picker-${locationModalKey}`}
+                initialLat={form.latitude ? parseFloat(form.latitude) : 30.3165}
+                initialLng={
+                  form.longitude ? parseFloat(form.longitude) : 78.0322
+                }
+                initialSelectedLocationDisplay={selectedLocation}
+                onLocationChange={(
+                  lat: number,
+                  lng: number,
+                  address?: string,
+                ) => {
+                  handleLocationChange(lat, lng, address);
+                }}
+                height="500px"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="mt-24 px-4 md:px-6 py-4 md:py-6 relative z-10 flex flex-col min-h-[calc(100vh-6rem)]">
         {error && (
           <div className="text-sm bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-2 rounded-lg border border-red-200 dark:border-red-800 transition-colors shadow-sm flex items-center gap-1 mb-4">
             <svg
-              className="w-4 h-4 flex-shrink-0"
+              className="w-4 h-4 shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -412,52 +595,8 @@ export default function NewTournamentPage() {
 
         {/* Main Card Container - Fills remaining space */}
         <div className="flex-1 overflow-auto">
-          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col h-full max-w-4xl mx-auto w-full">
-            {/* Organizer Info Header */}
-            <div className="relative bg-gradient-to-r from-blue-600 via-slate-600 to-blue-700 flex-shrink-0 p-4">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="relative flex items-center gap-3">
-                <div className="w-14 h-14 rounded-full bg-white dark:bg-gray-900 flex items-center justify-center shadow-xl ring-4 ring-white/30 flex-shrink-0">
-                  <span className="text-xl font-bold bg-gradient-to-br from-blue-600 to-slate-600 bg-clip-text text-transparent">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : "?"}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full whitespace-nowrap">
-                      ORGANIZER
-                    </span>
-                  </div>
-                  <p className="text-lg font-bold text-white mt-0.5 truncate">
-                    {user?.name || "Unknown"}
-                  </p>
-                  <p className="text-xs text-white/80 truncate">
-                    {user?.email}
-                  </p>
-                </div>
-                <div className="hidden lg:flex flex-shrink-0">
-                  <div className="text-right">
-                    <p className="text-xs text-white/70 uppercase tracking-wide">
-                      Creator
-                    </p>
-                    <div className="flex items-center gap-1 mt-1 text-white justify-end">
-                      <svg
-                        className="w-3 h-3"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span className="text-xs font-semibold">Verified</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col max-w-6xl mx-auto w-full">
+            {/* Organizer header removed per user request */}
 
             {/* Stepper Container - Flex grow to fill space, overflow scroll */}
             <div className="flex-1 overflow-auto p-4 md:p-6">
@@ -469,14 +608,14 @@ export default function NewTournamentPage() {
                   setStepError("");
                 }}
                 stepCircleContainerClassName="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 pt-0 shadow-inner"
-                contentClassName=""
+                contentClassName="min-h-[350px] p-6 overflow-y-auto"
                 footerClassName="border-t border-gray-200 dark:border-gray-700 pt-6 mt-8"
               >
                 {/* Step 1: Basic Information */}
                 <Step>
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                      Basic Information
+                  <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
+                      {isEditMode ? "Basic Information" : "Basic Information"}
                     </h2>
 
                     {stepError && (
@@ -536,14 +675,39 @@ export default function NewTournamentPage() {
                           required
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Age Group
+                        </label>
+                        <input
+                          name="ageGroup"
+                          placeholder="e.g. U19, Open, 18+"
+                          value={form.ageGroup}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                          Prize Pool (INR)
+                        </label>
+                        <input
+                          type="number"
+                          name="prizePool"
+                          placeholder="Optional"
+                          value={form.prizePool}
+                          onChange={handleChange}
+                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
+                        />
+                      </div>
                     </div>
                   </div>
                 </Step>
 
                 {/* Step 2: Tournament Location */}
                 <Step>
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
                       Tournament Location
                     </h2>
 
@@ -553,24 +717,57 @@ export default function NewTournamentPage() {
                       </div>
                     )}
 
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors">
-                        Select Location<span className="text-red-500">*</span>
-                      </label>
-                      <LocationPicker
-                        initialLat={
-                          form.latitude ? parseFloat(form.latitude) : 30.3165
-                        }
-                        initialLng={
-                          form.longitude ? parseFloat(form.longitude) : 78.0322
-                        }
-                        onLocationChange={handleLocationChange}
-                        height="300px"
-                      />
+                    <div className="space-y-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLocationModalKey((prev) => prev + 1);
+                          setShowLocationModal(true);
+                        }}
+                        className="w-full px-6 py-4 bg-linear-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                          />
+                        </svg>
+                        {form.latitude && form.longitude
+                          ? "Change Location"
+                          : "Select Location on Map"}
+                      </button>
+
                       {form.latitude && form.longitude && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors">
-                          Coordinates: {form.latitude}, {form.longitude}
-                        </p>
+                        <div className="p-4 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <svg
+                              className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 shrink-0"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            <div>
+                              <p className="font-semibold text-green-900 dark:text-green-200">
+                                {selectedLocation || "Location Selected"}
+                              </p>
+                              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                                Coordinates: {form.latitude}, {form.longitude}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -578,8 +775,8 @@ export default function NewTournamentPage() {
 
                 {/* Step 3: Dates & Participants */}
                 <Step>
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
                       Dates & Participants
                     </h2>
 
@@ -670,8 +867,8 @@ export default function NewTournamentPage() {
 
                 {/* Step 4: Details & Rules */}
                 <Step>
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
                       Tournament Details
                     </h2>
 
@@ -684,7 +881,7 @@ export default function NewTournamentPage() {
                         placeholder="Describe your tournament..."
                         value={form.description}
                         onChange={handleChange}
-                        rows={4}
+                        rows={3}
                         className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                       />
                     </div>
@@ -698,37 +895,9 @@ export default function NewTournamentPage() {
                         placeholder="Tournament rules and guidelines..."
                         value={form.rules}
                         onChange={handleChange}
-                        rows={4}
+                        rows={3}
                         className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
                       />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Age Group
-                        </label>
-                        <input
-                          name="ageGroup"
-                          placeholder="e.g. U19, Open, 18+"
-                          value={form.ageGroup}
-                          onChange={handleChange}
-                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                          Prize Pool (INR)
-                        </label>
-                        <input
-                          type="number"
-                          name="prizePool"
-                          placeholder="Optional"
-                          value={form.prizePool}
-                          onChange={handleChange}
-                          className="border border-gray-300 dark:border-gray-600 p-2 rounded w-full bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-colors"
-                        />
-                      </div>
                     </div>
 
                     <div className="text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
@@ -740,8 +909,8 @@ export default function NewTournamentPage() {
 
                 {/* Step 5: Team Settings */}
                 <Step>
-                  <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                  <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
+                    <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
                       Team Registration Settings
                     </h2>
 
@@ -772,12 +941,12 @@ export default function NewTournamentPage() {
 
                     <div className="mt-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                       <h3 className="font-semibold text-green-900 dark:text-green-300 mb-2">
-                        Ready to Create!
+                        {isEditMode ? "Ready to Update!" : "Ready to Create!"}
                       </h3>
                       <p className="text-sm text-green-700 dark:text-green-400">
-                        Click "Complete" to create your tournament. You'll be
-                        redirected to your dashboard where you can manage
-                        registrations.
+                        {isEditMode
+                          ? `Click "Complete" to save your changes. You'll be redirected to your dashboard.`
+                          : `Click "Complete" to create your tournament. You'll be redirected to your dashboard where you can manage registrations.`}
                       </p>
                     </div>
                   </div>

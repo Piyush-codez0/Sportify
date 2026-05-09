@@ -1,15 +1,23 @@
+/*
+ - Used on: server API routes that require authentication
+ - Features: authenticate helper to extract and verify user token from cookie
+*/
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken, TokenPayload } from "./auth";
+import { AUTH_COOKIE_NAME, verifyToken, TokenPayload } from "./auth";
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: TokenPayload;
 }
 
 export async function authenticate(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<TokenPayload | null> {
   try {
-    const token = request.headers.get("authorization")?.replace("Bearer ", "");
+    const cookieToken = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+    const headerToken = request.headers
+      .get("authorization")
+      ?.replace("Bearer ", "");
+    const token = cookieToken || headerToken;
 
     if (!token) {
       return null;
@@ -23,7 +31,7 @@ export async function authenticate(
 }
 
 export function requireAuth(
-  handler: (req: AuthenticatedRequest, context?: any) => Promise<NextResponse>
+  handler: (req: AuthenticatedRequest, context?: any) => Promise<NextResponse>,
 ) {
   return async (req: AuthenticatedRequest, context?: any) => {
     const user = await authenticate(req);
@@ -31,7 +39,7 @@ export function requireAuth(
     if (!user) {
       return NextResponse.json(
         { error: "Unauthorized - Please login" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -44,13 +52,16 @@ export function requireRole(
   ...roles: Array<"organizer" | "player" | "sponsor">
 ) {
   return (
-    handler: (req: AuthenticatedRequest, context?: any) => Promise<NextResponse>
+    handler: (
+      req: AuthenticatedRequest,
+      context?: any,
+    ) => Promise<NextResponse>,
   ) => {
     return requireAuth(async (req: AuthenticatedRequest, context?: any) => {
       if (!req.user || !roles.includes(req.user.role)) {
         return NextResponse.json(
           { error: "Forbidden - Insufficient permissions" },
-          { status: 403 }
+          { status: 403 },
         );
       }
 

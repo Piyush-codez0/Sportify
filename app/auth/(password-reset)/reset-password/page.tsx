@@ -1,34 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import { BorderBeam } from "@/components/ui/border-beam";
 
-export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+function ResetPasswordContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams?.get("token") || "";
+
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (!token) {
+      setError("Invalid reset link. Please request a new password reset.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ token, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || "Something went wrong");
       }
 
-      setSubmitted(true);
+      setSuccess(true);
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -38,7 +61,6 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center px-4 relative transition-colors">
-
       <div className="max-w-md w-full relative z-10">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 border-2 border-indigo-200/50 dark:border-indigo-700/50 transition-colors relative overflow-hidden">
           <BorderBeam
@@ -58,26 +80,22 @@ export default function ForgotPasswordPage() {
             initialOffset={50}
             reverse
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
+          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
 
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex flex-col items-center gap-3">
-              <img
-                src="/icon.png"
-                alt="Sportify"
-                className="w-16 h-16"
-              />
+              <img src="/icon.png" alt="Sportify" className="w-16 h-16" />
               <span className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors">
                 Sportify
               </span>
             </Link>
             <h2 className="mt-4 text-2xl font-bold text-gray-900 dark:text-white transition-colors">
-              Forgot Password?
+              {success ? "Password Reset!" : "Set New Password"}
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mt-2 transition-colors">
-              {submitted
-                ? "Check your email for a reset link"
-                : "No worries, we'll send you reset instructions"}
+              {success
+                ? "Your password has been updated successfully"
+                : "Enter your new password below"}
             </p>
           </div>
 
@@ -87,50 +105,80 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          {submitted ? (
+          {!token && !success ? (
             <div className="text-center">
-              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <div className="text-4xl mb-3">📧</div>
-                <p className="text-green-700 dark:text-green-300 font-medium">
-                  Reset link sent!
+              <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <div className="text-4xl mb-3">⚠️</div>
+                <p className="text-amber-700 dark:text-amber-300 font-medium">
+                  Invalid Reset Link
                 </p>
-                <p className="text-green-600 dark:text-green-400 text-sm mt-2">
-                  If an account exists for <strong>{email}</strong>, you'll
-                  receive an email with instructions to reset your password.
+                <p className="text-amber-600 dark:text-amber-400 text-sm mt-2">
+                  This password reset link is invalid or has expired. Please
+                  request a new one.
                 </p>
               </div>
-
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Didn't receive the email? Check your spam folder or try again.
-              </p>
-
-              <button
-                onClick={() => {
-                  setSubmitted(false);
-                  setEmail("");
-                }}
-                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold text-sm transition-colors"
+              <Link
+                href="/auth/forgot-password"
+                className="inline-block bg-indigo-600 dark:bg-indigo-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
               >
-                Try a different email
+                Request New Reset Link
+              </Link>
+            </div>
+          ) : success ? (
+            <div className="text-center">
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                <div className="text-4xl mb-3">✅</div>
+                <p className="text-green-700 dark:text-green-300 font-medium">
+                  Password updated successfully!
+                </p>
+                <p className="text-green-600 dark:text-green-400 text-sm mt-2">
+                  You can now sign in with your new password.
+                </p>
+              </div>
+              <button
+                onClick={() => router.push("/auth/login")}
+                className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+              >
+                Go to Sign In
               </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
-                  htmlFor="forgot-email"
+                  htmlFor="new-password"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors"
                 >
-                  Email Address
+                  New Password
                 </label>
                 <input
-                  id="forgot-email"
-                  type="email"
+                  id="new-password"
+                  type="password"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  minLength={6}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                  placeholder="your.email@example.com"
+                  placeholder="Min 6 characters"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm-password"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 transition-colors"
+                >
+                  Confirm Password
+                </label>
+                <input
+                  id="confirm-password"
+                  type="password"
+                  required
+                  minLength={6}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  placeholder="Re-enter your new password"
                 />
               </div>
 
@@ -139,7 +187,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 disabled:cursor-not-allowed transition-colors"
               >
-                {loading ? "Sending..." : "Send Reset Link"}
+                {loading ? "Resetting..." : "Reset Password"}
               </button>
             </form>
           )}
@@ -167,5 +215,19 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center">
+          <div className="text-gray-600 dark:text-gray-300">Loading...</div>
+        </div>
+      }
+    >
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

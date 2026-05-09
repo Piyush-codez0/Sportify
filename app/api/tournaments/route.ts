@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const { searchParams } = new URL(request.url);
+    const district = searchParams.get("district");
     const city = searchParams.get("city");
     const state = searchParams.get("state");
     const sport = searchParams.get("sport");
@@ -20,6 +21,12 @@ export async function GET(request: NextRequest) {
 
     const query: any = {};
 
+    if (district) {
+      query.$or = [
+        { district: new RegExp(district, "i") },
+        { city: new RegExp(district, "i") },
+      ];
+    }
     if (city) query.city = new RegExp(city, "i");
     if (state) query.state = new RegExp(state, "i");
     if (sport) query.sport = new RegExp(sport, "i");
@@ -38,7 +45,7 @@ export async function GET(request: NextRequest) {
       ) {
         return NextResponse.json(
           { error: "lat, lng and radiusKm must be valid numbers" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -63,7 +70,7 @@ export async function GET(request: NextRequest) {
     console.error("Fetch tournaments error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch tournaments" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,6 +87,7 @@ async function createHandler(request: AuthenticatedRequest) {
       description,
       venue,
       city,
+      district,
       state,
       latitude,
       longitude,
@@ -102,7 +110,7 @@ async function createHandler(request: AuthenticatedRequest) {
     if (!name || !sport || !description || !venue || !city || !state) {
       return NextResponse.json(
         { error: "Required fields missing" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -123,6 +131,7 @@ async function createHandler(request: AuthenticatedRequest) {
       },
       venue,
       city,
+      district,
       state,
       googleMapsLink,
       startDate,
@@ -143,13 +152,13 @@ async function createHandler(request: AuthenticatedRequest) {
 
     return NextResponse.json(
       { message: "Tournament created successfully", tournament },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error: any) {
     console.error("Create tournament error:", error);
     return NextResponse.json(
       { error: error.message || "Failed to create tournament" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

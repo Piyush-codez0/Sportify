@@ -1,7 +1,11 @@
+/*
+ - Used on: all client/server code making internal API calls
+ - Features: lightweight fetch wrapper for JSON APIs, attaches auth token
+*/
 export async function apiRequest(
   url: string,
   options: RequestInit = {},
-  token?: string | null
+  token?: string | null,
 ) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -14,6 +18,7 @@ export async function apiRequest(
 
   const response = await fetch(url, {
     ...options,
+    credentials: "include",
     headers,
   });
 

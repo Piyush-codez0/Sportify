@@ -1,4 +1,8 @@
 "use client";
+/*
+ - Used on: /organizer/tournaments/new, /tournaments/[id], tournament detail pages
+ - Features: Map rendering, marker display, tile layers (read-only)
+*/
 import { useEffect, useRef } from "react";
 import "leaflet/dist/leaflet.css";
 
@@ -73,9 +77,22 @@ export default function MapDisplay({
 
   return (
     <div
-      ref={mapContainerRef}
-      style={{ height, width: "100%" }}
       className="rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden"
-    />
+      style={{ borderRadius: 12 }}
+    >
+      <div
+        ref={mapContainerRef}
+        // enforce rounded clipping for Leaflet internals using clip-path
+        style={{
+          height,
+          width: "100%",
+          borderRadius: 12,
+          overflow: "hidden",
+          WebkitClipPath: "inset(0 round 12px)",
+          clipPath: "inset(0 round 12px)",
+        }}
+        className="w-full h-full"
+      />
+    </div>
   );
 }

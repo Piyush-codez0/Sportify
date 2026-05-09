@@ -1,3 +1,7 @@
+/*
+ - Used on: password reset and notification flows
+ - Features: email sending helper (nodemailer) for transactional emails
+*/
 import nodemailer from "nodemailer";
 
 const EMAIL_HOST = process.env.EMAIL_HOST!;
@@ -61,7 +65,7 @@ export async function sendRegistrationConfirmation(
   name: string,
   tournamentName: string,
   tournamentDate: string,
-  registrationType: string
+  registrationType: string,
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -92,7 +96,7 @@ export async function sendPaymentConfirmation(
   name: string,
   tournamentName: string,
   amount: number,
-  paymentId: string
+  paymentId: string,
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -124,7 +128,7 @@ export async function sendVerificationUpdate(
   tournamentName: string,
   organizerName: string,
   sportName: string,
-  verified: boolean
+  verified: boolean,
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -161,7 +165,7 @@ export async function sendVerificationUpdate(
 export async function sendTournamentUpdateToParticipants(
   emails: string[],
   tournamentName: string,
-  updateMessage: string
+  updateMessage: string,
 ) {
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -179,7 +183,7 @@ export async function sendTournamentUpdateToParticipants(
       to: email,
       subject: `Update: ${tournamentName}`,
       html,
-    })
+    }),
   );
 
   const results = await Promise.allSettled(promises);

@@ -55,7 +55,7 @@ interface Tournament {
 }
 
 function SponsorDashboardContent() {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const searchParams = useSearchParams();
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -73,7 +73,7 @@ function SponsorDashboardContent() {
   const [msg, setMsg] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [paidSponsorships, setPaidSponsorships] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [payingId, setPayingId] = useState<string | null>(null);
   const [stepperStep, setStepperStep] = useState(1);
@@ -85,7 +85,7 @@ function SponsorDashboardContent() {
     "all" | "pending" | "approved" | "rejected"
   >("all");
   const [deadlineSort, setDeadlineSort] = useState<"soonest" | "latest">(
-    "soonest"
+    "soonest",
   );
 
   const selectedTournamentId = selectedTournament?._id;
@@ -104,7 +104,7 @@ function SponsorDashboardContent() {
       approved: sponsorships.filter((s) => s.status === "approved").length,
       rejected: sponsorships.filter((s) => s.status === "rejected").length,
     }),
-    [sponsorships]
+    [sponsorships],
   );
 
   const availableTournaments = useMemo(() => {
@@ -126,14 +126,11 @@ function SponsorDashboardContent() {
   }, [tournaments, deadlineSort]);
 
   useEffect(() => {
-    if (!token) return;
     const load = async () => {
       try {
         const [sRes, tRes] = await Promise.all([
-          fetch("/api/sponsor/sponsorships", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/tournaments"),
+          fetch("/api/sponsor/sponsorships", { credentials: "include" }),
+          fetch("/api/tournaments", { credentials: "include" }),
         ]);
         const sData = await sRes.json();
         const tData = await tRes.json();
@@ -147,10 +144,10 @@ function SponsorDashboardContent() {
 
         // Filter out tournaments that are already sponsored
         const sponsoredTournamentIds = new Set(
-          sData.sponsorships.map((s: Sponsorship) => s.tournament._id)
+          sData.sponsorships.map((s: Sponsorship) => s.tournament._id),
         );
         const availableTournaments = tData.tournaments.filter(
-          (t: Tournament) => !sponsoredTournamentIds.has(t._id)
+          (t: Tournament) => !sponsoredTournamentIds.has(t._id),
         );
 
         setTournaments(availableTournaments);
@@ -161,7 +158,7 @@ function SponsorDashboardContent() {
       }
     };
     load();
-  }, [token]);
+  }, []);
 
   // Preselect tournament when navigated with ?tournamentId=
   useEffect(() => {
@@ -238,8 +235,8 @@ function SponsorDashboardContent() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -271,7 +268,6 @@ function SponsorDashboardContent() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
-
       <DashboardNavbar
         title="Sponsor Dashboard"
         userName={user?.name || "User"}
@@ -299,7 +295,7 @@ function SponsorDashboardContent() {
               className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl flex-shrink-0">
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-2xl shrink-0">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   Tournament Details
                 </h2>
@@ -345,7 +341,7 @@ function SponsorDashboardContent() {
                       </p>
                       <p className="font-semibold text-gray-900 dark:text-white">
                         {new Date(
-                          selectedTournamentDetails.startDate
+                          selectedTournamentDetails.startDate,
                         ).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
@@ -431,13 +427,13 @@ function SponsorDashboardContent() {
 
                 {/* Registration Deadline */}
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                  <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-700 rounded-lg">
+                  <div className="p-4 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-700 rounded-lg">
                     <p className="text-sm text-orange-600 dark:text-orange-300 mb-1">
                       Registration Deadline
                     </p>
                     <p className="font-bold text-orange-900 dark:text-orange-100">
                       {new Date(
-                        selectedTournamentDetails.registrationDeadline
+                        selectedTournamentDetails.registrationDeadline,
                       ).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
@@ -464,10 +460,10 @@ function SponsorDashboardContent() {
                       onClick={() => {
                         window.open(
                           selectedTournamentDetails.googleMapsLink,
-                          "_blank"
+                          "_blank",
                         );
                       }}
-                      className="flex-1 px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium shadow-lg flex items-center justify-center gap-2"
+                      className="flex-1 px-4 py-2 bg-linear-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-medium shadow-lg flex items-center justify-center gap-2"
                     >
                       <MapPin size={18} />
                       Get Directions
@@ -481,7 +477,7 @@ function SponsorDashboardContent() {
                       setStepperStep(2);
                       setSelectedTournamentDetails(null);
                     }}
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium shadow-lg"
+                    className="flex-1 px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium shadow-lg"
                   >
                     Sponsor This Tournament
                   </motion.button>
@@ -496,10 +492,10 @@ function SponsorDashboardContent() {
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl">
-          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-6 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors min-h-[400px] md:h-[82vh] overflow-visible">
+          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-6 bg-linear-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors min-h-[400px] md:h-[82vh] overflow-visible">
             {isProfileComplete && isPhoneVerified ? (
               <>
-                <h2 className="font-bold text-lg mb-4 text-gray-900 dark:text-white transition-colors bg-gradient-to-r from-blue-600 to-slate-600 bg-clip-text text-transparent">
+                <h2 className="font-bold text-lg mb-4 dark:text-white transition-colors bg-linear-to-r from-blue-600 to-slate-600 bg-clip-text text-transparent">
                   New Sponsorship
                 </h2>
                 {msg && (
@@ -521,7 +517,7 @@ function SponsorDashboardContent() {
                       setStepError("");
                       setStepperStep(step);
                     }}
-                    stepCircleContainerClassName="bg-gradient-to-r from-blue-50 to-slate-50 dark:from-gray-700/50 dark:to-gray-700/50 rounded-t-xl h-15 bg-white"
+                    stepCircleContainerClassName="bg-linear-to-r from-blue-50 to-slate-50 dark:from-gray-700/50 dark:to-gray-700/50 rounded-t-xl h-15 bg-white"
                     contentClassName="flex-1 overflow-y-auto px-5 py-10"
                     footerClassName="border-t border-gray-200 dark:border-gray-700 p-4 "
                     nextButtonText={stepperStep === 3 ? "Submit" : "Next"}
@@ -661,7 +657,7 @@ function SponsorDashboardContent() {
                         <motion.div
                           initial={{ opacity: 0, scale: 0.95 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className="space-y-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg"
+                          className="space-y-3 p-4 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg"
                         >
                           <div className="flex justify-between items-center pb-3 border-b border-blue-200 dark:border-blue-700">
                             <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -887,7 +883,7 @@ function SponsorDashboardContent() {
                         </div>
                         <div className="space-y-3 w-full max-w-xs">
                           <div className="flex items-start gap-3 text-left p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                               1
                             </div>
                             <div>
@@ -900,7 +896,7 @@ function SponsorDashboardContent() {
                             </div>
                           </div>
                           <div className="flex items-start gap-3 text-left p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                               2
                             </div>
                             <div>
@@ -913,7 +909,7 @@ function SponsorDashboardContent() {
                             </div>
                           </div>
                           <div className="flex items-start gap-3 text-left p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                            <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                            <div className="shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                               3
                             </div>
                             <div>
@@ -966,7 +962,7 @@ function SponsorDashboardContent() {
                                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                                   <CalendarDays className="w-4 h-4" />
                                   {new Date(
-                                    selectedTournament.startDate
+                                    selectedTournament.startDate,
                                   ).toLocaleDateString()}
                                 </div>
                               </div>
@@ -976,7 +972,7 @@ function SponsorDashboardContent() {
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() =>
                                     setSelectedTournamentDetails(
-                                      selectedTournament
+                                      selectedTournament,
                                     )
                                   }
                                   className="px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white text-xs rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
@@ -1063,7 +1059,7 @@ function SponsorDashboardContent() {
                                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                                           <CalendarDays className="w-4 h-4" />
                                           {new Date(
-                                            t.startDate
+                                            t.startDate,
                                           ).toLocaleDateString()}
                                         </div>
                                       </div>
@@ -1160,7 +1156,7 @@ function SponsorDashboardContent() {
                                             ", " +
                                             t.city +
                                             ", " +
-                                            t.state
+                                            t.state,
                                         )}`);
                                   window.open(link, "_blank");
                                 }}
@@ -1174,7 +1170,7 @@ function SponsorDashboardContent() {
                                 <CalendarDays className="w-3.5 h-3.5" /> Starts:
                               </span>{" "}
                               {new Date(t.startDate).toLocaleDateString(
-                                "en-GB"
+                                "en-GB",
                               )}
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 transition-colors">
@@ -1182,7 +1178,7 @@ function SponsorDashboardContent() {
                                 Registration Deadline:
                               </span>{" "}
                               {new Date(
-                                t.registrationDeadline
+                                t.registrationDeadline,
                               ).toLocaleDateString("en-GB")}
                             </p>
                             <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 transition-colors">
@@ -1228,7 +1224,7 @@ function SponsorDashboardContent() {
                     animate={{ opacity: 1, y: 0 }}
                     className="space-y-4"
                   >
-                    <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-2xl text-center">
+                    <div className="p-6 bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-200 dark:border-blue-700 rounded-2xl text-center">
                       <div className="text-4xl mb-3">🎯</div>
                       <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                         Create a New Sponsorship
@@ -1300,12 +1296,12 @@ function SponsorDashboardContent() {
                               {key === "all"
                                 ? `All (${sponsorshipCounts.all})`
                                 : key === "pending"
-                                ? `Pending (${sponsorshipCounts.pending})`
-                                : key === "approved"
-                                ? `Current (${sponsorshipCounts.approved})`
-                                : `Previous (${sponsorshipCounts.rejected})`}
+                                  ? `Pending (${sponsorshipCounts.pending})`
+                                  : key === "approved"
+                                    ? `Current (${sponsorshipCounts.approved})`
+                                    : `Previous (${sponsorshipCounts.rejected})`}
                             </button>
-                          )
+                          ),
                         )}
                       </div>
                     )}
@@ -1324,8 +1320,8 @@ function SponsorDashboardContent() {
                               {s.tournament.sport
                                 ? `${s.tournament.sport} Tournament`
                                 : s.tournament.name
-                                ? `${s.tournament.name} Tournament`
-                                : "Tournament"}
+                                  ? `${s.tournament.name} Tournament`
+                                  : "Tournament"}
                             </h3>
                             <p className="text-xs text-gray-600 dark:text-gray-300 transition-colors">
                               {s.tournament.organizer?.name || "Organizer"} •{" "}
@@ -1345,7 +1341,7 @@ function SponsorDashboardContent() {
                                   <motion.div
                                     initial={{ scale: 0.9, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className="mt-3 w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 shadow-lg"
+                                    className="mt-3 w-full bg-linear-to-r from-green-500 to-emerald-500 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 shadow-lg"
                                   >
                                     <Check className="w-5 h-5" />
                                     Paid ₹{s.amount.toLocaleString()}{" "}
@@ -1357,7 +1353,7 @@ function SponsorDashboardContent() {
                                       handlePayment(s._id, s.amount)
                                     }
                                     disabled={payingId === s._id}
-                                    className="mt-3 w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="mt-3 w-full bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                   >
                                     {payingId === s._id ? (
                                       <>

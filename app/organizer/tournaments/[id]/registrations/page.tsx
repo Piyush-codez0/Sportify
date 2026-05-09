@@ -29,11 +29,11 @@ interface Registration {
 }
 
 export default function TournamentRegistrations() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const params = useParams();
   const tournamentId = params?.id as string;
   const [tournamentTitle, setTournamentTitle] = useState(
-    "Tournament Player Registrations"
+    "Tournament Player Registrations",
   );
   const [sport, setSport] = useState<string>("");
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -47,16 +47,15 @@ export default function TournamentRegistrations() {
   const [searchQuery, setSearchQuery] = useState("");
   const [undoStates, setUndoStates] = useState<Set<string>>(new Set());
   const [actionType, setActionType] = useState<"success" | "error" | "info">(
-    "info"
+    "info",
   );
 
   useEffect(() => {
-    if (!token) return;
     const load = async () => {
       try {
         const res = await fetch(
           `/api/organizer/registrations/${tournamentId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          { credentials: "include" },
         );
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed");
@@ -67,8 +66,8 @@ export default function TournamentRegistrations() {
         } else if (tournamentId) {
           setTournamentTitle(
             `${decodeURIComponent(
-              tournamentId
-            )} Tournament Player Registrations`
+              tournamentId,
+            )} Tournament Player Registrations`,
           );
         }
       } catch (e: any) {
@@ -78,7 +77,7 @@ export default function TournamentRegistrations() {
       }
     };
     if (tournamentId) load();
-  }, [token, tournamentId]);
+  }, [tournamentId]);
 
   const verify = async (registrationId: string, verified: boolean) => {
     setActionMessage("Processing...");
@@ -88,8 +87,8 @@ export default function TournamentRegistrations() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({ registrationId, verified }),
       });
       const data = await res.json();
@@ -107,8 +106,8 @@ export default function TournamentRegistrations() {
                 verified: resolvedVerified,
                 status: resolvedStatus,
               }
-            : r
-        )
+            : r,
+        ),
       );
       // Remove from undo states when action is taken
       setUndoStates((prev) => {
@@ -118,7 +117,7 @@ export default function TournamentRegistrations() {
       });
       setActionType("success");
       setActionMessage(
-        verified ? "Approved successfully" : "Rejected successfully"
+        verified ? "Approved successfully" : "Rejected successfully",
       );
       setTimeout(() => setActionMessage(""), 3000);
     } catch (e: any) {
@@ -136,8 +135,8 @@ export default function TournamentRegistrations() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify({ registrationId, reset: true }),
       });
       const data = await res.json();
@@ -245,7 +244,6 @@ export default function TournamentRegistrations() {
 
   return (
     <div className="relative min-h-screen bg-slate-50 dark:bg-[#040812] transition-colors">
-
       <DashboardNavbar
         title={
           `${sport} Tournament Registrations` || "Tournament Registrations"
@@ -261,7 +259,7 @@ export default function TournamentRegistrations() {
         {error && (
           <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 p-4 rounded-lg flex items-start gap-3 transition-colors">
             <svg
-              className="w-5 h-5 flex-shrink-0 mt-0.5"
+              className="w-5 h-5 shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -286,13 +284,13 @@ export default function TournamentRegistrations() {
             aria-label="Close notification"
           >
             <div
-              className={`relative px-5 py-3 rounded-full shadow-2xl border text-sm font-semibold flex items-center gap-2 transition-transform hover:translate-y-[-2px] active:translate-y-[1px]
+              className={`relative px-5 py-3 rounded-full shadow-2xl border text-sm font-semibold flex items-center gap-2 transition-transform hover:-translate-y-0.5 active:translate-y-px
               ${
                 actionType === "success"
-                  ? "bg-gradient-to-r from-cyan-500 to-teal-600 text-white border-teal-300/60"
+                  ? "bg-linear-to-r from-cyan-500 to-teal-600 text-white border-teal-300/60"
                   : actionType === "error"
-                  ? "bg-gradient-to-r from-rose-500 to-red-600 text-white border-rose-300/60"
-                  : "bg-gradient-to-r from-indigo-500 to-blue-600 text-white border-indigo-300/60"
+                    ? "bg-linear-to-r from-rose-500 to-red-600 text-white border-rose-300/60"
+                    : "bg-linear-to-r from-indigo-500 to-blue-600 text-white border-indigo-300/60"
               }
             `}
             >
@@ -300,8 +298,8 @@ export default function TournamentRegistrations() {
                 {actionType === "success"
                   ? "✓"
                   : actionType === "error"
-                  ? "✕"
-                  : "ℹ️"}
+                    ? "✕"
+                    : "ℹ️"}
               </span>
               <span>{actionMessage}</span>
               <span className="absolute -top-1 -right-1 h-6 w-6 rounded-full bg-white/20 text-white text-xs flex items-center justify-center hover:bg-white/30">
@@ -319,7 +317,7 @@ export default function TournamentRegistrations() {
           <>
             {/* Statistics Cards */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors">
+              <div className="bg-linear-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Total
                 </p>
@@ -327,7 +325,7 @@ export default function TournamentRegistrations() {
                   {stats.total}
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/30 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 transition-colors">
+              <div className="bg-linear-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-900/30 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800 transition-colors">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Payments Pending
                 </p>
@@ -335,7 +333,7 @@ export default function TournamentRegistrations() {
                   {stats.pending}
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800 transition-colors">
+              <div className="bg-linear-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/30 p-4 rounded-lg border border-red-200 dark:border-red-800 transition-colors">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Rejected
                 </p>
@@ -343,7 +341,7 @@ export default function TournamentRegistrations() {
                   {stats.rejected}
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800 transition-colors">
+              <div className="bg-linear-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/30 p-4 rounded-lg border border-purple-200 dark:border-purple-800 transition-colors">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Paid
                 </p>
@@ -351,7 +349,7 @@ export default function TournamentRegistrations() {
                   {stats.paid}
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-900/30 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 transition-colors">
+              <div className="bg-linear-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/20 dark:to-indigo-900/30 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800 transition-colors">
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Teams
                 </p>
@@ -400,7 +398,7 @@ export default function TournamentRegistrations() {
                       {f === "pending" && ` (${stats.pending})`}
                       {f === "rejected" && ` (${stats.rejected})`}
                     </button>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -417,7 +415,7 @@ export default function TournamentRegistrations() {
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <div
-                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0 ${
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 ${
                             r.registrationType === "team"
                               ? "bg-blue-600"
                               : "bg-purple-600"
@@ -440,7 +438,7 @@ export default function TournamentRegistrations() {
                       </div>
 
                       {/* Status Badges */}
-                      <div className="flex flex-wrap gap-1.5 flex-shrink-0">
+                      <div className="flex flex-wrap gap-1.5 shrink-0">
                         {r.paymentStatus === "paid" && (
                           <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
                             💰 Paid
@@ -457,7 +455,7 @@ export default function TournamentRegistrations() {
                     {/* Compact Details */}
                     <div className="text-xs text-gray-600 dark:text-gray-400 space-y-2">
                       {r.aadharNumber && (
-                        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 p-3 rounded-lg">
+                        <div className="bg-linear-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 p-3 rounded-lg">
                           <div className="flex items-center gap-2 mb-2">
                             <span className="text-indigo-600 dark:text-indigo-400">
                               🪪
@@ -516,7 +514,7 @@ export default function TournamentRegistrations() {
                                       Aadhar No: {m.aadharNumber}
                                     </p>
                                   </div>
-                                  <div className="flex gap-1 flex-shrink-0">
+                                  <div className="flex gap-1 shrink-0">
                                     {(m.aadharFrontDocument ||
                                       m.aadharDocument) && (
                                       <a

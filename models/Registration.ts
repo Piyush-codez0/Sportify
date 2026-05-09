@@ -1,3 +1,7 @@
+/*
+ - Used on: registrations and team management
+ - Features: defines team member and registration schemas stored in MongoDB
+*/
 import mongoose, { Schema, Model, Document, Types } from "mongoose";
 
 export interface ITeamMember {
@@ -76,7 +80,7 @@ const TeamMemberSchema = new Schema<ITeamMember>(
     dateOfBirth: Date,
     gender: String,
   },
-  { _id: false }
+  { _id: false },
 );
 
 const RegistrationSchema = new Schema<IRegistration>(
@@ -147,7 +151,7 @@ const RegistrationSchema = new Schema<IRegistration>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Indexes

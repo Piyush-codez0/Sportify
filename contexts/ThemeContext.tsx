@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: whole app (site-wide theme)
+ - Features: provides theme context (light/dark) for components
+*/
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";

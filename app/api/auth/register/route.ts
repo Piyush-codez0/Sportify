@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import User from "@/models/User";
-import { generateToken } from "@/lib/auth";
+import {
+  AUTH_COOKIE_MAX_AGE,
+  AUTH_COOKIE_NAME,
+  generateToken,
+} from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +18,7 @@ export async function POST(request: NextRequest) {
     if (!name || !email || !password || !phone || !role) {
       return NextResponse.json(
         { error: "All fields are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists with this email" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -52,7 +56,7 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: "User registered successfully",
         token,
@@ -65,13 +69,23 @@ export async function POST(request: NextRequest) {
           phoneVerified: user.phoneVerified || false,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
+
+    response.cookies.set(AUTH_COOKIE_NAME, token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: AUTH_COOKIE_MAX_AGE,
+    });
+
+    return response;
   } catch (error: any) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { error: error.message || "Registration failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,3 +1,7 @@
+/*
+ - Used on: file uploads (Aadhar, profile pictures, sponsorship logos)
+ - Features: Cloudinary client configuration and upload helpers
+*/
 import { v2 as cloudinary } from "cloudinary";
 
 const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME!;
@@ -6,7 +10,7 @@ const API_SECRET = process.env.CLOUDINARY_API_SECRET!;
 
 if (!CLOUD_NAME || !API_KEY || !API_SECRET) {
   throw new Error(
-    "Please define Cloudinary env: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET"
+    "Please define Cloudinary env: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET",
   );
 }
 

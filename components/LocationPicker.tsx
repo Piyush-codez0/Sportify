@@ -1,4 +1,8 @@
 "use client";
+/*
+ - Used on: /organizer/tournaments/new (tournament creation)
+ - Features: Location autocomplete, reverse geocoding, city/district/state detection
+*/
 import { useEffect, useRef, useState } from "react";
 
 // Import leaflet only on client side
@@ -14,6 +18,7 @@ import "leaflet/dist/leaflet.css";
 interface LocationPickerProps {
   initialLat?: number;
   initialLng?: number;
+  initialSelectedLocationDisplay?: string;
   onLocationChange: (lat: number, lng: number, address?: string) => void;
   height?: string;
 }
@@ -27,29 +32,24 @@ const INDIA_BOUNDS: [[number, number], [number, number]] = [
 export default function LocationPicker({
   initialLat = 30.3165, // Dehradun latitude
   initialLng = 78.0322, // Dehradun longitude
+  initialSelectedLocationDisplay = "",
   onLocationChange,
   height = "220px",
 }: LocationPickerProps) {
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const searchRequestIdRef = useRef(0);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [locationMode, setLocationMode] = useState<"search" | "map">("search");
   const [isMapInitialized, setIsMapInitialized] = useState(false);
   const [selectedLocationDisplay, setSelectedLocationDisplay] =
-    useState<string>("");
+    useState<string>(initialSelectedLocationDisplay);
 
-  // Initialize map only when user switches to map mode (lazy loading)
+  // Initialize map on component mount (always visible)
   useEffect(() => {
-    if (
-      !mapContainerRef.current ||
-      mapRef.current ||
-      locationMode !== "map" ||
-      isMapInitialized
-    )
-      return;
+    if (!mapContainerRef.current || mapRef.current || isMapInitialized) return;
 
     // Get Leaflet - this will work because it's in useEffect (client-side only)
     const L = getLeaflet();
@@ -83,9 +83,6 @@ export default function LocationPicker({
       draggable: true,
     }).addTo(map);
 
-    // Emit initial position
-    onLocationChange(initialLat, initialLng);
-
     // Handle marker drag
     marker.on("dragend", async () => {
       const position = marker.getLatLng();
@@ -114,7 +111,7 @@ export default function LocationPicker({
         setIsMapInitialized(false);
       }
     };
-  }, [locationMode]);
+  }, []);
 
   // Update map and marker when initialLat/initialLng change (e.g., when returning to this step)
   useEffect(() => {
@@ -125,43 +122,63 @@ export default function LocationPicker({
     }
   }, [initialLat, initialLng, isMapInitialized]);
 
+  useEffect(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    if (!trimmedQuery) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const requestId = ++searchRequestIdRef.current;
+      searchLocation(trimmedQuery, requestId);
+    }, 30);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [searchQuery]);
+
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+        `/api/location/reverse?lat=${lat}&lng=${lng}`,
       );
+      if (!response.ok) {
+        throw new Error(`Reverse geocoding failed: ${response.status}`);
+      }
       const data = await response.json();
-      if (data.display_name) {
-        setSelectedLocationDisplay(data.display_name);
-        onLocationChange(lat, lng, data.display_name);
+      if (data.result?.display_name) {
+        setSelectedLocationDisplay(data.result.display_name);
+        onLocationChange(lat, lng, data.result.display_name);
       }
     } catch (error) {
       console.error("Reverse geocoding failed:", error);
     }
   };
 
-  const searchLocation = async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
+  const searchLocation = async (query: string, requestId: number) => {
     setIsSearching(true);
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-          query
-        )}&limit=5&countrycodes=in&viewbox=${INDIA_BOUNDS[0][1]},${
-          INDIA_BOUNDS[1][0]
-        },${INDIA_BOUNDS[1][1]},${INDIA_BOUNDS[0][0]}&bounded=1`
+        `/api/location/search?query=${encodeURIComponent(query)}`,
       );
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.status}`);
+      }
       const data = await response.json();
-      setSearchResults(data);
+      if (requestId === searchRequestIdRef.current) {
+        setSearchResults(data.results || []);
+      }
     } catch (error) {
       console.error("Search failed:", error);
-      setSearchResults([]);
+      if (requestId === searchRequestIdRef.current) {
+        setSearchResults([]);
+      }
     } finally {
-      setIsSearching(false);
+      if (requestId === searchRequestIdRef.current) {
+        setIsSearching(false);
+      }
     }
   };
 
@@ -184,77 +201,19 @@ export default function LocationPicker({
   };
 
   return (
-    <div className="space-y-3">
-      {/* Mode Toggle */}
-      <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
-        <button
-          type="button"
-          onClick={() => setLocationMode("search")}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            locationMode === "search"
-              ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-          }`}
-        >
-          <div className="flex items-center justify-center gap-2">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            Search Location
-          </div>
-        </button>
-        <button
-          type="button"
-          onClick={() => setLocationMode("map")}
-          className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            locationMode === "map"
-              ? "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-              : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-          }`}
-        >
-          <div className="flex items-center justify-center gap-2">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-              />
-            </svg>
-            Pick from Map
-          </div>
-        </button>
-      </div>
-
+    <div className="space-y-4">
       {/* Search Section */}
-      <div
-        className={
-          locationMode === "search" ? "block space-y-2 pb-2" : "hidden"
-        }
-      >
-        <div className="relative mb-2">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Search Location
+        </label>
+        <div className="relative">
           <input
             type="text"
-            placeholder="Search for a location in India..."
+            placeholder="Search for a location..."
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
-              searchLocation(e.target.value);
             }}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           />
@@ -266,7 +225,7 @@ export default function LocationPicker({
 
           {/* Search Results Dropdown */}
           {searchResults.length > 0 && (
-            <div className="absolute z-[100] w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl max-h-40 overflow-y-auto">
+            <div className="absolute z-100 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl max-h-40 overflow-y-auto">
               {searchResults.map((result, idx) => (
                 <button
                   key={idx}
@@ -282,18 +241,33 @@ export default function LocationPicker({
         </div>
         {searchQuery && searchResults.length === 0 && !isSearching && (
           <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-            No locations found. Try a different search or use "Pick from Map"
+            No locations found
           </p>
         )}
       </div>
 
       {/* Map Section */}
-      <div className={locationMode === "map" ? "block space-y-2" : "hidden"}>
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Or Pick from Map
+        </label>
         <div
-          ref={mapContainerRef}
-          style={{ height, width: "100%" }}
           className="rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden"
-        />
+          style={{ borderRadius: 12 }}
+        >
+          <div
+            ref={mapContainerRef}
+            style={{
+              height: "400px",
+              width: "100%",
+              borderRadius: 12,
+              overflow: "hidden",
+              WebkitClipPath: "inset(0 round 12px)",
+              clipPath: "inset(0 round 12px)",
+            }}
+            className="w-full h-full"
+          />
+        </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
           Click on the map or drag the marker to select a location
         </p>
@@ -304,7 +278,7 @@ export default function LocationPicker({
         <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border-2 border-green-500 dark:border-green-600 rounded-lg transition-colors">
           <div className="flex items-start gap-2">
             <svg
-              className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5"
+              className="w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
             >

@@ -1,10 +1,14 @@
+/*
+ - Used on: server-side database models and API routes
+ - Features: MongoDB connection helper (mongoose) and connection caching
+*/
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
 if (!MONGODB_URI) {
   throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
+    "Please define the MONGODB_URI environment variable inside .env.local",
   );
 }
 

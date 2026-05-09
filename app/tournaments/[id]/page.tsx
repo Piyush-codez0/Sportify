@@ -39,7 +39,7 @@ interface Tournament {
 export default function TournamentDetailPage() {
   const params = useParams();
   const id = params?.id as string;
-  const { user, token } = useAuth();
+  const { user } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -93,7 +93,7 @@ export default function TournamentDetailPage() {
           phone: "",
           aadharNumber: "",
           aadharDocument: "",
-        }))
+        })),
       );
     }
   }, [tournament]);
@@ -103,7 +103,7 @@ export default function TournamentDetailPage() {
     formData.append("file", file);
     const res = await fetch("/api/upload/aadhar", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
       body: formData,
     });
     const data = await res.json();
@@ -147,8 +147,8 @@ export default function TournamentDetailPage() {
       const url = await uploadAadhar(file);
       setTeamMembers((prev) =>
         prev.map((m, i) =>
-          i === index ? { ...m, aadharFrontDocument: url } : m
-        )
+          i === index ? { ...m, aadharFrontDocument: url } : m,
+        ),
       );
       setRegMessage(`Member ${index + 1} Aadhar front uploaded`);
     } catch (e: any) {
@@ -162,8 +162,8 @@ export default function TournamentDetailPage() {
       const url = await uploadAadhar(file);
       setTeamMembers((prev) =>
         prev.map((m, i) =>
-          i === index ? { ...m, aadharBackDocument: url } : m
-        )
+          i === index ? { ...m, aadharBackDocument: url } : m,
+        ),
       );
       setRegMessage(`Member ${index + 1} Aadhar back uploaded`);
     } catch (e: any) {
@@ -197,8 +197,8 @@ export default function TournamentDetailPage() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
               },
+              credentials: "include",
               body: JSON.stringify({
                 registrationId,
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -209,7 +209,7 @@ export default function TournamentDetailPage() {
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok)
               throw new Error(
-                verifyData.error || "Payment verification failed"
+                verifyData.error || "Payment verification failed",
               );
             setRegMessage("Payment successful and verified!");
           } catch (e: any) {
@@ -255,11 +255,11 @@ export default function TournamentDetailPage() {
             !m.phone ||
             !m.aadharNumber ||
             !m.aadharFrontDocument ||
-            !m.aadharBackDocument
+            !m.aadharBackDocument,
         );
         if (incomplete)
           throw new Error(
-            "All team member fields + Aadhar (front & back) required"
+            "All team member fields + Aadhar (front & back) required",
           );
         payload.teamName = teamName;
         payload.teamMembers = teamMembers;
@@ -268,8 +268,8 @@ export default function TournamentDetailPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -291,7 +291,7 @@ export default function TournamentDetailPage() {
         // Check if payment was expected
         if (tournament && tournament.entryFee > 0) {
           setRegMessage(
-            `Registration successful! Payment of ₹${tournament.entryFee} is pending. Please contact the organizer for payment details.`
+            `Registration successful! Payment of ₹${tournament.entryFee} is pending. Please contact the organizer for payment details.`,
           );
         } else {
           setRegMessage("Registered successfully - No payment needed");
@@ -308,7 +308,6 @@ export default function TournamentDetailPage() {
   if (loading)
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
-
         <div className="relative z-10 text-gray-900 dark:text-white">
           Loading...
         </div>
@@ -317,7 +316,6 @@ export default function TournamentDetailPage() {
   if (error)
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
-
         <div className="relative z-10 text-red-600 dark:text-red-400">
           {error}
         </div>
@@ -326,7 +324,6 @@ export default function TournamentDetailPage() {
   if (!tournament)
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
-
         <div className="relative z-10 text-gray-900 dark:text-white">
           Not found
         </div>
@@ -335,13 +332,14 @@ export default function TournamentDetailPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
-
-      {token ? (
+      {user ? (
         <DashboardNavbar
-          title={tournament ? `${tournament.sport} Tournament` : "Tournament Details"}
+          title={
+            tournament ? `${tournament.sport} Tournament` : "Tournament Details"
+          }
           userName={user?.name || "User"}
           userProfileComplete={Boolean(
-            user?.city && user?.state && user?.gender
+            user?.city && user?.state && user?.gender,
           )}
           userPhoneVerified={Boolean(user?.phoneVerified)}
           onProfileClick={() => {}}
@@ -371,7 +369,7 @@ export default function TournamentDetailPage() {
                   </Link>
                   <Link
                     href="/auth/register"
-                    className="px-6 py-2.5 text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
+                    className="px-6 py-2.5 text-base bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
                   >
                     Sign Up
                   </Link>
@@ -386,7 +384,7 @@ export default function TournamentDetailPage() {
       >
         <div className="bg-white/90 dark:bg-[#1E2939]/90 backdrop-blur-md rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 transition-colors overflow-hidden">
           {/* Header with gradient background */}
-          <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 p-8 text-white">
+          <div className="relative bg-linear-to-r from-purple-600 via-pink-600 to-indigo-600 p-8 text-white">
             <div className="absolute inset-0 bg-black/10"></div>
             <div className="relative z-10">
               <h1 className="text-4xl font-bold mb-3 drop-shadow-lg">
@@ -438,7 +436,7 @@ export default function TournamentDetailPage() {
                 {tournament.prizePool && tournament.prizePool > 0 && (
                   <div className="relative inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite]"
+                      className="absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent animate-[shimmer_2s_infinite]"
                       style={{
                         backgroundSize: "200% 100%",
                         animation: "shimmer 2s infinite",
@@ -476,7 +474,7 @@ export default function TournamentDetailPage() {
           <div className="p-8">
             {/* Quick Info Cards */}
             <div className="grid md:grid-cols-3 gap-4 mb-8">
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
+              <div className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-700">
                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Start Date
                 </div>
@@ -490,7 +488,7 @@ export default function TournamentDetailPage() {
                   startDate.setHours(0, 0, 0, 0);
                   const daysRemaining = Math.ceil(
                     (startDate.getTime() - today.getTime()) /
-                      (1000 * 60 * 60 * 24)
+                      (1000 * 60 * 60 * 24),
                   );
 
                   if (daysRemaining > 0) {
@@ -516,13 +514,13 @@ export default function TournamentDetailPage() {
                 })()}
               </div>
               {tournament.registrationDeadline && (
-                <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-xl border border-orange-200 dark:border-orange-700">
+                <div className="bg-linear-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 p-4 rounded-xl border border-orange-200 dark:border-orange-700">
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                     Registration Deadline
                   </div>
                   <div className="text-lg font-bold text-gray-900 dark:text-white">
                     {new Date(
-                      tournament.registrationDeadline
+                      tournament.registrationDeadline,
                     ).toLocaleDateString("en-GB")}
                   </div>
                   {(() => {
@@ -532,7 +530,7 @@ export default function TournamentDetailPage() {
                     deadline.setHours(0, 0, 0, 0);
                     const daysRemaining = Math.ceil(
                       (deadline.getTime() - today.getTime()) /
-                        (1000 * 60 * 60 * 24)
+                        (1000 * 60 * 60 * 24),
                     );
 
                     if (daysRemaining > 0) {
@@ -559,7 +557,7 @@ export default function TournamentDetailPage() {
                 </div>
               )}
               {tournament.maxParticipants && (
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-green-200 dark:border-green-700">
+                <div className="bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-green-200 dark:border-green-700">
                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                     Max Participants
                   </div>
@@ -572,7 +570,7 @@ export default function TournamentDetailPage() {
 
             {/* Description Section */}
             {tournament.description && (
-              <div className="mb-6 p-6 bg-gradient-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-xl border border-purple-200 dark:border-purple-700">
+              <div className="mb-6 p-6 bg-linear-to-br from-purple-50/50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-xl border border-purple-200 dark:border-purple-700">
                 <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
                   <svg
                     className="w-6 h-6 text-purple-600 dark:text-purple-400"
@@ -597,7 +595,7 @@ export default function TournamentDetailPage() {
 
             {/* Rules Section */}
             {tournament.rules && (
-              <div className="mb-6 p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl border border-blue-200 dark:border-blue-700">
+              <div className="mb-6 p-6 bg-linear-to-br from-blue-50/50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 rounded-xl border border-blue-200 dark:border-blue-700">
                 <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white flex items-center gap-2">
                   <svg
                     className="w-6 h-6 text-blue-600 dark:text-blue-400"
@@ -633,8 +631,9 @@ export default function TournamentDetailPage() {
               </div>
             )}
             {/* Location Link Button */}
-            {(tournament.location?.coordinates || tournament.googleMapsLink) && (
-              <div className="mb-6 p-6 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/10 dark:to-teal-900/10 rounded-xl border border-emerald-200 dark:border-emerald-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            {(tournament.location?.coordinates ||
+              tournament.googleMapsLink) && (
+              <div className="mb-6 p-6 bg-linear-to-br from-emerald-50/50 to-teal-50/50 dark:from-emerald-900/10 dark:to-teal-900/10 rounded-xl border border-emerald-200 dark:border-emerald-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h2 className="text-xl font-bold mb-1 text-gray-900 dark:text-white flex items-center gap-2">
                     <svg
@@ -662,7 +661,7 @@ export default function TournamentDetailPage() {
                     {tournament.venue}, {tournament.city}, {tournament.state}
                   </p>
                 </div>
-                
+
                 <a
                   href={
                     tournament.googleMapsLink ||
@@ -674,8 +673,18 @@ export default function TournamentDetailPage() {
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 border-2 border-emerald-500/30 rounded-xl font-bold hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:scale-105 transition-all shadow-sm"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                    />
                   </svg>
                   Get Directions
                 </a>
@@ -698,13 +707,13 @@ export default function TournamentDetailPage() {
                     return deadline < now;
                   })()) ||
                 ["closed", "completed", "cancelled", "ongoing"].includes(
-                  (tournament as any).status || ""
+                  (tournament as any).status || "",
                 );
 
               if (isTournamentEnded) {
                 return (
-                  <div className="mb-6 flex items-center gap-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-6 py-5">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl">
+                  <div className="mb-6 flex items-center gap-4 bg-linear-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl px-6 py-5">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-2xl">
                       🏁
                     </div>
                     <div>
@@ -722,8 +731,8 @@ export default function TournamentDetailPage() {
 
               if (isRegistrationClosed) {
                 return (
-                  <div className="mb-6 flex items-center gap-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-700 rounded-xl px-6 py-5">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-2xl">
+                  <div className="mb-6 flex items-center gap-4 bg-linear-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border border-red-200 dark:border-red-700 rounded-xl px-6 py-5">
+                    <div className="shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 flex items-center justify-center text-2xl">
                       🔒
                     </div>
                     <div>
@@ -731,8 +740,9 @@ export default function TournamentDetailPage() {
                         Registration Closed
                       </p>
                       <p className="text-sm text-red-500 dark:text-red-400 mt-0.5">
-                        The registration deadline for this tournament has passed.
-                        You can no longer register as a player or sponsor.
+                        The registration deadline for this tournament has
+                        passed. You can no longer register as a player or
+                        sponsor.
                       </p>
                     </div>
                   </div>
@@ -743,7 +753,7 @@ export default function TournamentDetailPage() {
                 <div className="mb-6 flex flex-col sm:flex-row gap-4">
                   <Link
                     href={`/auth/register?role=player`}
-                    className="flex-1 text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
+                    className="flex-1 text-center bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
                   >
                     🚀 Register as Player
                   </Link>

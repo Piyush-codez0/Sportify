@@ -1,3 +1,7 @@
+/*
+ - Used on: profile & address forms (ProfileModal, tournament creation)
+ - Features: provides list of Indian states for state dropdowns
+*/
 export const INDIAN_STATES = [
   "Andhra Pradesh",
   "Arunachal Pradesh",

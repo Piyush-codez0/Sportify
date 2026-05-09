@@ -49,28 +49,23 @@ interface Sponsorship {
 }
 
 export default function OrganizerDashboard() {
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [activeTab, setActiveTab] = useState<"sponsorships" | "tournaments">(
-    "tournaments"
+    "tournaments",
   );
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) return;
     const load = async () => {
       try {
         const [tRes, sRes] = await Promise.all([
-          fetch("/api/organizer/tournaments", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/organizer/sponsorships", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          fetch("/api/organizer/tournaments", { credentials: "include" }),
+          fetch("/api/organizer/sponsorships", { credentials: "include" }),
         ]);
         const tData = await tRes.json();
         const sData = await sRes.json();
@@ -85,7 +80,7 @@ export default function OrganizerDashboard() {
       }
     };
     load();
-  }, [token]);
+  }, []);
 
   if (!user || user.role !== "organizer") {
     return <div className="p-6">Access denied.</div>;
@@ -93,7 +88,6 @@ export default function OrganizerDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
-
       <DashboardNavbar
         title="Organizer Dashboard"
         userName={user?.name || "User"}
@@ -226,25 +220,25 @@ export default function OrganizerDashboard() {
                                     method: "POST",
                                     headers: {
                                       "Content-Type": "application/json",
-                                      Authorization: `Bearer ${token}`,
                                     },
+                                    credentials: "include",
                                     body: JSON.stringify({
                                       sponsorshipId: s._id,
                                       status: "approved",
                                     }),
-                                  }
+                                  },
                                 );
                                 const data = await res.json();
                                 if (!res.ok)
                                   throw new Error(
-                                    data.error || "Failed to approve"
+                                    data.error || "Failed to approve",
                                   );
                                 setSponsorships((prev) =>
                                   prev.map((sp) =>
                                     sp._id === s._id
                                       ? { ...sp, status: "approved" }
-                                      : sp
-                                  )
+                                      : sp,
+                                  ),
                                 );
                               } catch (e: any) {
                                 alert(e.message);
@@ -263,25 +257,25 @@ export default function OrganizerDashboard() {
                                     method: "POST",
                                     headers: {
                                       "Content-Type": "application/json",
-                                      Authorization: `Bearer ${token}`,
                                     },
+                                    credentials: "include",
                                     body: JSON.stringify({
                                       sponsorshipId: s._id,
                                       status: "rejected",
                                     }),
-                                  }
+                                  },
                                 );
                                 const data = await res.json();
                                 if (!res.ok)
                                   throw new Error(
-                                    data.error || "Failed to reject"
+                                    data.error || "Failed to reject",
                                   );
                                 setSponsorships((prev) =>
                                   prev.map((sp) =>
                                     sp._id === s._id
                                       ? { ...sp, status: "rejected" }
-                                      : sp
-                                  )
+                                      : sp,
+                                  ),
                                 );
                               } catch (e: any) {
                                 alert(e.message);
@@ -348,7 +342,7 @@ export default function OrganizerDashboard() {
                             Registration Deadline:
                           </span>{" "}
                           {new Date(t.registrationDeadline).toLocaleDateString(
-                            "en-GB"
+                            "en-GB",
                           )}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
@@ -391,6 +385,12 @@ export default function OrganizerDashboard() {
                       </div>
                       <div className="mt-3 flex gap-2">
                         <Link
+                          href={`/organizer/tournaments/new?editId=${t._id}`}
+                          className="flex-1 text-center bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 px-3 py-2 rounded-md text-sm font-semibold hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors shadow-sm"
+                        >
+                          Edit
+                        </Link>
+                        <Link
                           href={`/organizer/tournaments/${t._id}/registrations`}
                           className="flex-1 text-center bg-indigo-600 dark:bg-indigo-500 text-white px-3 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm"
                         >
@@ -400,7 +400,7 @@ export default function OrganizerDashboard() {
                           onClick={async () => {
                             if (
                               !confirm(
-                                `Are you sure you want to delete ${t.sport} Tournament? This action cannot be undone.`
+                                `Are you sure you want to delete ${t.sport} Tournament? This action cannot be undone.`,
                               )
                             ) {
                               return;
@@ -411,20 +411,18 @@ export default function OrganizerDashboard() {
                                 `/api/tournaments/${t._id}`,
                                 {
                                   method: "DELETE",
-                                  headers: {
-                                    Authorization: `Bearer ${token}`,
-                                  },
-                                }
+                                  credentials: "include",
+                                },
                               );
                               const data = await res.json();
                               if (!res.ok)
                                 throw new Error(
-                                  data.error || "Failed to delete tournament"
+                                  data.error || "Failed to delete tournament",
                                 );
                               setTournaments((prev) =>
                                 prev.filter(
-                                  (tournament) => tournament._id !== t._id
-                                )
+                                  (tournament) => tournament._id !== t._id,
+                                ),
                               );
                               alert("Tournament deleted successfully!");
                             } catch (e: any) {

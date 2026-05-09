@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: landing and auth pages
+ - Features: small visual spark used for button/interaction feedback
+*/
 import { useRef, useEffect, useCallback } from "react";
 
 const ClickSpark = ({
@@ -62,7 +65,7 @@ const ClickSpark = ({
           return t * (2 - t);
       }
     },
-    [easing]
+    [easing],
   );
 
   useEffect(() => {

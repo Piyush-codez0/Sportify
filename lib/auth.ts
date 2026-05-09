@@ -1,6 +1,12 @@
+/*
+ - Used on: server auth routes and middleware
+ - Features: JWT helpers, cookie constants, token verification
+*/
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
+export const AUTH_COOKIE_NAME = "sportify_auth_token";
+export const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 
 if (!JWT_SECRET) {
   throw new Error("Please define JWT_SECRET in .env.local");

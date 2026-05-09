@@ -1,3 +1,7 @@
+/*
+ - Used on: tournaments listing, details, creation flow
+ - Features: tournament schema including location, venue, organizer reference
+*/
 import mongoose, { Schema, Model, Document, Types } from "mongoose";
 
 export interface ITournament extends Document {
@@ -14,6 +18,7 @@ export interface ITournament extends Document {
   };
   venue: string;
   city: string;
+  district?: string;
   state: string;
   googleMapsLink?: string;
 
@@ -89,6 +94,7 @@ const TournamentSchema = new Schema<ITournament>(
       type: String,
       required: [true, "City is required"],
     },
+    district: String,
     state: {
       type: String,
       required: [true, "State is required"],
@@ -152,12 +158,13 @@ const TournamentSchema = new Schema<ITournament>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Create geospatial index for location-based queries
 TournamentSchema.index({ location: "2dsphere" });
 TournamentSchema.index({ city: 1, state: 1 });
+TournamentSchema.index({ district: 1, state: 1 });
 TournamentSchema.index({ sport: 1 });
 TournamentSchema.index({ status: 1 });
 TournamentSchema.index({ startDate: 1 });

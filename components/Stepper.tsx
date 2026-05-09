@@ -1,3 +1,7 @@
+/*
+ - Used on: multi-step forms (e.g., /organizer/tournaments/new)
+ - Features: step navigation, validation indicator, animated transitions
+*/
 import React, {
   useState,
   Children,
@@ -49,6 +53,10 @@ export default function Stepper({
   ...rest
 }: StepperProps) {
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
+  // track per-step validation: true = valid/completed, false = invalid (left incomplete), undefined = unknown/not-evaluated
+  const [stepValidities, setStepValidities] = useState<
+    Record<number, boolean | undefined>
+  >({});
   const [direction, setDirection] = useState<number>(0);
   const stepsArray = Children.toArray(children);
   const totalSteps = stepsArray.length;
@@ -56,6 +64,23 @@ export default function Stepper({
   const isLastStep = currentStep === totalSteps;
 
   const updateStep = (newStep: number) => {
+    // If moving forward, evaluate validation for intermediate steps and mark validity
+    // Compute validities OUTSIDE setState to avoid calling parent's setState during Stepper's render
+    if (newStep > currentStep) {
+      const newValidities: Record<number, boolean> = {};
+      for (let s = 1; s < newStep; s++) {
+        // if we already evaluated this step as false, keep it false
+        if (stepValidities[s] === false) continue;
+        try {
+          const valid = onValidate(s);
+          newValidities[s] = Boolean(valid);
+        } catch (e) {
+          newValidities[s] = false;
+        }
+      }
+      setStepValidities((prev) => ({ ...prev, ...newValidities }));
+    }
+
     setCurrentStep(newStep);
     if (newStep > totalSteps) {
       onFinalStepCompleted();
@@ -113,7 +138,7 @@ export default function Stepper({
   return (
     <div className="flex flex-col w-full h-full max-w-3xl mx-auto" {...rest}>
       <div
-        className={`${stepCircleContainerClassName} flex-shrink-0 flex w-full items-center justify-center gap-0.5 px-2 pt-10 md:px-4 md:py-1`}
+        className={`${stepCircleContainerClassName} shrink-0 flex w-full items-center justify-center gap-0.5 px-2 pt-10 md:px-4 md:py-1`}
       >
         {stepsArray.map((_, index) => {
           const stepNumber = index + 1;
@@ -132,10 +157,16 @@ export default function Stepper({
                   disableStepIndicators={disableStepIndicators}
                   currentStep={currentStep}
                   onClickStep={handleStepClick}
+                  stepValidities={stepValidities}
                 />
               )}
               {isNotLastStep && (
-                <StepConnector isComplete={currentStep > stepNumber} />
+                <StepConnector
+                  isComplete={
+                    currentStep > stepNumber &&
+                    stepValidities[stepNumber] !== false
+                  }
+                />
               )}
             </React.Fragment>
           );
@@ -153,7 +184,7 @@ export default function Stepper({
 
       {!isCompleted && (
         <div
-          className={`flex-shrink-0 px-4 md:px-8 py-4 border-t border-gray-200 dark:border-gray-700 ${footerClassName}`}
+          className={`shrink-0 px-4 md:px-8 py-4 border-t border-gray-200 dark:border-gray-700 ${footerClassName}`}
         >
           <div
             className={`flex gap-3 ${
@@ -184,10 +215,10 @@ export default function Stepper({
             )}
             <button
               onClick={isLastStep ? handleComplete : handleNext}
-              className="relative flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-slate-600 text-white font-bold shadow-lg shadow-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/60 hover:scale-105 active:scale-95 overflow-hidden group"
+              className="relative flex items-center gap-2 px-8 py-3 rounded-xl bg-linear-to-r from-blue-600 to-slate-600 text-white font-bold shadow-lg shadow-blue-500/50 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/60 hover:scale-105 active:scale-95 overflow-hidden group"
               {...nextButtonProps}
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-slate-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="absolute inset-0 bg-linear-to-r from-slate-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               <span className="relative">
                 {isLastStep ? "Complete" : nextButtonText}
               </span>
@@ -314,6 +345,7 @@ interface StepIndicatorProps {
   currentStep: number;
   onClickStep: (clicked: number) => void;
   disableStepIndicators?: boolean;
+  stepValidities?: Record<number, boolean | undefined>;
 }
 
 function StepIndicator({
@@ -321,13 +353,16 @@ function StepIndicator({
   currentStep,
   onClickStep,
   disableStepIndicators = false,
+  stepValidities = {},
 }: StepIndicatorProps) {
-  const status =
-    currentStep === step
-      ? "active"
-      : currentStep < step
-      ? "inactive"
-      : "complete";
+  let status: "active" | "inactive" | "complete" | "invalid";
+  if (currentStep === step) status = "active";
+  else if (currentStep < step) status = "inactive";
+  else {
+    // past step: determine if it was validated
+    const v = stepValidities[step];
+    status = v === false ? "invalid" : "complete";
+  }
 
   const handleClick = () => {
     if (step !== currentStep && !disableStepIndicators) {
@@ -347,7 +382,7 @@ function StepIndicator({
       {/* Glow effect for active step */}
       {status === "active" && (
         <motion.div
-          className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-slate-500 rounded-full blur-lg opacity-50"
+          className="absolute -inset-2 bg-linear-to-r from-blue-500 to-slate-500 rounded-full blur-lg opacity-50"
           animate={{ opacity: [0.3, 0.6, 0.3] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -373,12 +408,20 @@ function StepIndicator({
             color: "#ffffff",
             boxShadow: "0 0 0 0 rgba(16, 185, 129, 0)",
           },
+          invalid: {
+            scale: 0.9,
+            backgroundColor: "#ef4444",
+            color: "#ffffff",
+            boxShadow: "0 0 0 0 rgba(239, 68, 68, 0)",
+          },
         }}
         transition={{ duration: 0.3, type: "spring", stiffness: 300 }}
         className="relative flex h-8 w-8 items-center justify-center rounded-full font-bold text-xs shadow-lg ring-2 ring-white dark:ring-gray-800"
       >
         {status === "complete" ? (
           <CheckIcon className="h-5 w-5 text-white" />
+        ) : status === "invalid" ? (
+          <CrossIcon className="h-5 w-5 text-white" />
         ) : status === "active" ? (
           <motion.div className="text-base font-bold">{step}</motion.div>
         ) : (
@@ -386,6 +429,32 @@ function StepIndicator({
         )}
       </motion.div>
     </motion.div>
+  );
+}
+
+function CrossIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      {...props}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <motion.path
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{
+          delay: 0.05,
+          type: "tween",
+          ease: "easeOut",
+          duration: 0.24,
+        }}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
   );
 }
 
@@ -410,7 +479,7 @@ function StepConnector({ isComplete }: StepConnectorProps) {
       />
       {isComplete && (
         <motion.div
-          className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent"
+          className="absolute left-0 top-0 h-full w-full bg-linear-to-r from-transparent via-white/30 to-transparent"
           animate={{ x: ["-100%", "200%"] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
         />

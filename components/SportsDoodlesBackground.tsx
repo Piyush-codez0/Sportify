@@ -1,5 +1,8 @@
 "use client";
-
+/*
+ - Used on: landing and tournament listing pages
+ - Features: decorative background doodles and animations
+*/
 import { useEffect, useState } from "react";
 
 const sportsDoodles = [

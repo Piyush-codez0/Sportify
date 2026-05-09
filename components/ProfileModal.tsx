@@ -1,4 +1,8 @@
 "use client";
+/*
+ - Used on: organizer dashboard and tournament creation pages
+ - Features: Profile editing, phone verification, profile completeness UI
+*/
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { INDIAN_STATES } from "@/lib/indianStates";
@@ -11,7 +15,7 @@ interface ProfileModalProps {
 type Gender = "male" | "female" | "other";
 
 export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
-  const { user, token, refreshUser, updateUser } = useAuth();
+  const { user, refreshUser, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState<"profile" | "verify">("profile");
   const [showEdit, setShowEdit] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -71,8 +75,8 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
+          credentials: "include",
         });
         console.log("API response status:", res.status);
         const data = await res.json();
@@ -135,8 +139,8 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -186,9 +190,6 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 My Profile
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {user?.email}
-              </p>
             </div>
           </div>
           <button
