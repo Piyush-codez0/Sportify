@@ -471,7 +471,7 @@ function StepConnector({ isComplete }: StepConnectorProps) {
   return (
     <div className="relative mx-1.5 h-1 flex-1 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
       <motion.div
-        className="absolute left-0 top-0 h-full bg-gradient-to-r from-blue-500 to-slate-500 rounded-full"
+        className="absolute left-0 top-0 h-full bg-linear-to-r from-blue-500 to-slate-500 rounded-full"
         variants={lineVariants}
         initial={false}
         animate={isComplete ? "complete" : "incomplete"}

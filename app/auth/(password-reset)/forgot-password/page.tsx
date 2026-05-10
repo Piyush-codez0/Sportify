@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
             initialOffset={50}
             reverse
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
+          <div className="absolute inset-0 bg-linear-to-br from-indigo-500/5 via-purple-500/5 to-pink-500/5 pointer-events-none rounded-2xl" />
 
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex flex-col items-center gap-3">

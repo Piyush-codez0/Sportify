@@ -236,7 +236,7 @@ export default function TournamentDetailPage() {
     setRegLoading(true);
     setRegMessage("Submitting registration...");
     try {
-      let payload: any = { tournamentId: id, registrationType };
+      const payload: any = { tournamentId: id, registrationType };
       if (registrationType === "individual") {
         if (!aadharNumber || aadharNumber.trim().length === 0)
           throw new Error("Please enter your Aadhar number");

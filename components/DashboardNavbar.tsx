@@ -55,7 +55,7 @@ export default function DashboardNavbar({
             <img
               src="/icon.png"
               alt="Sportify"
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shadow-md flex-shrink-0"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg shadow-md shrink-0"
             />
             <div className="min-w-0">
               <h1 className="text-sm sm:text-xl font-bold text-gray-900 dark:text-white transition-colors truncate">
@@ -68,10 +68,10 @@ export default function DashboardNavbar({
           </div>
 
           {/* Right: Profile and Logout Buttons */}
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={onProfileClick}
-              className="flex items-center gap-1.5 sm:gap-2 p-2 sm:px-4 sm:py-2 bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 dark:hover:from-indigo-600 dark:hover:to-blue-600 font-medium transition-all duration-200 shadow-md hover:shadow-lg group"
+              className="flex items-center gap-1.5 sm:gap-2 p-2 sm:px-4 sm:py-2 bg-linear-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white rounded-lg hover:from-indigo-700 hover:to-blue-700 dark:hover:from-indigo-600 dark:hover:to-blue-600 font-medium transition-all duration-200 shadow-md hover:shadow-lg group"
             >
               <img
                 src={

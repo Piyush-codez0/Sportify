@@ -107,9 +107,16 @@ async function createHandler(request: AuthenticatedRequest) {
     } = body;
 
     // Validation
-    if (!name || !sport || !description || !venue || !city || !state) {
+    const missingFields = [];
+    if (!name) missingFields.push("name");
+    if (!sport) missingFields.push("sport");
+    if (!venue) missingFields.push("venue");
+    if (!city) missingFields.push("city");
+    if (!state) missingFields.push("state");
+
+    if (missingFields.length > 0) {
       return NextResponse.json(
-        { error: "Required fields missing" },
+        { error: `Required fields missing: ${missingFields.join(", ")}` },
         { status: 400 },
       );
     }

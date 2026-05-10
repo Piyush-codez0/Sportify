@@ -11,6 +11,8 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { INDIAN_STATES } from "@/lib/indianStates";
 import Stepper, { Step } from "@/components/Stepper";
 
+import { Suspense } from "react";
+
 const POPULAR_SPORTS = [
   "Cricket",
   "Football",
@@ -25,6 +27,14 @@ const POPULAR_SPORTS = [
 ];
 
 export default function NewTournamentPage() {
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <NewTournamentPageContent />
+    </Suspense>
+  );
+}
+
+function NewTournamentPageContent() {
   const { user, logout, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -191,20 +201,29 @@ export default function NewTournamentPage() {
   };
 
   const validateStep4 = (): [boolean, string] => {
-    // All fields in step 4 are optional, so validation passes
+    // Description and Rules are optional
     return [true, ""];
   };
 
   const validateStep5 = (): [boolean, string] => {
+    if (form.allowTeamRegistration) {
+      if (!form.teamSize) {
+        return [false, "Please enter team size"];
+      }
+      if (parseInt(form.teamSize) < 2) {
+        return [false, "Team size must be at least 2"];
+      }
+    }
     return [true, ""];
   };
 
   const handleStepChange = (step: number): boolean => {
     let result: [boolean, string] = [true, ""];
-    if (step === 2) result = validateStep1();
-    else if (step === 3) result = validateStep2();
-    else if (step === 4) result = validateStep3();
-    else if (step === 5) result = validateStep4();
+    if (step === 1) result = validateStep1();
+    else if (step === 2) result = validateStep2();
+    else if (step === 3) result = validateStep3();
+    else if (step === 4) result = validateStep4();
+    else if (step === 5) result = validateStep5();
 
     // Schedule setting stepError asynchronously to avoid setState during render
     setTimeout(() => {
@@ -329,6 +348,8 @@ export default function NewTournamentPage() {
             teamSize: form.teamSize ? parseInt(form.teamSize, 10) : undefined,
             entryFee: parseFloat(form.entryFee || "0"),
             prizePool: form.prizePool ? parseFloat(form.prizePool) : undefined,
+            // Send as undefined if empty to avoid stale Mongoose required validator
+            description: form.description?.trim() || undefined,
           }),
         },
       );
@@ -773,11 +794,11 @@ export default function NewTournamentPage() {
                   </div>
                 </Step>
 
-                {/* Step 3: Dates & Participants */}
+                {/* Step 3: Tournament Details */}
                 <Step>
                   <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
                     <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
-                      Dates & Participants
+                      Tournament Details
                     </h2>
 
                     {stepError && (
@@ -865,11 +886,11 @@ export default function NewTournamentPage() {
                   </div>
                 </Step>
 
-                {/* Step 4: Details & Rules */}
+                {/* Step 4: Other Information */}
                 <Step>
                   <div className="space-y-4 ml-4 md:ml-8 mt-6 md:mt-8">
                     <h2 className="text-2xl md:text-3xl font-extrabold bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent mb-6 uppercase tracking-wide">
-                      Tournament Details
+                      Other Information
                     </h2>
 
                     <div>

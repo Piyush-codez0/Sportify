@@ -8,7 +8,7 @@ export interface ITournament extends Document {
   _id: Types.ObjectId;
   name: string;
   sport: string;
-  description: string;
+  description?: string;
   organizer: mongoose.Types.ObjectId;
 
   // Location details
@@ -66,7 +66,7 @@ const TournamentSchema = new Schema<ITournament>(
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
+      trim: true,
     },
     organizer: {
       type: Schema.Types.ObjectId,

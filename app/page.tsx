@@ -44,7 +44,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
           <motion.div
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={{ duration: 0.3 }}
-            className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
+            className="shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
           >
             <svg
               className="w-4 h-4 text-purple-600 dark:text-purple-400"
@@ -168,8 +168,8 @@ export default function Home() {
     <SmoothScroll>
       <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative overflow-hidden transition-colors">
         {/* Mesh gradient background */}
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
+        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
 
         {/* Subtle Noise Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none -z-10 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay">
@@ -196,7 +196,7 @@ export default function Home() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="sm:hidden fixed inset-0 top-[56px] bg-white/30 dark:bg-black/40 backdrop-blur-lg z-30"
+              className="sm:hidden fixed inset-0 top-14 bg-white/30 dark:bg-black/40 backdrop-blur-lg z-30"
             />
           )}
         </AnimatePresence>
@@ -261,7 +261,7 @@ export default function Home() {
                       </Link>
                       <Link
                         href="/auth/register"
-                        className="px-6 py-2.5 text-base bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+                        className="px-6 py-2.5 text-base bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
                       >
                         Sign Up
                       </Link>
@@ -311,11 +311,11 @@ export default function Home() {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="sm:hidden overflow-hidden border-t border-purple-200/50 dark:border-purple-500/20 bg-gradient-to-b from-white/90 to-white/80 dark:from-gray-900/80 dark:to-black/80 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(168,85,247,0.15)] relative z-40"
+                className="sm:hidden overflow-hidden border-t border-purple-200/50 dark:border-purple-500/20 bg-linear-to-b from-white/90 to-white/80 dark:from-gray-900/80 dark:to-black/80 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(168,85,247,0.15)] relative z-40"
               >
                 <div className="px-4 py-6 flex flex-col gap-4 relative">
                   {/* Subtle inner glow */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-linear-to-b from-purple-500/5 to-transparent pointer-events-none" />
 
                   <Link
                     href="/tournaments"
@@ -324,7 +324,7 @@ export default function Home() {
                   >
                     Explore Tournaments
                   </Link>
-                  <div className="h-px bg-gradient-to-r from-transparent via-purple-200 dark:via-purple-800/50 to-transparent my-2 relative z-10" />
+                  <div className="h-px bg-linear-to-r from-transparent via-purple-200 dark:via-purple-800/50 to-transparent my-2 relative z-10" />
                   {user ? (
                     <>
                       <Link
@@ -350,7 +350,7 @@ export default function Home() {
                             router.push("/");
                           }
                         }}
-                        className="text-center py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                        className="text-center py-3 rounded-xl bg-linear-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
                       >
                         Logout
                       </button>
@@ -367,7 +367,7 @@ export default function Home() {
                       <Link
                         href="/auth/register"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-center py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                        className="text-center py-3 rounded-xl bg-linear-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
                       >
                         Sign Up
                       </Link>
@@ -405,9 +405,9 @@ export default function Home() {
               className="absolute inset-0 w-full h-full object-cover scale-110 blur-[2px] hidden sm:dark:block"
             />
             {/* Overlay to ensure text readability */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/80 via-white/40 to-white/10 dark:bg-none dark:bg-black/30" />
+            <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/40 to-white/10 dark:bg-none dark:bg-black/30" />
             {/* Gradient fade to page background at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-[#040812] dark:via-[#040812]/80 dark:to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-40 bg-linear-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-[#040812] dark:via-[#040812]/80 dark:to-transparent" />
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
@@ -429,11 +429,11 @@ export default function Home() {
                 <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight text-gray-900 dark:text-white">
                   Build Tomorrow's <br className="sm:hidden" />
                   <span className="relative inline-block">
-                    <span className="relative z-10 bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+                    <span className="relative z-10 bg-linear-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
                       Champions
                     </span>
                     {/* Subtle underline/highlight effect behind the text */}
-                    <span className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-500/40 to-pink-500/40 -z-10 -rotate-1 rounded-sm blur-[0.5px]"></span>
+                    <span className="absolute bottom-0 left-0 w-full h-1.5 bg-linear-to-r from-purple-500/40 to-pink-500/40 -z-10 -rotate-1 rounded-sm blur-[0.5px]"></span>
                   </span>
                 </h1>
               </div>
@@ -453,7 +453,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 mb-6 sm:mb-8 px-2 pt-16   ">
                 <Link
                   href="/auth/register"
-                  className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
+                  className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
                 >
                   {/* Button content */}
                   <span className="relative z-10 flex items-center gap-2">
@@ -513,11 +513,11 @@ export default function Home() {
 
           {/* Kinetic Light Pipe Separator */}
           <div className="w-full max-w-5xl mx-auto py-12 sm:pb-24 pt-4 relative flex items-center justify-center z-20">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-slate-400/30 dark:via-slate-500/30 to-transparent" />
-            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-slate-500/30 dark:via-slate-400/30 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-slate-400/20 dark:via-slate-300/20 to-transparent blur-md animate-pulse" />
+            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-slate-400/30 dark:via-slate-500/30 to-transparent" />
+            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-slate-500/30 dark:via-slate-400/30 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-slate-400/20 dark:via-slate-300/20 to-transparent blur-md animate-pulse" />
             <div className="relative w-8 h-8 bg-white/40 dark:bg-slate-800/50 backdrop-blur-xl border border-slate-300/40 dark:border-slate-600/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(34,197,94,0.1)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-200/20 to-slate-300/20 dark:from-slate-700/20 dark:to-slate-600/20" />
+              <div className="absolute inset-0 bg-linear-to-br from-slate-200/20 to-slate-300/20 dark:from-slate-700/20 dark:to-slate-600/20" />
               {/* Sports Accent Pulse */}
               <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse" />
             </div>
@@ -533,7 +533,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: false, margin: "-100px" }}
-                className="font-display text-2xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent tracking-tight"
+                className="font-display text-2xl sm:text-4xl md:text-5xl font-black bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent tracking-tight"
               >
                 How It Works
               </motion.h2>
@@ -542,12 +542,12 @@ export default function Home() {
             <div ref={timelineRef} className="relative max-w-4xl mx-auto pb-6">
               {/* Vertical Light Pipe Timeline */}
               <div
-                className="absolute left-8 sm:left-1/2 top-0 w-[2px] sm:-ml-[1px] bg-purple-500/10 dark:bg-purple-500/10 rounded-full"
+                className="absolute left-8 sm:left-1/2 top-0 w-0.5 sm:-ml-px bg-purple-500/10 dark:bg-purple-500/10 rounded-full"
                 style={{ height: "83%" }}
               >
                 {/* The filled part of the pipe */}
                 <motion.div
-                  className="absolute top-0 w-full bg-gradient-to-b from-purple-500/50 to-pink-500 shadow-[0_0_10px_#ec4899] rounded-full"
+                  className="absolute top-0 w-full bg-linear-to-b from-purple-500/50 to-pink-500 shadow-[0_0_10px_#ec4899] rounded-full"
                   style={{ height: dotPosition }}
                 />
                 {/* The moving dot */}
@@ -691,15 +691,15 @@ export default function Home() {
                     >
                       <div className="group relative p-6 sm:p-8 rounded-3xl bg-white/5 dark:bg-gray-900/40 border border-[rgba(255,255,255,0.5)] dark:border-[rgba(255,255,255,0.08)] backdrop-blur-xl saturate-150 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_8px_30px_rgba(168,85,247,0.05)] hover:bg-white/10 dark:hover:bg-gray-900/60 transition-all duration-500 overflow-hidden">
                         {/* Hover Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                         <div
                           className={`flex items-center gap-4 mb-4 ${index % 2 === 0 ? "sm:flex-row-reverse" : ""}`}
                         >
-                          <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+                          <div className="shrink-0 w-12 h-12 rounded-2xl bg-linear-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
                             {item.icon}
                           </div>
-                          <span className="font-display text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-purple-300 to-purple-100 dark:from-gray-700 dark:to-gray-900 opacity-60">
+                          <span className="font-display text-4xl font-black text-transparent bg-clip-text bg-linear-to-b from-purple-300 to-purple-100 dark:from-gray-700 dark:to-gray-900 opacity-60">
                             {item.step}
                           </span>
                         </div>
@@ -722,19 +722,19 @@ export default function Home() {
 
           {/* Kinetic Light Pipe Separator */}
           <div className="w-full max-w-5xl mx-auto py-10 sm:py-24 relative flex items-center justify-center">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
             <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
-              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
+              <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
+              <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
             </div>
           </div>
 
           {/* How Sportify Can Help You Section */}
           <div>
             <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
-              <span className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 One Platform. Three Powerful Roles.
               </span>
             </h2>
@@ -742,13 +742,13 @@ export default function Home() {
             {/* Role Cards - Glassmorphism */}
             <div className="relative">
               {/* Ambient Background Glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 dark:from-purple-500/5 dark:via-blue-500/5 dark:to-pink-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 dark:from-purple-500/5 dark:via-blue-500/5 dark:to-pink-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* Organizers Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
                   <Pointer className="text-purple-600" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 rounded-3xl transition-all duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 rounded-3xl transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
@@ -778,9 +778,9 @@ export default function Home() {
                 </div>
 
                 {/* Players Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
                   <Pointer className="text-blue-600" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
@@ -810,9 +810,9 @@ export default function Home() {
                 </div>
 
                 {/* Sponsors Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
                   <Pointer className="text-pink-600" />
-                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
@@ -846,19 +846,19 @@ export default function Home() {
 
           {/* Kinetic Light Pipe Separator */}
           <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
-            <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-            <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
             <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
-              <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_3s_infinite]" />
+              <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
+              <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_3s_infinite]" />
             </div>
           </div>
 
           {/* Key Features - 2x2 Grid with Sport Icons */}
           <div>
             <div className="text-center mb-8 sm:mb-16">
-              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
                 Powerful Features
               </h2>
               <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
@@ -871,7 +871,7 @@ export default function Home() {
               <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
                       src="/icons/location.gif"
                       alt="Location Based Discovery"
@@ -894,7 +894,7 @@ export default function Home() {
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-purple-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
                       src="/icons/registration.gif"
                       alt="Digital Registration"
@@ -917,7 +917,7 @@ export default function Home() {
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
                       src="/icons/payments.gif"
                       alt="Secure Payments"
@@ -940,7 +940,7 @@ export default function Home() {
               <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-orange-600" />
                 <div className="flex gap-5 items-start">
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
                       src="/icons/notifications.gif"
                       alt="Real-time Notifications"
@@ -964,12 +964,12 @@ export default function Home() {
 
         {/* Kinetic Light Pipe Separator */}
         <div className="w-full max-w-5xl mx-auto py-10 sm:py-16 relative flex items-center justify-center z-10">
-          <div className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-          <div className="absolute w-2/3 h-[2px] bg-gradient-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-          <div className="absolute w-1/3 h-[8px] bg-gradient-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
+          <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
+          <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
+          <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
           <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20" />
-            <div className="w-2 h-2 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_4s_infinite]" />
+            <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
+            <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_4s_infinite]" />
           </div>
         </div>
 
@@ -994,7 +994,7 @@ export default function Home() {
                 Frequently Asked Questions
               </span>
             </div>
-            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
               Got Questions?
             </h2>
             <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
@@ -1048,7 +1048,7 @@ export default function Home() {
           </div>
 
           {/* Contact CTA */}
-          <div className="mt-12 text-center p-8 rounded-2xl bg-gradient-to-br from-purple-50/50 via-white/30 to-blue-50/50 dark:from-purple-900/20 dark:via-gray-800/30 dark:to-blue-900/20 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50">
+          <div className="mt-12 text-center p-8 rounded-2xl bg-linear-to-br from-purple-50/50 via-white/30 to-blue-50/50 dark:from-purple-900/20 dark:via-gray-800/30 dark:to-blue-900/20 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50">
             <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white">
               Still have questions?
             </h3>
@@ -1057,7 +1057,7 @@ export default function Home() {
             </p>
             <a
               href="mailto:support@sportify.com"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
             >
               <svg
                 className="w-5 h-5"
@@ -1080,8 +1080,8 @@ export default function Home() {
         {/* Professional Footer */}
         <footer className="relative z-10 transition-colors overflow-hidden border-t border-slate-200/50 dark:border-white/5">
           {/* Subtle Top Glow & Depth */}
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-slate-300 dark:via-white/10 to-transparent" />
-          <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-slate-50 dark:from-white/[0.02] to-transparent pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-slate-300 dark:via-white/10 to-transparent" />
+          <div className="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-slate-50 dark:from-white/[0.02] to-transparent pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
@@ -1093,7 +1093,7 @@ export default function Home() {
                     alt="Sportify"
                     className="w-10 h-10 rounded-xl shadow-lg"
                   />
-                  <h3 className="font-display text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+                  <h3 className="font-display text-2xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
                     Sportify
                   </h3>
                 </div>

@@ -162,7 +162,7 @@ export default function OrganizerDashboard() {
                   {sponsorships.map((s) => (
                     <div
                       key={s._id}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow transition-colors flex flex-col h-full"
                     >
                       <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
                         {s.sponsor.companyName || "Sponsor"}
@@ -210,7 +210,7 @@ export default function OrganizerDashboard() {
                         </div>
                       )}
                       {s.status === "pending" && (
-                        <div className="flex gap-2 mt-3">
+                        <div className="flex gap-2 mt-auto pt-4">
                           <button
                             onClick={async () => {
                               try {
@@ -308,7 +308,7 @@ export default function OrganizerDashboard() {
                   {tournaments.map((t) => (
                     <div
                       key={t._id}
-                      className="group relative border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300"
+                      className="group relative border border-gray-200 dark:border-gray-700 rounded-2xl p-5 bg-white dark:bg-gray-800 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <h2 className="font-semibold text-lg text-gray-900 dark:text-white">
@@ -383,7 +383,7 @@ export default function OrganizerDashboard() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-3 flex gap-2">
+                      <div className="mt-auto pt-4 flex gap-2">
                         <Link
                           href={`/organizer/tournaments/new?editId=${t._id}`}
                           className="flex-1 text-center bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 px-3 py-2 rounded-md text-sm font-semibold hover:bg-indigo-50 dark:hover:bg-gray-600 transition-colors shadow-sm"

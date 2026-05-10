@@ -280,7 +280,7 @@ export default function TournamentsBrowse() {
                   </Link>
                   <Link
                     href="/auth/register"
-                    className="px-6 py-2.5 text-base bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
+                    className="px-6 py-2.5 text-base bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300"
                   >
                     Sign Up
                   </Link>
@@ -296,7 +296,7 @@ export default function TournamentsBrowse() {
           <div className="text-center mb-10">
             
             <h1 className="text-3xl sm:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
-              Discover Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Challenges</span>
+              Discover Your <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-500 to-purple-600">Challenges</span>
             </h1>
             <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto font-medium">
               Find and join premier sports tournaments in your area. Compete, grow, and connect with the community.
@@ -307,7 +307,7 @@ export default function TournamentsBrowse() {
         {/* Premium Filter Card */}
         <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-gray-700/50 p-6 mb-8 relative overflow-hidden group">
           {/* Subtle Glow Effect */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-gradient-to-b from-indigo-500/5 to-transparent blur-3xl -z-10 group-hover:from-indigo-500/10 transition-colors duration-500"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-linear-to-b from-indigo-500/5 to-transparent blur-3xl -z-10 group-hover:from-indigo-500/10 transition-colors duration-500"></div>
 
           {/* Filter Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6 relative z-10">
@@ -434,7 +434,7 @@ export default function TournamentsBrowse() {
                 setFilters({ district: "", state: "", sport: "", useRadius: false, radiusKm: "10", showOnlyActive: false });
                 setLocation(null);
               }}
-              className="flex items-center justify-center gap-2 text-sm bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all font-semibold shadow-sm hover:shadow active:scale-95 flex-shrink-0"
+              className="flex items-center justify-center gap-2 text-sm bg-gray-100/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 px-5 py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all font-semibold shadow-sm hover:shadow active:scale-95 shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -453,7 +453,7 @@ export default function TournamentsBrowse() {
           }`}
         >
           {/* Gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 dark:from-emerald-600 dark:via-teal-600 dark:to-cyan-600" />
+          <div className="absolute inset-0 bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 dark:from-emerald-600 dark:via-teal-600 dark:to-cyan-600" />
           {/* Subtle pattern overlay */}
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
@@ -461,7 +461,7 @@ export default function TournamentsBrowse() {
             {/* Left: text */}
             <div className="flex items-center gap-4">
               {/* Animated Location Pin Container */}
-              <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex-shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+              <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
                 <svg className={`w-6 h-6 text-white ${filters.useRadius ? 'animate-bounce' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -490,7 +490,7 @@ export default function TournamentsBrowse() {
             </div>
 
             {/* Right: button + radius */}
-            <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               {/* Radius input — shows when active */}
               {filters.useRadius && (
                 <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-3 py-2">
@@ -523,11 +523,11 @@ export default function TournamentsBrowse() {
               >
                 {/* Shimmer on active */}
                 {filters.useRadius && (
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-emerald-100/60 to-transparent animate-[shimmer_2s_infinite] pointer-events-none" />
+                  <span className="absolute inset-0 bg-linear-to-r from-transparent via-emerald-100/60 to-transparent animate-[shimmer_2s_infinite] pointer-events-none" />
                 )}
 
                 {/* Pulsing pin icon */}
-                <span className="relative flex-shrink-0">
+                <span className="relative shrink-0">
                   {filters.useRadius && (
                     <span className="absolute inset-0 rounded-full bg-emerald-400/40 animate-ping" />
                   )}
@@ -633,7 +633,7 @@ export default function TournamentsBrowse() {
                 >
                   {/* ── COLORED HEADER STRIP ─────────────────────── */}
                   <div
-                    className={`relative bg-gradient-to-br ${
+                    className={`relative bg-linear-to-br ${
                       isInactive ? "from-gray-400 to-gray-500" : headerGradient
                     } px-6 pt-5 pb-10 overflow-hidden`}
                   >
@@ -643,7 +643,7 @@ export default function TournamentsBrowse() {
                     {/* Top Content: Thumbnail + Details */}
                     <div className="relative flex items-center gap-4 z-10">
                       {/* Real Image Thumbnail */}
-                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_4px_12px_rgba(0,0,0,0.15)] flex-shrink-0 bg-white/20">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0 bg-white/20">
                         <img 
                           src={sportImage} 
                           alt={t.sport} 
@@ -657,7 +657,7 @@ export default function TournamentsBrowse() {
                         </h2>
                         {/* Location chip */}
                         <div className="flex items-center gap-1 mt-0.5 text-white/90 text-xs font-medium">
-                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
@@ -674,13 +674,13 @@ export default function TournamentsBrowse() {
                     )}
 
                     {/* Bottom curved gradient shade */}
-                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/60 to-transparent pointer-events-none rounded-t-[100%]" style={{ transform: "scaleX(1.5)", transformOrigin: "bottom center" }} />
+                    <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-black/60 to-transparent pointer-events-none rounded-t-[100%]" style={{ transform: "scaleX(1.5)", transformOrigin: "bottom center" }} />
                   </div>
 
                   {/* ── STATUS BANNER (replaces ribbon) ─────────────── */}
                   {isInactive && (
                     <div
-                      className={`relative z-20 -mt-1 w-full flex items-center justify-center gap-2 py-2 px-4 text-white text-sm font-bold tracking-wide bg-gradient-to-r ${status.ribbonBg} shadow-md`}
+                      className={`relative z-20 -mt-1 w-full flex items-center justify-center gap-2 py-2 px-4 text-white text-sm font-bold tracking-wide bg-linear-to-r ${status.ribbonBg} shadow-md`}
                     >
                       <span className="text-base">{status.emoji}</span>
                       <span>{status.label}</span>
@@ -700,7 +700,7 @@ export default function TournamentsBrowse() {
                     {/* Organizer */}
                     {t.organizer && (
                       <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         <span className="truncate">
@@ -712,14 +712,14 @@ export default function TournamentsBrowse() {
                     {/* Dates row */}
                     <div className="flex flex-wrap gap-x-4 gap-y-1">
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                        <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <span>Starts: {new Date(t.startDate).toLocaleDateString("en-GB")}</span>
                       </div>
                       {t.registrationDeadline && (
                         <div className={`flex items-center gap-1 text-xs font-medium ${isInactive ? "text-red-500 dark:text-red-400" : "text-orange-600 dark:text-orange-400"}`}>
-                          <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <span>Deadline: {new Date(t.registrationDeadline).toLocaleDateString("en-GB")}</span>
@@ -748,13 +748,13 @@ export default function TournamentsBrowse() {
                     <div className="flex-1"></div> {/* Spacer to push buttons to bottom */}
 
                     {/* Divider */}
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
+                    <div className="h-px bg-linear-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent" />
 
                     {/* CTA Button */}
                     <div className="pt-2">
                       <button
                         onClick={() => setSelectedTournament(t)}
-                        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md"
+                        className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 text-white text-sm font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -811,7 +811,7 @@ export default function TournamentsBrowse() {
               </button>
 
               {/* Header Section (Constant/Sticky) */}
-              <div className="relative h-32 sm:h-44 bg-slate-900 flex items-end flex-shrink-0">
+              <div className="relative h-32 sm:h-44 bg-slate-900 flex items-end shrink-0">
                 {/* Sport Background Image */}
                 <img 
                   src={
@@ -967,7 +967,7 @@ export default function TournamentsBrowse() {
               <div className="p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-col sm:flex-row gap-4">
                 <Link
                   href={token ? `/tournaments/${selectedTournament._id}` : `/auth/register?role=player`}
-                  className="flex-[1.5] bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-4 px-8 rounded-2xl text-center shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
+                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-4 px-8 rounded-2xl text-center shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
                 >
                   {token ? "Proceed to Register" : "Register to Compete"}
                 </Link>
