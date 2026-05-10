@@ -35,19 +35,23 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
     >
       <button
         onClick={onToggle}
-        className="w-full text-left p-4 sm:p-6 rounded-2xl bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-lg transition-all duration-300"
+        className={`w-full text-left p-4 sm:p-6 rounded-2xl backdrop-blur-sm transition-all duration-300 ${
+          isOpen
+            ? "bg-blue-50/80 dark:bg-blue-900/20 border-blue-300 dark:border-blue-500 shadow-md shadow-blue-500/10"
+            : "bg-white/60 dark:bg-gray-800/60 border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-lg"
+        } border`}
       >
-        <div className="flex items-start justify-between gap-4">
-          <h3 className="text-lg font-bold text-gray-900 dark:text-white pr-8 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <h3 className={`text-base sm:text-lg font-bold pr-4 sm:pr-8 transition-colors ${isOpen ? "text-blue-700 dark:text-blue-300" : "text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400"}`}>
             {question}
           </h3>
           <motion.div
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={{ duration: 0.3 }}
-            className="shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
+            className={`shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-colors ${isOpen ? "bg-blue-200 dark:bg-blue-800/60" : "bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50"}`}
           >
             <svg
-              className="w-4 h-4 text-purple-600 dark:text-purple-400"
+              className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isOpen ? "text-blue-700 dark:text-blue-300" : "text-blue-600 dark:text-blue-400"}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -70,7 +74,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
               transition={{ duration: 0.3 }}
               className="overflow-hidden"
             >
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed pt-4 border-t border-purple-100 dark:border-purple-800/30 mt-4">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed pt-3 sm:pt-4 border-t border-blue-200 dark:border-blue-800/50 mt-3 sm:mt-4">
                 {answer}
               </p>
             </motion.div>
@@ -233,7 +237,7 @@ export default function Home() {
                               ? "/player/dashboard"
                               : "/sponsor/dashboard"
                         }
-                        className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
+                        className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-300 font-medium transition-all"
                       >
                         Dashboard
                       </Link>
@@ -255,13 +259,13 @@ export default function Home() {
                     <>
                       <Link
                         href="/auth/login"
-                        className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-300 font-medium transition-all"
+                        className="px-5 py-2.5 text-base text-gray-700 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-300 font-medium transition-all"
                       >
                         Login
                       </Link>
                       <Link
                         href="/auth/register"
-                        className="px-6 py-2.5 text-base bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+                        className="px-6 py-2.5 text-base bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300"
                       >
                         Sign Up
                       </Link>
@@ -272,7 +276,7 @@ export default function Home() {
                 {/* Mobile Hamburger Button */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="sm:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                  className="sm:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                   aria-label="Toggle mobile menu"
                 >
                   <svg
@@ -311,20 +315,20 @@ export default function Home() {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
-                className="sm:hidden overflow-hidden border-t border-purple-200/50 dark:border-purple-500/20 bg-linear-to-b from-white/90 to-white/80 dark:from-gray-900/80 dark:to-black/80 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(168,85,247,0.15)] relative z-40"
+                className="sm:hidden overflow-hidden border-t border-blue-200/50 dark:border-blue-500/20 bg-linear-to-b from-white/90 to-white/80 dark:from-gray-900/80 dark:to-black/80 backdrop-blur-3xl shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(168,85,247,0.15)] relative z-40"
               >
                 <div className="px-4 py-6 flex flex-col gap-4 relative">
                   {/* Subtle inner glow */}
-                  <div className="absolute inset-0 bg-linear-to-b from-purple-500/5 to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-linear-to-b from-blue-500/5 to-transparent pointer-events-none" />
 
                   <Link
                     href="/tournaments"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 relative z-10 px-2"
+                    className="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 relative z-10 px-2"
                   >
                     Explore Tournaments
                   </Link>
-                  <div className="h-px bg-linear-to-r from-transparent via-purple-200 dark:via-purple-800/50 to-transparent my-2 relative z-10" />
+                  <div className="h-px bg-linear-to-r from-transparent via-blue-200 dark:via-blue-800/50 to-transparent my-2 relative z-10" />
                   {user ? (
                     <>
                       <Link
@@ -336,7 +340,7 @@ export default function Home() {
                               : "/sponsor/dashboard"
                         }
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-center py-3 rounded-xl border-2 border-purple-200 dark:border-purple-800 font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+                        className="text-center py-3 rounded-xl border-2 border-blue-200 dark:border-blue-800 font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                       >
                         Dashboard
                       </Link>
@@ -350,7 +354,7 @@ export default function Home() {
                             router.push("/");
                           }
                         }}
-                        className="text-center py-3 rounded-xl bg-linear-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                        className="text-center py-3 rounded-xl bg-linear-to-r from-blue-600 to-emerald-600 font-semibold text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-transform"
                       >
                         Logout
                       </button>
@@ -360,14 +364,14 @@ export default function Home() {
                       <Link
                         href="/auth/login"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-center py-3 rounded-xl border-2 border-purple-200 dark:border-purple-800 font-semibold text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+                        className="text-center py-3 rounded-xl border-2 border-blue-200 dark:border-blue-800 font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors"
                       >
                         Login
                       </Link>
                       <Link
                         href="/auth/register"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="text-center py-3 rounded-xl bg-linear-to-r from-purple-600 to-pink-600 font-semibold text-white shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                        className="text-center py-3 rounded-xl bg-linear-to-r from-blue-600 to-emerald-600 font-semibold text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-transform"
                       >
                         Sign Up
                       </Link>
@@ -382,14 +386,23 @@ export default function Home() {
         {/* Hero Section */}
         <div className="relative z-10">
           {/* Hero Background Image with Blur & Dark Overlay */}
-          <div className="absolute inset-0 z-0 overflow-hidden">
-            {/* Mobile Hero Image (High Impact for small screens) */}
+          <div className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
+            {/* Mobile Light Mode Image */}
+            <img
+              src="/icons/hero-mobile-light.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-105 blur-[1px] block sm:hidden dark:hidden"
+            />
+            {/* Mobile Dark Mode Image */}
             <img
               src="/icons/hero-image-mobile.png"
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover scale-105 blur-[1px] block sm:hidden"
+              className="absolute inset-0 w-full h-full object-cover scale-105 blur-[1px] hidden dark:block dark:sm:hidden"
             />
+            {/* Extra black overlay for mobile light mode to help text pop */}
+            <div className="absolute inset-0 bg-black/20 block sm:hidden dark:hidden z-[1]" />
             {/* Desktop Light Mode Image */}
             <img
               src="/icons/hero-image-light.png"
@@ -406,8 +419,6 @@ export default function Home() {
             />
             {/* Overlay to ensure text readability */}
             <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/40 to-white/10 dark:bg-none dark:bg-black/30" />
-            {/* Gradient fade to page background at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-40 bg-linear-to-t from-slate-50 via-slate-50/80 to-transparent dark:from-[#040812] dark:via-[#040812]/80 dark:to-transparent" />
           </div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
@@ -426,23 +437,23 @@ export default function Home() {
 
               {/* Main Headline */}
               <div className="mb-6 sm:mb-8 relative">
-                <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight relative w-full text-center tracking-tight text-gray-900 dark:text-white">
+                <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] relative w-full text-center tracking-tight text-gray-900 dark:text-white">
                   Build Tomorrow's <br className="sm:hidden" />
                   <span className="relative inline-block">
-                    <span className="relative z-10 bg-linear-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+                    <span className="relative z-10 bg-linear-to-r from-blue-600 via-emerald-500 to-blue-600 bg-clip-text text-transparent">
                       Champions
                     </span>
                     {/* Subtle underline/highlight effect behind the text */}
-                    <span className="absolute bottom-0 left-0 w-full h-1.5 bg-linear-to-r from-purple-500/40 to-pink-500/40 -z-10 -rotate-1 rounded-sm blur-[0.5px]"></span>
+                    <span className="absolute bottom-1 left-0 w-full h-2 sm:h-3 bg-linear-to-r from-blue-500/40 to-emerald-500/40 -z-10 -rotate-1 rounded-sm blur-[0.5px]"></span>
                   </span>
                 </h1>
               </div>
 
               {/* Subheadline */}
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-200 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-2">
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-200 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed font-medium px-4">
                 Organize, discover, and participate in local sports tournaments
                 across India.
-                <span className="text-purple-600 dark:text-purple-300 font-semibold">
+                <span className="text-blue-600 dark:text-blue-300 font-semibold">
                   {" "}
                   Connect organizers, players, and sponsors
                 </span>{" "}
@@ -453,7 +464,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 mb-6 sm:mb-8 px-2 pt-16   ">
                 <Link
                   href="/auth/register"
-                  className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
+                  className="group relative px-6 sm:px-10 py-4 sm:py-4 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-2xl text-lg sm:text-lg font-bold hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 animate-pulse-ring"
                 >
                   {/* Button content */}
                   <span className="relative z-10 flex items-center gap-2">
@@ -502,8 +513,8 @@ export default function Home() {
                 </div>
 
                 {/* Info (Blue) */}
-                <div className="flex items-center gap-2 px-4 py-2 bg-blue-50/80 dark:bg-blue-500/10 backdrop-blur-md rounded-full border border-blue-200 dark:border-blue-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300">
-                  <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                <div className="flex items-center gap-2 px-4 py-2 bg-cyan-50/80 dark:bg-cyan-500/10 backdrop-blur-md rounded-full border border-cyan-200 dark:border-cyan-500/30 shadow-[0_0_15px_rgba(59,130,246,0.1)] hover:scale-105 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300">
+                  <span className="text-sm font-semibold text-cyan-700 dark:text-cyan-400">
                     👥 1000+ players joined
                   </span>
                 </div>
@@ -532,8 +543,8 @@ export default function Home() {
               <motion.h2
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, margin: "-100px" }}
-                className="font-display text-2xl sm:text-4xl md:text-5xl font-black bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent tracking-tight"
+                viewport={{ once: true, margin: "-50px" }}
+                className="font-display text-3xl sm:text-4xl md:text-5xl font-black bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent tracking-tight"
               >
                 How It Works
               </motion.h2>
@@ -542,20 +553,20 @@ export default function Home() {
             <div ref={timelineRef} className="relative max-w-4xl mx-auto pb-6">
               {/* Vertical Light Pipe Timeline */}
               <div
-                className="absolute left-8 sm:left-1/2 top-0 w-0.5 sm:-ml-px bg-purple-500/10 dark:bg-purple-500/10 rounded-full"
+                className="absolute left-8 sm:left-1/2 top-0 w-0.5 sm:-ml-px bg-blue-500/10 dark:bg-blue-500/10 rounded-full"
                 style={{ height: "83%" }}
               >
                 {/* The filled part of the pipe */}
                 <motion.div
-                  className="absolute top-0 w-full bg-linear-to-b from-purple-500/50 to-pink-500 shadow-[0_0_10px_#ec4899] rounded-full"
+                  className="absolute top-0 w-full bg-linear-to-b from-blue-500/50 to-emerald-500 shadow-[0_0_10px_#10b981] rounded-full"
                   style={{ height: dotPosition }}
                 />
                 {/* The moving dot */}
                 <motion.div
-                  className="absolute left-1/2 -translate-x-1/2 w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-background border-2 border-pink-500 shadow-[0_0_20px_#ec4899] flex items-center justify-center z-20"
+                  className="absolute left-1/2 -translate-x-1/2 w-4 h-4 sm:w-6 sm:h-6 rounded-full bg-background border-2 border-emerald-500 shadow-[0_0_20px_#10b981] flex items-center justify-center z-20"
                   style={{ top: dotPosition, y: "-50%" }}
                 >
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-pink-500 animate-pulse" />
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse" />
                 </motion.div>
               </div>
 
@@ -674,7 +685,7 @@ export default function Home() {
                     {/* The Timeline Node */}
                     <div className="absolute left-8 sm:left-1/2 -ml-2 sm:-ml-2.5 mt-8 sm:mt-0 sm:top-1/2 sm:-translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white dark:bg-gray-200 border-2 border-white dark:border-gray-200 flex items-center justify-center z-10 overflow-hidden shadow-sm">
                       <motion.div
-                        className="w-full h-full bg-pink-500 shadow-[0_0_10px_#ec4899]"
+                        className="w-full h-full bg-emerald-500 shadow-[0_0_10px_#10b981]"
                         style={{
                           opacity: useTransform(
                             scrollYProgress,
@@ -691,23 +702,23 @@ export default function Home() {
                     >
                       <div className="group relative p-6 sm:p-8 rounded-3xl bg-white/5 dark:bg-gray-900/40 border border-[rgba(255,255,255,0.5)] dark:border-[rgba(255,255,255,0.08)] backdrop-blur-xl saturate-150 shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_8px_30px_rgba(0,0,0,0.04)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_8px_30px_rgba(168,85,247,0.05)] hover:bg-white/10 dark:hover:bg-gray-900/60 transition-all duration-500 overflow-hidden">
                         {/* Hover Gradient Overlay */}
-                        <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                         <div
                           className={`flex items-center gap-4 mb-4 ${index % 2 === 0 ? "sm:flex-row-reverse" : ""}`}
                         >
-                          <div className="shrink-0 w-12 h-12 rounded-2xl bg-linear-to-br from-purple-600 to-pink-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/30">
+                          <div className="shrink-0 w-12 h-12 rounded-2xl bg-linear-to-br from-blue-600 to-emerald-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
                             {item.icon}
                           </div>
-                          <span className="font-display text-4xl font-black text-transparent bg-clip-text bg-linear-to-b from-purple-300 to-purple-100 dark:from-gray-700 dark:to-gray-900 opacity-60">
+                          <span className="font-display text-4xl font-black text-transparent bg-clip-text bg-linear-to-b from-blue-300 to-blue-100 dark:from-gray-700 dark:to-gray-900 opacity-60">
                             {item.step}
                           </span>
                         </div>
 
-                        <h3 className="font-display text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10 group-hover:text-purple-600 dark:group-hover:text-purple-300 transition-colors duration-300">
+                        <h3 className="font-display text-lg sm:text-2xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 relative z-10 group-hover:text-blue-600 dark:group-hover:text-blue-300 transition-colors duration-300">
                           {item.title}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-400 leading-relaxed relative z-10">
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed relative z-10">
                           {item.desc}
                         </p>
 
@@ -722,19 +733,19 @@ export default function Home() {
 
           {/* Kinetic Light Pipe Separator */}
           <div className="w-full max-w-5xl mx-auto py-10 sm:py-24 relative flex items-center justify-center">
-            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
-            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
-              <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-pulse" />
+            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-blue-500/30 dark:via-blue-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-emerald-500/50 dark:via-emerald-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-blue-400/40 dark:via-blue-300/40 to-transparent blur-md animate-pulse" />
+            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-blue-300/40 dark:border-blue-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+              <div className="absolute inset-0 bg-linear-to-br from-blue-400/20 to-emerald-400/20" />
+              <div className="w-2 h-2 bg-linear-to-br from-blue-500 to-emerald-500 rounded-full shadow-[0_0_10px_#60a5fa] animate-pulse" />
             </div>
           </div>
 
           {/* How Sportify Can Help You Section */}
           <div>
-            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
-              <span className="bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+            <h2 className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
+              <span className="bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
                 One Platform. Three Powerful Roles.
               </span>
             </h2>
@@ -742,45 +753,13 @@ export default function Home() {
             {/* Role Cards - Glassmorphism */}
             <div className="relative">
               {/* Ambient Background Glow */}
-              <div className="absolute inset-0 bg-linear-to-r from-purple-500/10 via-blue-500/10 to-pink-500/10 dark:from-purple-500/5 dark:via-blue-500/5 dark:to-pink-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 via-cyan-500/10 to-emerald-500/10 dark:from-blue-500/5 dark:via-cyan-500/5 dark:to-emerald-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* Organizers Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-purple-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-purple-800/40 backdrop-blur-xl border border-purple-200/50 dark:border-purple-400/50 hover:border-purple-400/70 dark:hover:border-purple-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
-                  <Pointer className="text-purple-600" />
-                  <div className="absolute inset-0 bg-linear-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/5 group-hover:to-pink-500/5 rounded-3xl transition-all duration-500" />
-
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
-                      <svg
-                        className="w-8 h-8 text-purple-600 dark:text-purple-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                      For Organizers
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                      Create and manage tournaments with ease. Track
-                      registrations, verify players, and handle payments
-                      seamlessly.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Players Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-blue-900/30 backdrop-blur-xl border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400/70 dark:hover:border-blue-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-blue-800/40 backdrop-blur-xl border border-blue-200/50 dark:border-blue-400/50 hover:border-blue-400/70 dark:hover:border-blue-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
                   <Pointer className="text-blue-600" />
-                  <div className="absolute inset-0 bg-linear-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-br from-blue-500/0 to-emerald-500/0 group-hover:from-blue-500/5 group-hover:to-emerald-500/5 rounded-3xl transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
@@ -794,14 +773,46 @@ export default function Home() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
+                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="font-display text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      For Organizers
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+                      Create and manage tournaments with ease. Track
+                      registrations, verify players, and handle payments
+                      seamlessly.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Players Card */}
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-cyan-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-cyan-900/30 backdrop-blur-xl border border-cyan-200/50 dark:border-cyan-700/50 hover:border-cyan-400/70 dark:hover:border-cyan-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
+                  <Pointer className="text-cyan-600" />
+                  <div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/5 rounded-3xl transition-all duration-500" />
+
+                  <div className="relative z-10">
+                    <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
+                      <svg
+                        className="w-8 h-8 text-cyan-600 dark:text-cyan-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                         />
                       </svg>
                     </div>
-                    <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3 className="font-display text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
                       For Players
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Discover nearby tournaments, register digitally, and build
                       your competitive profile. Never miss an opportunity to
                       play.
@@ -810,14 +821,14 @@ export default function Home() {
                 </div>
 
                 {/* Sponsors Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-pink-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-pink-900/30 backdrop-blur-xl border border-pink-200/50 dark:border-pink-700/50 hover:border-pink-400/70 dark:hover:border-pink-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
-                  <Pointer className="text-pink-600" />
-                  <div className="absolute inset-0 bg-linear-to-br from-pink-500/0 to-purple-500/0 group-hover:from-pink-500/5 group-hover:to-purple-500/5 rounded-3xl transition-all duration-500" />
+                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-emerald-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-emerald-900/30 backdrop-blur-xl border border-emerald-200/50 dark:border-emerald-700/50 hover:border-emerald-400/70 dark:hover:border-emerald-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
+                  <Pointer className="text-emerald-600" />
+                  <div className="absolute inset-0 bg-linear-to-br from-emerald-500/0 to-blue-500/0 group-hover:from-emerald-500/5 group-hover:to-blue-500/5 rounded-3xl transition-all duration-500" />
 
                   <div className="relative z-10">
                     <div className="w-16 h-16 p-2.5 bg-slate-900/5 dark:bg-white/5 rounded-[10px] shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] backdrop-blur-md border border-slate-200/50 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300">
                       <svg
-                        className="w-8 h-8 text-pink-600 dark:text-pink-400"
+                        className="w-8 h-8 text-emerald-600 dark:text-emerald-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -830,10 +841,10 @@ export default function Home() {
                         />
                       </svg>
                     </div>
-                    <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                    <h3 className="font-display text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                       For Sponsors
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Find relevant tournaments and promote your brand directly
                       within the sporting community. Maximize your reach and
                       impact.
@@ -846,19 +857,19 @@ export default function Home() {
 
           {/* Kinetic Light Pipe Separator */}
           <div className="w-full max-w-5xl mx-auto py-16 sm:py-24 relative flex items-center justify-center">
-            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
-            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-              <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
-              <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_3s_infinite]" />
+            <div className="absolute w-full h-px bg-linear-to-r from-transparent via-blue-500/30 dark:via-blue-400/30 to-transparent" />
+            <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-emerald-500/50 dark:via-emerald-400/50 to-transparent blur-[1px]" />
+            <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-blue-400/40 dark:via-blue-300/40 to-transparent blur-md animate-pulse" />
+            <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-blue-300/40 dark:border-blue-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+              <div className="absolute inset-0 bg-linear-to-br from-blue-400/20 to-emerald-400/20" />
+              <div className="w-2 h-2 bg-linear-to-br from-blue-500 to-emerald-500 rounded-full shadow-[0_0_10px_#60a5fa] animate-[pulse_3s_infinite]" />
             </div>
           </div>
 
           {/* Key Features - 2x2 Grid with Sport Icons */}
           <div>
             <div className="text-center mb-8 sm:mb-16">
-              <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+              <h2 className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
                 Powerful Features
               </h2>
               <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
@@ -868,8 +879,8 @@ export default function Home() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto">
               {/* Feature 1 */}
-              <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
-                <Pointer className="text-blue-600" />
+              <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+                <Pointer className="text-cyan-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
@@ -879,10 +890,10 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h4 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       Location-Based Discovery
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Find tournaments near you based on city and state with
                       smart geolocation
                     </p>
@@ -891,8 +902,8 @@ export default function Home() {
               </div>
 
               {/* Feature 2 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
-                <Pointer className="text-purple-600" />
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+                <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
                     <HoverGif
@@ -902,10 +913,10 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h4 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       Digital Registration
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Individual and team registration with secure Aadhar
                       verification
                     </p>
@@ -914,7 +925,7 @@ export default function Home() {
               </div>
 
               {/* Feature 3 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -925,10 +936,10 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h4 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       Secure Payments
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Razorpay integration for hassle-free and secure tournament
                       fees
                     </p>
@@ -937,7 +948,7 @@ export default function Home() {
               </div>
 
               {/* Feature 4 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50 hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-xl transition-all duration-300">
+              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-orange-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -948,10 +959,10 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    <h4 className="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       Real-time Notifications
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
                       Stay updated with tournament changes and instant
                       announcements
                     </p>
@@ -964,21 +975,21 @@ export default function Home() {
 
         {/* Kinetic Light Pipe Separator */}
         <div className="w-full max-w-5xl mx-auto py-10 sm:py-16 relative flex items-center justify-center z-10">
-          <div className="absolute w-full h-px bg-linear-to-r from-transparent via-purple-500/30 dark:via-purple-400/30 to-transparent" />
-          <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-pink-500/50 dark:via-pink-400/50 to-transparent blur-[1px]" />
-          <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-purple-400/40 dark:via-purple-300/40 to-transparent blur-md animate-pulse" />
-          <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-purple-300/40 dark:border-purple-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
-            <div className="absolute inset-0 bg-linear-to-br from-purple-400/20 to-pink-400/20" />
-            <div className="w-2 h-2 bg-linear-to-br from-purple-500 to-pink-500 rounded-full shadow-[0_0_10px_#c084fc] animate-[pulse_4s_infinite]" />
+          <div className="absolute w-full h-px bg-linear-to-r from-transparent via-blue-500/30 dark:via-blue-400/30 to-transparent" />
+          <div className="absolute w-2/3 h-0.5 bg-linear-to-r from-transparent via-emerald-500/50 dark:via-emerald-400/50 to-transparent blur-[1px]" />
+          <div className="absolute w-1/3 h-2 bg-linear-to-r from-transparent via-blue-400/40 dark:via-blue-300/40 to-transparent blur-md animate-pulse" />
+          <div className="relative w-8 h-8 bg-white/20 dark:bg-gray-900/50 backdrop-blur-xl border border-blue-300/40 dark:border-blue-500/40 rotate-45 flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.2)]">
+            <div className="absolute inset-0 bg-linear-to-br from-blue-400/20 to-emerald-400/20" />
+            <div className="w-2 h-2 bg-linear-to-br from-blue-500 to-emerald-500 rounded-full shadow-[0_0_10px_#60a5fa] animate-[pulse_4s_infinite]" />
           </div>
         </div>
 
         {/* FAQ Section */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pb-16 sm:pb-32">
           <div className="text-center mb-8 sm:mb-16">
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-100/50 dark:bg-purple-900/30 border border-purple-300/50 dark:border-purple-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100/50 dark:bg-blue-900/30 border border-blue-300/50 dark:border-blue-700/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm">
               <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -990,11 +1001,11 @@ export default function Home() {
                   d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span className="text-xs sm:text-sm font-semibold text-purple-700 dark:text-purple-300">
+              <span className="text-xs sm:text-sm font-semibold text-blue-700 dark:text-blue-300">
                 Frequently Asked Questions
               </span>
             </div>
-            <h2 className="font-display tracking-tight text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-purple-900 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white bg-clip-text text-transparent">
+            <h2 className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
               Got Questions?
             </h2>
             <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
@@ -1048,16 +1059,16 @@ export default function Home() {
           </div>
 
           {/* Contact CTA */}
-          <div className="mt-12 text-center p-8 rounded-2xl bg-linear-to-br from-purple-50/50 via-white/30 to-blue-50/50 dark:from-purple-900/20 dark:via-gray-800/30 dark:to-blue-900/20 backdrop-blur-sm border border-purple-200/50 dark:border-purple-700/50">
-            <h3 className="font-display text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+          <div className="mt-12 text-center p-8 rounded-2xl bg-linear-to-br from-blue-50/50 via-white/30 to-cyan-50/50 dark:from-blue-900/20 dark:via-gray-800/30 dark:to-cyan-900/20 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50">
+            <h3 className="font-display text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white">
               Still have questions?
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-5">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-5">
               Our team is here to help you get started with Sportify
             </p>
             <a
               href="mailto:support@sportify.com"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-blue-500/50 hover:scale-105 transition-all duration-300"
             >
               <svg
                 className="w-5 h-5"
@@ -1093,7 +1104,7 @@ export default function Home() {
                     alt="Sportify"
                     className="w-10 h-10 rounded-xl shadow-lg"
                   />
-                  <h3 className="font-display text-2xl font-bold bg-linear-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+                  <h3 className="font-display text-2xl font-bold bg-linear-to-r from-blue-600 via-emerald-600 to-blue-600 bg-clip-text text-transparent">
                     Sportify
                   </h3>
                 </div>
