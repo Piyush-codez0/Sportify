@@ -11,8 +11,9 @@ import { INDIAN_DISTRICTS } from "@/lib/indianDistricts";
 
 interface Tournament {
   _id: string;
-  name: string;
+  name?: string;
   sport: string;
+  bannerImage?: string;
   city: string;
   state: string;
   startDate: string;
@@ -36,19 +37,22 @@ interface Tournament {
   };
 }
 
+const UNIVERSAL_SPORT_IMAGE = "https://plus.unsplash.com/premium_vector-1683121882279-a86a4aff8bae?q=80&w=1632&auto=format&fit=crop";
+
 // Sport image context for sports (higher res for banners)
+// IMPORTANT: Use direct image CDN URLs (images.unsplash.com/...), NOT page URLs (unsplash.com/illustrations/...)
 const SPORT_BANNER_IMAGES: Record<string, string> = {
-  football: "https://images.unsplash.com/photo-1518605368461-1ee511687286?w=800&q=80",
-  cricket: "https://images.unsplash.com/photo-1531415074968-03610062d88a?w=800&q=80",
-  chess: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=800&q=80",
+  football: "https://plus.unsplash.com/premium_vector-1729397524180-a56fa5ed8edc?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  cricket: "https://plus.unsplash.com/premium_vector-1729669504256-7067b1af7f01?q=80&w=1098&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  chess: "https://plus.unsplash.com/premium_vector-1742653578865-13fa6e3e831b?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   badminton: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&q=80",
-  tennis: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=800&q=80",
-  kabaddi: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800&q=80",
-  basketball: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80",
-  volleyball: "https://images.unsplash.com/photo-1592656670411-591eef3073bc?w=800&q=80",
+  tennis: "https://plus.unsplash.com/premium_vector-1714340078975-806213831c17?q=80&w=1051&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  kabaddi: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
+  basketball: "https://plus.unsplash.com/premium_vector-1729578885274-610cdfcf6760?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  volleyball: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80",
   "table tennis": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&q=80",
-  athletics: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
-  "kho-kho": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80",
+  athletics: "https://images.unsplash.com/photo-1552674605-171ff5ea5787?w=800&q=80",
+  polo: "https://images.unsplash.com/photo-1516756953057-acad3b3d8d2d?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 };
 
 // Helper: get tournament status tag info
@@ -605,22 +609,12 @@ export default function TournamentsBrowse() {
               };
               const sportEmoji = sportEmojis[sportKey] || "🏆";
 
-              // Real image context for sports
-              const sportImages: Record<string, string> = {
-                football: "https://images.unsplash.com/photo-1518605368461-1ee511687286?w=150&h=150&fit=crop&q=80",
-                cricket: "https://images.unsplash.com/photo-1531415074968-03610062d88a?w=150&h=150&fit=crop&q=80",
-                chess: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=150&h=150&fit=crop&q=80",
-                badminton: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=150&h=150&fit=crop&q=80",
-                tennis: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?w=150&h=150&fit=crop&q=80",
-                kabaddi: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=150&h=150&fit=crop&q=80",
-                basketball: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=150&h=150&fit=crop&q=80",
-                volleyball: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=150&h=150&fit=crop&q=80",
-                "table tennis": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=150&h=150&fit=crop&q=80",
-                athletics: "https://images.unsplash.com/photo-1552674605-171ff5ea5787?w=150&h=150&fit=crop&q=80",
-                "kho-kho": "https://images.unsplash.com/photo-1526676037777-05a232554f77?w=150&h=150&fit=crop&q=80",
-              };
-              const defaultImage = "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=150&h=150&fit=crop&q=80";
-              const sportImage = sportImages[sportKey] || defaultImage;
+              // Use the shared banner images map, just smaller for thumbnails
+              const defaultImage = UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150").replace("fit=crop", "h=150&fit=crop");
+              const bannerUrl = SPORT_BANNER_IMAGES[sportKey];
+              const sportImage = bannerUrl
+                ? bannerUrl.replace(/w=\d+/, "w=150")
+                : defaultImage;
 
               return (
                 <div
@@ -645,9 +639,15 @@ export default function TournamentsBrowse() {
                       {/* Real Image Thumbnail */}
                       <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0 bg-white/20">
                         <img 
-                          src={sportImage} 
+                          src={t.bannerImage || sportImage} 
                           alt={t.sport} 
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.src !== UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150")) {
+                              target.src = UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150");
+                            }
+                          }}
                         />
                       </div>
                       
@@ -790,14 +790,14 @@ export default function TournamentsBrowse() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/60 backdrop-blur-sm"
             onClick={() => setSelectedTournament(null)}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
-              className="bg-white dark:bg-[#1E293B] w-full max-w-2xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col relative"
+              className="bg-white dark:bg-[#1E293B] w-full max-w-2xl max-h-[92vh] sm:max-h-[85vh] rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col relative"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -811,29 +811,50 @@ export default function TournamentsBrowse() {
               </button>
 
               {/* Header Section (Constant/Sticky) */}
-              <div className="relative h-32 sm:h-44 bg-slate-900 flex items-end shrink-0">
+              <div className="relative h-28 sm:h-44 bg-slate-900 flex items-end shrink-0">
                 {/* Sport Background Image */}
                 <img 
                   src={
-                    Object.entries(SPORT_BANNER_IMAGES).find(([key]) => 
-                      selectedTournament.sport.toLowerCase().includes(key)
-                    )?.[1] || "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1000&q=80"
+                    selectedTournament.bannerImage ||
+                    SPORT_BANNER_IMAGES[selectedTournament.sport.toLowerCase()] ||
+                    UNIVERSAL_SPORT_IMAGE.replace("w=1632", "w=1000")
                   }
                   alt={selectedTournament.sport}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1000&q=80";
+                    const target = e.currentTarget;
+                    if (target.src !== UNIVERSAL_SPORT_IMAGE) {
+                      target.src = UNIVERSAL_SPORT_IMAGE;
+                    }
                   }}
                 />
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle, white 1.5px, transparent 1.5px)", backgroundSize: "24px 24px" }} />
-                <div className="relative z-10 w-full p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <h2 className="text-2xl sm:text-3xl font-black text-white mb-1 drop-shadow-md">
-                        {selectedTournament.sport} Tournament
-                      </h2>
-                      <div className="flex items-center gap-2 text-white/90 font-medium text-sm">
+                <div className="relative z-10 w-full p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      {/* Real Image Thumbnail */}
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_4px_12px_rgba(0,0,0,0.15)] shrink-0 bg-white/20">
+                        <img 
+                          src={
+                            selectedTournament.bannerImage ||
+                            (SPORT_BANNER_IMAGES[selectedTournament.sport.toLowerCase()] || UNIVERSAL_SPORT_IMAGE).replace(/w=\d+/, "w=150")
+                          }
+                          alt={selectedTournament.sport} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.currentTarget;
+                            if (target.src !== UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150")) {
+                              target.src = UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150");
+                            }
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <h2 className="text-xl sm:text-3xl font-black text-white mb-0.5 sm:mb-1 drop-shadow-md leading-tight">
+                          {selectedTournament.name || `${selectedTournament.sport} Tournament`}
+                        </h2>
+                      <div className="flex items-center gap-1.5 sm:gap-2 text-white/90 font-medium text-xs sm:text-sm">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -841,10 +862,11 @@ export default function TournamentsBrowse() {
                         {selectedTournament.venue}, {selectedTournament.city}
                       </div>
                     </div>
+                  </div>
                     {selectedTournament.prizePool && (
-                      <div className="bg-white/20 backdrop-blur-md border border-white/30 px-6 py-2.5 rounded-2xl">
-                        <p className="text-white/80 text-xs font-bold uppercase tracking-wider">Prize Pool</p>
-                        <p className="text-white text-2xl font-black">₹{selectedTournament.prizePool.toLocaleString()}</p>
+                      <div className="bg-white/20 backdrop-blur-md border border-white/30 px-4 sm:px-6 py-1.5 sm:py-2.5 rounded-xl sm:rounded-2xl">
+                        <p className="text-white/80 text-[10px] sm:text-xs font-bold uppercase tracking-wider">Prize Pool</p>
+                        <p className="text-white text-lg sm:text-2xl font-black">₹{selectedTournament.prizePool.toLocaleString()}</p>
                       </div>
                     )}
                   </div>
@@ -852,8 +874,8 @@ export default function TournamentsBrowse() {
               </div>
 
               {/* Scrollable Content */}
-              <div className="overflow-y-auto flex-1 custom-scrollbar">
-                <div className="p-6 sm:p-8">
+              <div className="overflow-y-auto flex-1 custom-scrollbar overscroll-contain">
+                <div className="p-4 sm:p-8">
                   {/* Grid Info */}
                   {(() => {
                     const overlayStatus = getTournamentStatus(selectedTournament);
@@ -872,9 +894,9 @@ export default function TournamentsBrowse() {
                     };
 
                     return (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
                         {infoItems.map((item, i) => (
-                          <div key={i} className={`p-4 rounded-2xl border transition-all hover:scale-[1.02] ${colorMap[item.color]}`}>
+                          <div key={i} className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all hover:scale-[1.02] ${colorMap[item.color]}`}>
                             <div className="flex items-center justify-between mb-1">
                               <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">{item.label}</p>
                               <span className="text-xs">{item.icon}</span>
@@ -886,15 +908,15 @@ export default function TournamentsBrowse() {
                     );
                   })()}
 
-                  <div className="space-y-8">
+                  <div className="space-y-5 sm:space-y-8">
                       {/* About */}
                       {selectedTournament.description && (
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2">
                             <span className="w-1.5 h-6 bg-indigo-500 rounded-full" />
                             About the Tournament
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+                          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
                             {selectedTournament.description}
                           </p>
                         </div>
@@ -903,11 +925,11 @@ export default function TournamentsBrowse() {
                       {/* Rules */}
                       {selectedTournament.rules && (
                         <div>
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 flex items-center gap-2">
                             <span className="w-1 h-5 bg-purple-500 rounded-full" />
                             Tournament Rules
                           </h3>
-                          <div className="bg-gray-100/50 dark:bg-white/5 p-5 rounded-2xl border border-gray-200 dark:border-white/10">
+                          <div className="bg-gray-100/50 dark:bg-white/5 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-white/10">
                             <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap text-sm">
                               {selectedTournament.rules}
                             </p>
@@ -916,7 +938,7 @@ export default function TournamentsBrowse() {
                       )}
 
                       {/* Organizer */}
-                      <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
+                      <div className="p-4 sm:p-5 bg-slate-50 dark:bg-white/5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-white/10">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -933,7 +955,7 @@ export default function TournamentsBrowse() {
                       </div>
 
                       {/* Venue & Directions */}
-                      <div className="p-5 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="p-4 sm:p-5 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-xl sm:rounded-2xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -964,16 +986,16 @@ export default function TournamentsBrowse() {
               </div>
 
               {/* Action Footer */}
-              <div className="p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-col sm:flex-row gap-4">
+              <div className="p-3 sm:p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-row gap-2.5 sm:gap-4 shrink-0">
                 <Link
                   href={token ? `/tournaments/${selectedTournament._id}` : `/auth/register?role=player`}
-                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-4 px-8 rounded-2xl text-center shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
+                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
                 >
                   {token ? "Proceed to Register" : "Register to Compete"}
                 </Link>
                 <Link
                   href={`/auth/register?role=sponsor&tournamentId=${selectedTournament._id}`}
-                  className="flex-1 bg-white dark:bg-gray-800/50 text-indigo-600 dark:text-indigo-300 border-2 border-indigo-100 dark:border-indigo-500/20 font-bold py-4 px-8 rounded-2xl text-center hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all active:scale-95 shadow-sm"
+                  className="flex-1 bg-white dark:bg-gray-800/50 text-indigo-600 dark:text-indigo-300 border-2 border-indigo-100 dark:border-indigo-500/20 font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all active:scale-95 shadow-sm"
                 >
                   Sponsor
                 </Link>
