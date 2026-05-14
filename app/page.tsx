@@ -29,7 +29,7 @@ function FAQItem({ question, answer, isOpen, onToggle }: FAQItemProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: false }}
       transition={{ duration: 0.5 }}
       className="group"
     >
@@ -143,6 +143,11 @@ export default function Home() {
   });
   const dotPosition = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 800], [0, 200]);
+  const heroBgY = useTransform(scrollY, [0, 800], [0, 300]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+
   useEffect(() => {
     setMounted(true);
 
@@ -170,10 +175,28 @@ export default function Home() {
 
   return (
     <SmoothScroll>
-      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative overflow-hidden transition-colors">
-        {/* Mesh gradient background */}
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
-        <div className="absolute inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_bottom_left,var(--tw-gradient-stops))] from-slate-200/40 via-transparent to-transparent dark:from-slate-800/20" />
+      <div className="min-h-screen relative overflow-hidden transition-colors">
+        {/* Base Background */}
+        <div className="absolute inset-0 pointer-events-none -z-20 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-[#040812]" />
+        
+        {/* Soft Ambience Background - Floating Orbs */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+          <motion.div 
+            animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/20 dark:bg-indigo-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" 
+          />
+          <motion.div 
+            animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[60%] rounded-full bg-emerald-500/15 dark:bg-emerald-500/10 blur-[130px] mix-blend-multiply dark:mix-blend-screen" 
+          />
+          <motion.div 
+            animate={{ x: [0, 30, 0], y: [0, -40, 0] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-500/15 blur-[100px] mix-blend-multiply dark:mix-blend-screen" 
+          />
+        </div>
 
         {/* Subtle Noise Texture Overlay */}
         <div className="absolute inset-0 pointer-events-none -z-10 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay">
@@ -386,7 +409,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="relative z-10">
           {/* Hero Background Image with Blur & Dark Overlay */}
-          <div className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
+          <motion.div style={{ y: heroBgY }} className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
             {/* Mobile Light Mode Image */}
             <img
               src="/icons/hero-mobile-light.png"
@@ -419,11 +442,11 @@ export default function Home() {
             />
             {/* Overlay to ensure text readability */}
             <div className="absolute inset-0 bg-linear-to-br from-white/80 via-white/40 to-white/10 dark:bg-none dark:bg-black/30" />
-          </div>
+          </motion.div>
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-8 sm:pb-24 relative z-10">
             {/* Main Content Wrapper */}
-            <div className="text-center max-w-5xl mx-auto">
+            <motion.div style={{ y: heroY, opacity: heroOpacity }} className="text-center max-w-5xl mx-auto">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 rounded-full mb-4 sm:mb-5 backdrop-blur-sm shadow-sm">
                 <span className="relative flex h-2 w-2">
@@ -436,7 +459,18 @@ export default function Home() {
               </div>
 
               {/* Main Headline */}
-              <div className="mb-6 sm:mb-8 relative">
+              <div className="mb-6 sm:mb-8 relative flex justify-center items-center">
+                {/* Abstract Geometric Background Shape */}
+                <motion.div 
+                  className="absolute w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] opacity-[0.03] dark:opacity-[0.06] pointer-events-none -z-10"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 256 256" fill="none">
+                    <path d="M 128 64 L 160 33 L 192.5 0 L 256 0 L 256 64 L 192 128 L 191.5 128 L 224 161 L 256 192 L 256 256 L 192 256 L 128 192 L 96 223 L 63.5 256 L 0 256 L 0 192 L 64 128 L 64.5 128 L 32 95 L 0 64 L 0 0 L 64 0 Z" className="fill-slate-900 dark:fill-white" />
+                  </svg>
+                </motion.div>
+
                 <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] relative w-full text-center tracking-tight text-gray-900 dark:text-white">
                   Build Tomorrow's <br className="sm:hidden" />
                   <span className="relative inline-block">
@@ -486,7 +520,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/tournaments"
-                  className="px-6 sm:px-10 py-4 sm:py-4 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm text-slate-800 dark:text-white border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-lg sm:text-lg font-bold hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 hover:scale-105 transition-all duration-300"
+                  className="px-6 sm:px-10 py-4 sm:py-4 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm text-slate-800 dark:text-white border-2 border-slate-300 dark:border-slate-700 rounded-2xl text-lg sm:text-lg font-bold hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500 hover:scale-105 transition-all duration-300"
                 >
                   Explore Tournaments
                 </Link>
@@ -519,7 +553,7 @@ export default function Home() {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Kinetic Light Pipe Separator */}
@@ -543,7 +577,7 @@ export default function Home() {
               <motion.h2
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: false, amount: 0.1 }}
                 className="font-display text-3xl sm:text-4xl md:text-5xl font-black bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent tracking-tight"
               >
                 How It Works
@@ -744,20 +778,19 @@ export default function Home() {
 
           {/* How Sportify Can Help You Section */}
           <div>
-            <h2 className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
+            <motion.h2 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.6 }} className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black text-center mb-8 sm:mb-16">
               <span className="bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
                 One Platform. Three Powerful Roles.
               </span>
-            </h2>
+            </motion.h2>
 
             {/* Role Cards - Glassmorphism */}
             <div className="relative">
-              {/* Ambient Background Glow */}
-              <div className="absolute inset-0 bg-linear-to-r from-blue-500/10 via-cyan-500/10 to-emerald-500/10 dark:from-blue-500/5 dark:via-cyan-500/5 dark:to-emerald-500/5 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
+              <div className="absolute inset-0 bg-linear-to-r from-blue-500/5 via-cyan-500/5 to-emerald-500/5 dark:from-blue-500/0 dark:via-cyan-500/0 dark:to-emerald-500/0 blur-[100px] -z-10 rounded-[4rem] pointer-events-none" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* Organizers Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-blue-800/40 backdrop-blur-xl border border-blue-200/50 dark:border-blue-400/50 hover:border-blue-400/70 dark:hover:border-blue-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-blue-50/60 dark:from-slate-800/80 dark:via-slate-800/60 dark:to-blue-800/40 backdrop-blur-xl border border-blue-200/50 dark:border-blue-400/50 hover:border-blue-400/70 dark:hover:border-blue-300/70 shadow-[0_0_30px_rgba(168,85,247,0.1)] hover:shadow-[0_0_40px_rgba(168,85,247,0.25)] transition-all duration-500">
                   <Pointer className="text-blue-600" />
                   <div className="absolute inset-0 bg-linear-to-br from-blue-500/0 to-emerald-500/0 group-hover:from-blue-500/5 group-hover:to-emerald-500/5 rounded-3xl transition-all duration-500" />
 
@@ -786,10 +819,10 @@ export default function Home() {
                       seamlessly.
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Players Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-cyan-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-cyan-900/30 backdrop-blur-xl border border-cyan-200/50 dark:border-cyan-700/50 hover:border-cyan-400/70 dark:hover:border-cyan-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-cyan-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-cyan-900/30 backdrop-blur-xl border border-cyan-200/50 dark:border-cyan-700/50 hover:border-cyan-400/70 dark:hover:border-cyan-500/70 shadow-[0_0_30px_rgba(59,130,246,0.1)] hover:shadow-[0_0_40px_rgba(59,130,246,0.25)] transition-all duration-500">
                   <Pointer className="text-cyan-600" />
                   <div className="absolute inset-0 bg-linear-to-br from-cyan-500/0 to-blue-500/0 group-hover:from-cyan-500/5 group-hover:to-blue-500/5 rounded-3xl transition-all duration-500" />
 
@@ -818,10 +851,10 @@ export default function Home() {
                       play.
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Sponsors Card */}
-                <div className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-emerald-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-emerald-900/30 backdrop-blur-xl border border-emerald-200/50 dark:border-emerald-700/50 hover:border-emerald-400/70 dark:hover:border-emerald-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] hover:scale-[1.02] transition-all duration-500">
+                <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-5 sm:p-8 rounded-3xl bg-linear-to-br from-white/60 via-white/40 to-emerald-50/60 dark:from-gray-800/60 dark:via-gray-800/40 dark:to-emerald-900/30 backdrop-blur-xl border border-emerald-200/50 dark:border-emerald-700/50 hover:border-emerald-400/70 dark:hover:border-emerald-500/70 shadow-[0_0_30px_rgba(236,72,153,0.1)] hover:shadow-[0_0_40px_rgba(236,72,153,0.25)] transition-all duration-500">
                   <Pointer className="text-emerald-600" />
                   <div className="absolute inset-0 bg-linear-to-br from-emerald-500/0 to-blue-500/0 group-hover:from-emerald-500/5 group-hover:to-blue-500/5 rounded-3xl transition-all duration-500" />
 
@@ -850,7 +883,7 @@ export default function Home() {
                       impact.
                     </p>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
@@ -868,18 +901,18 @@ export default function Home() {
 
           {/* Key Features - 2x2 Grid with Sport Icons */}
           <div>
-            <div className="text-center mb-8 sm:mb-16">
+            <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.6 }} className="text-center mb-8 sm:mb-16">
               <h2 className="font-display tracking-tight text-3xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 bg-linear-to-r from-gray-900 via-blue-900 to-gray-900 dark:from-white dark:via-blue-200 dark:to-white bg-clip-text text-transparent">
                 Powerful Features
               </h2>
               <p className="text-sm sm:text-lg text-gray-600 dark:text-gray-400">
                 Everything you need to revolutionize sports tournaments
               </p>
-            </div>
+            </motion.div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto">
               {/* Feature 1 */}
-              <div className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-5 sm:p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-cyan-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -899,10 +932,10 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Feature 2 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-blue-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -922,10 +955,10 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Feature 3 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-green-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -945,10 +978,10 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Feature 4 */}
-              <div className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
+              <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }} whileHover={{ y: -8, scale: 1.02 }} className="group relative p-8 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
                 <Pointer className="text-orange-600" />
                 <div className="flex gap-5 items-start">
                   <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[10px] bg-slate-900/5 dark:bg-white/5 backdrop-blur-md shadow-[0_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3)] flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 overflow-hidden">
@@ -968,7 +1001,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -1059,7 +1092,7 @@ export default function Home() {
           </div>
 
           {/* Contact CTA */}
-          <div className="mt-12 text-center p-8 rounded-2xl bg-linear-to-br from-blue-50/50 via-white/30 to-cyan-50/50 dark:from-blue-900/20 dark:via-gray-800/30 dark:to-cyan-900/20 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: false, amount: 0.1 }} transition={{ duration: 0.5 }} className="mt-12 text-center p-8 rounded-2xl bg-linear-to-br from-blue-50/50 via-white/30 to-cyan-50/50 dark:from-blue-900/20 dark:via-gray-800/30 dark:to-cyan-900/20 backdrop-blur-sm border border-blue-200/50 dark:border-blue-700/50">
             <h3 className="font-display text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white">
               Still have questions?
             </h3>
@@ -1085,7 +1118,7 @@ export default function Home() {
               </svg>
               Contact Support
             </a>
-          </div>
+          </motion.div>
         </div>
 
         {/* Professional Footer */}

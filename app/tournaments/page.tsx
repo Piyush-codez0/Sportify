@@ -49,9 +49,9 @@ const SPORT_BANNER_IMAGES: Record<string, string> = {
   tennis: "https://plus.unsplash.com/premium_vector-1714340078975-806213831c17?q=80&w=1051&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   kabaddi: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80",
   basketball: "https://plus.unsplash.com/premium_vector-1729578885274-610cdfcf6760?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  volleyball: "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=800&q=80",
+  volleyball: "https://plus.unsplash.com/premium_vector-1729467317128-6b7020a76e81?q=80&w=1267&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   "table tennis": "https://images.unsplash.com/photo-1534158914592-062992fbe900?w=800&q=80",
-  athletics: "https://images.unsplash.com/photo-1552674605-171ff5ea5787?w=800&q=80",
+  athletics: "https://plus.unsplash.com/premium_vector-1683121839433-2eb5106b1827?q=80&w=3014&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   polo: "https://images.unsplash.com/photo-1516756953057-acad3b3d8d2d?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 };
 
@@ -247,7 +247,28 @@ export default function TournamentsBrowse() {
     : tournaments;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
+    <div className="min-h-screen relative overflow-hidden transition-colors">
+      {/* Base Background Layer */}
+      <div className="absolute inset-0 pointer-events-none -z-20 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-[#040812]" />
+      
+      {/* Soft Ambience Background - Floating Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/20 dark:bg-indigo-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[60%] rounded-full bg-emerald-500/15 dark:bg-emerald-500/10 blur-[130px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, 30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-500/15 blur-[100px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+      </div>
 
       {token ? (
         <DashboardNavbar
@@ -448,106 +469,80 @@ export default function TournamentsBrowse() {
           </div>
         </div>
 
-        {/* ── FIND NEAR ME — Separate Card ──────────────────────── */}
+        {/* ── FIND NEAR ME — Interactive Location Card ──────────────────────── */}
         <div
-          className={`relative mb-6 rounded-2xl overflow-hidden shadow-lg transition-all duration-500 ${
+          className={`relative mb-8 rounded-3xl overflow-hidden border transition-all duration-500 shadow-lg ${
             filters.useRadius
-              ? "ring-2 ring-emerald-400 dark:ring-emerald-500 shadow-emerald-400/30"
-              : "hover:shadow-xl"
+              ? "bg-white dark:bg-gray-800 border-emerald-500 shadow-emerald-500/20"
+              : "bg-white/80 dark:bg-gray-800/80 border-gray-200 dark:border-gray-700 hover:shadow-xl hover:border-emerald-300 dark:hover:border-emerald-700"
           }`}
         >
-          {/* Gradient background */}
-          <div className="absolute inset-0 bg-linear-to-r from-emerald-500 via-teal-500 to-cyan-500 dark:from-emerald-600 dark:via-teal-600 dark:to-cyan-600" />
-          {/* Subtle pattern overlay */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+          {/* Subtle gradient glow when active */}
+          <div className={`absolute inset-0 bg-linear-to-r from-emerald-500/10 to-teal-500/10 transition-opacity duration-500 ${filters.useRadius ? 'opacity-100' : 'opacity-0'}`} />
 
-          <div className="relative flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4">
-            {/* Left: text */}
-            <div className="flex items-center gap-4">
-              {/* Animated Location Pin Container */}
-              <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-                <svg className={`w-6 h-6 text-white ${filters.useRadius ? 'animate-bounce' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {filters.useRadius && (
-                  <span className="absolute -bottom-1 w-5 h-1 bg-white/50 rounded-[100%] animate-pulse blur-[2px]"></span>
-                )}
-              </div>
-
-              <div>
-                <p className="text-white font-bold text-lg leading-tight flex items-center gap-2">
-                  {filters.useRadius ? (
-                    <span>
-                      Tournaments near <span className="text-emerald-100 underline decoration-emerald-200/50 underline-offset-4">{userCity || user?.city || "you"}</span>
-                    </span>
-                  ) : (
-                    "Find Tournaments Near Me"
-                  )}
-                </p>
-                <p className="text-white/80 text-xs mt-1 font-medium">
-                  {filters.useRadius 
-                    ? `Searching within ${filters.radiusKm}km radius of your location` 
-                    : "Use your GPS location to discover nearby tournaments"}
-                </p>
-              </div>
-            </div>
-
-            {/* Right: button + radius */}
-            <div className="flex items-center gap-3 shrink-0">
-              {/* Radius input — shows when active */}
-              {filters.useRadius && (
-                <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl px-3 py-2">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  <input
-                    type="number"
-                    value={filters.radiusKm}
-                    min={1}
-                    max={200}
-                    onChange={(e) => setFilters({ ...filters, radiusKm: e.target.value })}
-                    className="w-12 bg-transparent text-white text-sm text-center font-bold focus:outline-none placeholder:text-white/60"
-                  />
-                  <span className="text-xs text-white/80 font-semibold">km</span>
-                </div>
-              )}
-
-              <button
-                onClick={() => {
+          <div className="relative p-5 sm:p-6 flex flex-col gap-4 sm:gap-5">
+            {/* Top row: Title and Toggle */}
+            <div className="flex items-center justify-between gap-4 cursor-pointer select-none" onClick={() => {
                   const next = !filters.useRadius;
                   setFilters({ ...filters, useRadius: next });
                   if (next && !location) getLocation();
-                }}
-                className={`relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 select-none overflow-hidden ${
-                  filters.useRadius
-                    ? "bg-white text-emerald-700 shadow-lg scale-[1.03]"
-                    : "bg-white/20 backdrop-blur-sm border border-white/40 text-white hover:bg-white/30 hover:scale-[1.02] hover:shadow-md"
-                }`}
-              >
-                {/* Shimmer on active */}
-                {filters.useRadius && (
-                  <span className="absolute inset-0 bg-linear-to-r from-transparent via-emerald-100/60 to-transparent animate-[shimmer_2s_infinite] pointer-events-none" />
-                )}
-
-                {/* Pulsing pin icon */}
-                <span className="relative shrink-0">
-                  {filters.useRadius && (
-                    <span className="absolute inset-0 rounded-full bg-emerald-400/40 animate-ping" />
-                  )}
-                  <svg
-                    className={`w-4 h-4 relative z-10 ${filters.useRadius ? "text-emerald-600" : "text-white"}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                }}>
+              <div className="flex items-center gap-4">
+                <div className={`flex items-center justify-center w-12 h-12 shrink-0 rounded-2xl transition-all duration-500 shadow-sm ${filters.useRadius ? 'bg-emerald-500 text-white scale-105' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>
+                  <svg className={`w-6 h-6 ${filters.useRadius ? 'animate-bounce' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                </span>
+                </div>
+                <div>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-base sm:text-lg flex items-center gap-2">
+                    {filters.useRadius ? "Tournaments Near You" : "Find Tournaments Near Me"}
+                    {filters.useRadius && (
+                      <span className="relative flex h-2.5 w-2.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium leading-tight">
+                    {filters.useRadius && userCity
+                      ? `Searching around ${userCity}`
+                      : "Use GPS to discover local sports events"}
+                  </p>
+                </div>
+              </div>
 
-                <span className="relative z-10">
-                  {filters.useRadius ? "✓ Searching" : "Enable"}
-                </span>
-              </button>
+              {/* iOS style toggle */}
+              <div
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none shrink-0 ${filters.useRadius ? 'bg-emerald-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform duration-300 shadow-sm ${filters.useRadius ? 'translate-x-6' : 'translate-x-1'}`} />
+              </div>
+            </div>
+
+            {/* Bottom row: Radius Slider (smoothly appears) */}
+            <div className={`transition-all duration-500 overflow-hidden ${filters.useRadius ? 'max-h-40 opacity-100 mt-1 sm:mt-2' : 'max-h-0 opacity-0 m-0'}`}>
+              <div className="pt-4 border-t border-emerald-500/20 dark:border-emerald-500/20 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                 <div className="w-full flex-1">
+                  <div className="flex justify-between items-center mb-3">
+                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">Search Radius</label>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-100 dark:bg-emerald-900/50 px-2 py-1 rounded-md text-sm shadow-inner">{filters.radiusKm} km</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={filters.radiusKm}
+                    onChange={(e) => setFilters({ ...filters, radiusKm: e.target.value })}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-2 font-medium px-1">
+                    <span>1 km</span>
+                    <span>25 km</span>
+                    <span>50 km</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -852,7 +847,11 @@ export default function TournamentsBrowse() {
                       </div>
                       <div>
                         <h2 className="text-xl sm:text-3xl font-black text-white mb-0.5 sm:mb-1 drop-shadow-md leading-tight">
-                          {selectedTournament.name || `${selectedTournament.sport} Tournament`}
+                          {selectedTournament.name 
+                            ? (selectedTournament.name.toLowerCase().includes('tournament') 
+                                ? selectedTournament.name 
+                                : `${selectedTournament.name} Tournament`)
+                            : `${selectedTournament.sport} Tournament`}
                         </h2>
                       <div className="flex items-center gap-1.5 sm:gap-2 text-white/90 font-medium text-xs sm:text-sm">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -938,7 +937,7 @@ export default function TournamentsBrowse() {
                       )}
 
                       {/* Organizer */}
-                      <div className="p-4 sm:p-5 bg-slate-50 dark:bg-white/5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-white/10">
+                      <div className="p-4 sm:p-5 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-white/5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-white/10">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

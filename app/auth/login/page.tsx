@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,114 +28,33 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center px-4 relative transition-colors overflow-hidden">
-      <style>{`
-        .login-glass-card {
-          background: rgba(255, 255, 255, 0.92);
-          backdrop-filter: blur(28px) saturate(160%);
-          -webkit-backdrop-filter: blur(28px) saturate(160%);
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          border-radius: 28px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
-        }
-        :is(.dark) .login-glass-card {
-          background: rgba(10, 20, 45, 0.82);
-          border: 1px solid rgba(0, 245, 160, 0.18);
-          box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
-        }
-        .login-glass-card::before {
-          content: "";
-          position: absolute;
-          top: 0; left: 0; right: 0; height: 1px;
-          background: transparent;
-          border-top-left-radius: 28px;
-          border-top-right-radius: 28px;
-          pointer-events: none;
-          z-index: 10;
-        }
-        :is(.dark) .login-glass-card::before {
-          background: linear-gradient(90deg, transparent, rgba(0,245,160,0.5), rgba(0,217,245,0.5), transparent);
-        }
-        .login-neon-input { transition: all 0.2s ease-out !important; }
-        .login-neon-input:focus {
-          border-color: rgba(99, 102, 241, 0.5) !important;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
-          outline: none !important;
-        }
-        :is(.dark) .login-neon-input:focus {
-          border-color: rgba(0, 245, 160, 0.45) !important;
-          box-shadow: 0 0 0 3px rgba(0,245,160,0.1), 0 0 20px rgba(0,245,160,0.08) !important;
-        }
-        .login-neon-button {
-          background: linear-gradient(135deg, #00f5a0, #00d9f5) !important;
-          /* More visible but still controlled glow: teal base + soft cyan rim + small dark anchor */
-          box-shadow: 0 8px 20px rgba(0,245,160,0.22), 0 0 10px rgba(0,217,245,0.14), 0 2px 6px rgba(0,0,0,0.12) !important;
-          transition: all 0.16s ease-out !important;
-          color: #0a142d !important;
-          border: none !important;
-        }
-        .login-neon-button:hover {
-          transform: translateY(-2px) scale(1.01) !important;
-          /* Slightly stronger but still tight hover glow */
-          box-shadow: 0 12px 28px rgba(0,245,160,0.28), 0 0 16px rgba(0,217,245,0.18), 0 4px 10px rgba(0,0,0,0.14) !important;
-        }
-        .login-orb {
-          position: absolute;
-          border-radius: 50%;
-          animation: loginDrift 12s infinite alternate ease-in-out;
-          /* visible in light mode at low opacity so the effect isn't lost */
-          opacity: 1;
-          pointer-events: none;
-          background-repeat: no-repeat;
-          will-change: transform, opacity, filter;
-          transform: translateZ(0);
-          mix-blend-mode: screen;
-        }
-        /* stronger visibility in dark mode */
-        :is(.dark) .login-orb {
-          opacity: 1;
-        }
-
-        /* Use radial-gradient stops to produce a smooth, banding-free glow */
-        .login-orb1 {
-          width: 520px;
-          height: 520px;
-          top: -10%;
-          left: -10%;
-          background: radial-gradient(circle at 30% 30%, rgba(0,245,160,0.42) 0%, rgba(0,217,245,0.18) 30%, rgba(0,0,0,0) 70%);
-          filter: blur(120px);
-        }
-        .login-orb2 {
-          width: 400px;
-          height: 400px;
-          bottom: -10%;
-          right: -10%;
-          background: radial-gradient(circle at 70% 70%, rgba(0,217,245,0.36) 0%, rgba(0,245,160,0.12) 35%, rgba(0,0,0,0) 75%);
-          filter: blur(110px);
-          animation-delay: -5s;
-        }
-        .login-orb3 {
-          width: 280px;
-          height: 280px;
-          top: 40%;
-          right: -5%;
-          background: radial-gradient(circle at 60% 40%, rgba(123,97,255,0.32) 0%, rgba(0,217,245,0.08) 40%, rgba(0,0,0,0) 80%);
-          filter: blur(100px);
-          animation-delay: -9s;
-        }
-        @keyframes loginDrift {
-          from { transform: translate(0, 0) scale(1); }
-          to { transform: translate(40px, 30px) scale(1.08); }
-        }
-      `}</style>
-
-      {/* Floating orbs - visible in dark mode only */}
-      <div className="login-orb login-orb1"></div>
-      <div className="login-orb login-orb2"></div>
-      <div className="login-orb login-orb3"></div>
+    <div className="min-h-screen relative overflow-hidden transition-colors flex items-center justify-center px-4">
+      {/* Base Background Layer */}
+      <div className="absolute inset-0 pointer-events-none -z-20 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-[#040812]" />
+      
+      {/* Soft Ambience Background - Floating Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/20 dark:bg-indigo-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[60%] rounded-full bg-emerald-500/15 dark:bg-emerald-500/10 blur-[130px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, 30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-500/15 blur-[100px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+      </div>
 
       <div className="max-w-md w-full relative z-10">
-        <div className="login-glass-card p-6 sm:p-8 transition-colors relative overflow-hidden">
+        <div className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-gray-700/50 p-6 sm:p-8 relative overflow-hidden group">
+          {/* Subtle Glow Effect */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-linear-to-b from-indigo-500/5 to-transparent blur-3xl -z-10 group-hover:from-indigo-500/10 transition-colors duration-500"></div>
           <div className="text-center mb-6">
             <Link href="/" className="inline-flex flex-col items-center gap-2">
               <img src="/icon.png" alt="Sportify" className="w-16 h-16" />
@@ -216,7 +136,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="login-neon-input w-full px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
                 placeholder="your.email@example.com"
               />
             </div>
@@ -235,7 +155,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="login-neon-input w-full px-4 py-2.5 pr-11 border border-gray-200 dark:border-white/10 rounded-xl bg-white/50 dark:bg-white/5 text-gray-900 dark:text-white transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                  className="w-full px-4 py-2.5 pr-11 border border-gray-300 dark:border-gray-600 rounded-xl bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors placeholder:text-gray-400 dark:placeholder:text-gray-500 shadow-sm"
                   placeholder="Enter your password"
                 />
                 <button
@@ -290,7 +210,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="login-neon-button w-full py-2.5 px-4 rounded-xl font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>

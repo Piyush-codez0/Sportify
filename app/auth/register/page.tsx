@@ -93,105 +93,27 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] flex items-center justify-center px-4 py-8 relative transition-colors overflow-hidden">
-      <style>{`
-        .card-container {
-          perspective: 1200px;
-        }
-        .glass-card {
-          background: rgba(255, 255, 255, 0.92);
-          backdrop-filter: blur(28px) saturate(160%);
-          -webkit-backdrop-filter: blur(28px) saturate(160%);
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          border-radius: 28px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
-          transform-style: preserve-3d;
-          transition: transform 0.08s ease-out;
-        }
-        :is(.dark) .glass-card {
-          background: rgba(10, 20, 45, 0.82);
-          border: 1px solid rgba(0, 245, 160, 0.18);
-          box-shadow: 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
-        }
-        @media (hover: none) {
-          .glass-card { transform: none !important; }
-        }
-        .glass-card::before {
-          content: "";
-          position: absolute;
-          top: 0; left: 0; right: 0; height: 1px;
-          background: transparent;
-          border-top-left-radius: 28px;
-          border-top-right-radius: 28px;
-          pointer-events: none;
-          z-index: 10;
-        }
-        :is(.dark) .glass-card::before {
-          background: linear-gradient(90deg, transparent, rgba(0,245,160,0.5), rgba(0,217,245,0.5), transparent);
-        }
-        .neon-input { transition: all 0.2s ease-out !important; }
-        .neon-input:focus {
-          border-color: rgba(99, 102, 241, 0.5) !important;
-          box-shadow: 0 0 0 3px rgba(99,102,241,0.1) !important;
-          transform: translateY(-1px) !important;
-          outline: none !important;
-        }
-        :is(.dark) .neon-input:focus {
-          border-color: rgba(0, 245, 160, 0.45) !important;
-          box-shadow: 0 0 0 3px rgba(0,245,160,0.1), 0 0 20px rgba(0,245,160,0.08) !important;
-        }
-        .neon-button {
-          background: linear-gradient(135deg, #00f5a0, #00d9f5) !important;
-          box-shadow: 0 8px 24px rgba(0,245,160,0.3) !important;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-          color: #0a142d !important;
-          border: none !important;
-          position: relative;
-          overflow: visible;
-        }
-        .neon-button::after {
-          content: "";
-          position: absolute;
-          inset: -2px;
-          border-radius: inherit;
-          background: linear-gradient(135deg, #00f5a0, #00d9f5);
-          opacity: 0;
-          filter: blur(16px);
-          transition: opacity 0.3s ease-out;
-          z-index: -1;
-        }
-        .neon-button:hover {
-          transform: translateY(-3px) scale(1.02) !important;
-          box-shadow: 0 16px 48px rgba(0,245,160,0.5), 0 0 60px rgba(0,217,245,0.2) !important;
-        }
-        .neon-button:hover::after {
-          opacity: 0.6;
-        }
-        .neon-button:active {
-          transform: translateY(-1px) scale(0.99) !important;
-        }
-        .orbs-container {
-          position: absolute; inset: 0; z-index: 0; pointer-events: none;
-        }
-        .orb {
-          position: absolute; border-radius: 50%;
-          animation: drift 12s infinite alternate ease-in-out;
-          opacity: 0;
-        }
-        :is(.dark) .orb { opacity: 0.18; }
-        .orb1 { width: 520px; height: 520px; top: -10%; left: -10%; background-color: #00f5a0; filter: blur(80px); }
-        .orb2 { width: 400px; height: 400px; bottom: -10%; right: -10%; background-color: #00d9f5; filter: blur(80px); animation-delay: -5s; }
-        .orb3 { width: 280px; height: 280px; top: 40%; right: -5%; background-color: #7b61ff; filter: blur(80px); animation-delay: -9s; }
-        @keyframes drift {
-          from { transform: translate(0, 0) scale(1); }
-          to { transform: translate(40px, 30px) scale(1.08); }
-        }
-      `}</style>
-
-      <div className="orbs-container">
-        <div className="orb orb1"></div>
-        <div className="orb orb2"></div>
-        <div className="orb orb3"></div>
+    <div className="min-h-screen relative overflow-hidden transition-colors flex items-center justify-center px-4 py-8">
+      {/* Base Background Layer */}
+      <div className="absolute inset-0 pointer-events-none -z-20 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-[#040812]" />
+      
+      {/* Soft Ambience Background - Floating Orbs */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/20 dark:bg-indigo-500/15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, -40, 0], y: [0, 50, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[60%] rounded-full bg-emerald-500/15 dark:bg-emerald-500/10 blur-[130px] mix-blend-multiply dark:mix-blend-screen" 
+        />
+        <motion.div 
+          animate={{ x: [0, 30, 0], y: [0, -40, 0] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 dark:bg-purple-500/15 blur-[100px] mix-blend-multiply dark:mix-blend-screen" 
+        />
       </div>
 
       <div className="max-w-2xl w-full relative z-10 card-container">
@@ -199,9 +121,11 @@ function RegisterContent() {
           ref={cardRef}
           onMouseMove={!role ? handleMouseMove : undefined}
           onMouseLeave={!role ? handleMouseLeave : undefined}
-          className="glass-card bg-white dark:bg-gray-800 p-4 sm:p-6 transition-colors relative overflow-hidden"
-          style={role ? { transform: "none" } : undefined}
+          className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 dark:border-gray-700/50 p-6 sm:p-8 relative overflow-hidden group"
+          style={{ transformStyle: "preserve-3d", transition: "transform 0.08s ease-out", ...(role ? { transform: "none" } : {}) }}
         >
+          {/* Subtle Glow Effect */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-linear-to-b from-indigo-500/5 to-transparent blur-3xl -z-10 group-hover:from-indigo-500/10 transition-colors duration-500"></div>
           <BorderBeam
             size={150}
             duration={14}
@@ -474,7 +398,7 @@ function RegisterContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="neon-button w-full bg-indigo-600 dark:bg-indigo-500 text-white py-2.5 px-4 rounded-lg text-sm font-semibold hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:bg-indigo-400 dark:disabled:bg-indigo-700 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-indigo-500 to-purple-600 text-white font-bold py-3 px-4 rounded-xl hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   {loading ? "Creating Account..." : "Sign Up"}
                 </button>

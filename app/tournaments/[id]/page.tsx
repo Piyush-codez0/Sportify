@@ -307,7 +307,7 @@ export default function TournamentDetailPage() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] p-6">
         <div className="relative z-10 text-gray-900 dark:text-white">
           Loading...
         </div>
@@ -315,7 +315,7 @@ export default function TournamentDetailPage() {
     );
   if (error)
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] p-6">
         <div className="relative z-10 text-red-600 dark:text-red-400">
           {error}
         </div>
@@ -323,7 +323,7 @@ export default function TournamentDetailPage() {
     );
   if (!tournament)
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#040812] p-6">
+      <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] p-6">
         <div className="relative z-10 text-gray-900 dark:text-white">
           Not found
         </div>
@@ -331,7 +331,7 @@ export default function TournamentDetailPage() {
     );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors">
+    <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] relative transition-colors">
       {user ? (
         <DashboardNavbar
           title={
