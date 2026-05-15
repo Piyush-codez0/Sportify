@@ -409,7 +409,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="relative z-10">
           {/* Hero Background Image with Blur & Dark Overlay */}
-          <motion.div style={{ y: heroBgY }} className="absolute inset-0 z-0 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
+          <motion.div style={{ y: heroBgY }} className="absolute inset-0 z-0 overflow-hidden mask-[linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]">
             {/* Mobile Light Mode Image */}
             <img
               src="/icons/hero-mobile-light.png"
@@ -425,7 +425,7 @@ export default function Home() {
               className="absolute inset-0 w-full h-full object-cover scale-105 blur-[1px] hidden dark:block dark:sm:hidden"
             />
             {/* Extra black overlay for mobile light mode to help text pop */}
-            <div className="absolute inset-0 bg-black/20 block sm:hidden dark:hidden z-[1]" />
+            <div className="absolute inset-0 bg-black/20 block sm:hidden dark:hidden z-1" />
             {/* Desktop Light Mode Image */}
             <img
               src="/icons/hero-image-light.png"
@@ -1125,7 +1125,7 @@ export default function Home() {
         <footer className="relative z-10 transition-colors overflow-hidden border-t border-slate-200/50 dark:border-white/5">
           {/* Subtle Top Glow & Depth */}
           <div className="absolute top-0 inset-x-0 h-px bg-linear-to-r from-transparent via-slate-300 dark:via-white/10 to-transparent" />
-          <div className="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-slate-50 dark:from-white/[0.02] to-transparent pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-24 bg-linear-to-b from-slate-50 dark:from-white/2 to-transparent pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">

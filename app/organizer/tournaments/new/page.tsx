@@ -373,6 +373,7 @@ function NewTournamentPageContent() {
           userPhoneVerified={isPhoneVerified}
           onProfileClick={() => setShowProfile(true)}
           onLogout={logout}
+          userGender={user?.gender}
         />
         {/* Base Background Layer */}
         <div className="absolute inset-0 pointer-events-none -z-20 bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-none dark:bg-[#040812]" />
@@ -571,6 +572,7 @@ function NewTournamentPageContent() {
         userPhoneVerified={isPhoneVerified}
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
+        userGender={user?.gender}
       />
       <ProfileModal
         isOpen={showProfile}

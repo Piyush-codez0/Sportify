@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardNavbar from "@/components/DashboardNavbar";
 import { INDIAN_STATES } from "@/lib/indianStates";
 import { INDIAN_DISTRICTS } from "@/lib/indianDistricts";
+import ProfileModal from "@/components/ProfileModal";
 
 interface Tournament {
   _id: string;
@@ -132,7 +133,8 @@ function getTournamentStatus(t: Tournament): {
 }
 
 export default function TournamentsBrowse() {
-  const { token, user } = useAuth();
+  const { token, user, logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
   const [filters, setFilters] = useState({
     district: "",
     state: "",
@@ -271,16 +273,23 @@ export default function TournamentsBrowse() {
       </div>
 
       {token ? (
-        <DashboardNavbar
-          title="Browse Tournaments"
-          userName={user?.name || "User"}
-          userProfileComplete={Boolean(
-            user?.city && user?.state && user?.gender
-          )}
-          userPhoneVerified={Boolean(user?.phoneVerified)}
-          onProfileClick={() => {}}
-          onLogout={() => {}}
-        />
+        <>
+          <DashboardNavbar
+            title="Browse Tournaments"
+            userName={user?.name || "User"}
+            userProfileComplete={Boolean(
+              user?.city && user?.state && user?.gender
+            )}
+            userPhoneVerified={Boolean(user?.phoneVerified)}
+            onProfileClick={() => setShowProfile(true)}
+            onLogout={logout}
+            userGender={user?.gender}
+          />
+          <ProfileModal
+            isOpen={showProfile}
+            onClose={() => setShowProfile(false)}
+          />
+        </>
       ) : (
         <nav className="bg-white/70 dark:bg-[#040812]/60 backdrop-blur-[10px] dark:backdrop-blur-2xl shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-black/5 dark:border-white/10 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -616,7 +625,7 @@ export default function TournamentsBrowse() {
                   key={t._id}
                   className={`group relative rounded-3xl overflow-hidden bg-white/70 dark:bg-gray-800/60 backdrop-blur-xl border border-white/50 dark:border-gray-700/50 shadow-xl transition-all duration-500 flex flex-col ${
                     isInactive
-                      ? "opacity-50 grayscale-[60%] pointer-events-none"
+                      ? "opacity-50 grayscale-60 pointer-events-none"
                       : "hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/20 hover:border-indigo-300/50 dark:hover:border-indigo-500/50 cursor-pointer"
                   }`}
                 >
@@ -636,7 +645,7 @@ export default function TournamentsBrowse() {
                         <img 
                           src={t.bannerImage || sportImage} 
                           alt={t.sport} 
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          className="w-full h-full object-cover grayscale-60 opacity-30 dark:opacity-20 transition-all duration-500 group-hover:scale-110 group-hover:grayscale-0 group-hover:opacity-60"
                           onError={(e) => {
                             const target = e.currentTarget;
                             if (target.src !== UNIVERSAL_SPORT_IMAGE.replace(/w=\d+/, "w=150")) {
@@ -785,7 +794,7 @@ export default function TournamentsBrowse() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-6 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
             onClick={() => setSelectedTournament(null)}
           >
             <motion.div
@@ -988,7 +997,7 @@ export default function TournamentsBrowse() {
               <div className="p-3 sm:p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-row gap-2.5 sm:gap-4 shrink-0">
                 <Link
                   href={token ? `/tournaments/${selectedTournament._id}` : `/auth/register?role=player`}
-                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
+                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-size-[200%_auto] hover:bg-right text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
                 >
                   {token ? "Proceed to Register" : "Register to Compete"}
                 </Link>

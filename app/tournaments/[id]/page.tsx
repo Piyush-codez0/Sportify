@@ -6,6 +6,7 @@ import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
 
 import DashboardNavbar from "@/components/DashboardNavbar";
+import ProfileModal from "@/components/ProfileModal";
 
 interface Tournament {
   _id: string;
@@ -39,10 +40,11 @@ interface Tournament {
 export default function TournamentDetailPage() {
   const params = useParams();
   const id = params?.id as string;
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showProfile, setShowProfile] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -333,18 +335,25 @@ export default function TournamentDetailPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] relative transition-colors">
       {user ? (
-        <DashboardNavbar
-          title={
-            tournament ? `${tournament.sport} Tournament` : "Tournament Details"
-          }
-          userName={user?.name || "User"}
-          userProfileComplete={Boolean(
-            user?.city && user?.state && user?.gender,
-          )}
-          userPhoneVerified={Boolean(user?.phoneVerified)}
-          onProfileClick={() => {}}
-          onLogout={() => {}}
-        />
+        <>
+          <DashboardNavbar
+            title={
+              tournament ? `${tournament.sport} Tournament` : "Tournament Details"
+            }
+            userName={user?.name || "User"}
+            userProfileComplete={Boolean(
+              user?.city && user?.state && user?.gender,
+            )}
+            userPhoneVerified={Boolean(user?.phoneVerified)}
+            onProfileClick={() => setShowProfile(true)}
+            onLogout={logout}
+            userGender={user?.gender}
+          />
+          <ProfileModal
+            isOpen={showProfile}
+            onClose={() => setShowProfile(false)}
+          />
+        </>
       ) : (
         <nav className="bg-white/70 dark:bg-[#040812]/60 backdrop-blur-[10px] dark:backdrop-blur-2xl shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.6)] fixed inset-x-0 top-0 z-40 border-b border-black/5 dark:border-white/10 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">

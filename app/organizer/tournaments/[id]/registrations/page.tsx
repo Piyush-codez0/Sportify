@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import DashboardNavbar from "@/components/DashboardNavbar";
+import ProfileModal from "@/components/ProfileModal";
 
 interface Registration {
   _id: string;
@@ -29,7 +30,8 @@ interface Registration {
 }
 
 export default function TournamentRegistrations() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [showProfile, setShowProfile] = useState(false);
   const params = useParams();
   const tournamentId = params?.id as string;
   const [tournamentTitle, setTournamentTitle] = useState(
@@ -251,8 +253,13 @@ export default function TournamentRegistrations() {
         userName={user?.name || "User"}
         userProfileComplete={Boolean(user?.city && user?.state && user?.gender)}
         userPhoneVerified={Boolean(user?.phoneVerified)}
-        onProfileClick={() => {}}
-        onLogout={() => {}}
+        onProfileClick={() => setShowProfile(true)}
+        onLogout={logout}
+        userGender={user?.gender}
+      />
+      <ProfileModal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
       />
       <div className="relative z-10 pt-24 max-w-7xl mx-auto p-6">
         {/* Error Message */}

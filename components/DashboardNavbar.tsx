@@ -12,6 +12,7 @@ interface DashboardNavbarProps {
   userProfileComplete: boolean;
   userPhoneVerified: boolean;
   onProfileClick: () => void;
+  onLogout: () => void;
   stats?: { label: string; value: string | number }[];
   notificationCount?: number;
   userGender?: string;

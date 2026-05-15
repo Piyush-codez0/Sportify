@@ -528,7 +528,7 @@ export default function OrganizerDashboard() {
                       <div className="mt-auto pt-4 flex items-center gap-2">
                         <Link
                           href={`/organizer/tournaments/${t._id}/registrations`}
-                          className="flex-[2] text-center bg-linear-to-r from-indigo-500 to-purple-600 text-white px-3 py-2.5 rounded-xl text-sm font-bold hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg active:scale-95"
+                          className="flex-2 text-center bg-linear-to-r from-indigo-500 to-purple-600 text-white px-3 py-2.5 rounded-xl text-sm font-bold hover:from-indigo-600 hover:to-purple-700 transition-all shadow-md hover:shadow-lg active:scale-95"
                         >
                           View Players
                         </Link>

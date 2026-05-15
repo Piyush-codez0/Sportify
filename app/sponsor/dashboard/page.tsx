@@ -275,6 +275,7 @@ function SponsorDashboardContent() {
         userPhoneVerified={isPhoneVerified}
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
+        userGender={user?.gender}
       />
       <div className="pt-20 sm:pt-24 max-w-5xl mx-auto px-3 sm:px-6 lg:px-10 p-3 sm:p-6 relative z-10">
         <ProfileModal

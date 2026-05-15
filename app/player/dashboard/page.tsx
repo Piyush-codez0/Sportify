@@ -59,6 +59,7 @@ export default function PlayerDashboard() {
         userPhoneVerified={Boolean(user?.phoneVerified)}
         onProfileClick={() => setShowProfile(true)}
         onLogout={logout}
+        userGender={user?.gender}
       />
       <div className="pt-20 sm:pt-24 max-w-5xl mx-auto p-3 sm:p-6 relative z-10">
         <ProfileModal
