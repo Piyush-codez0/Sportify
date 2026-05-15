@@ -169,19 +169,26 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     userPhoneVerified: user?.phoneVerified,
   });
 
+  const avatarUrl = (() => {
+    const baseSeed = user?.name || "User";
+    const gender = user?.gender?.toLowerCase();
+    if (gender === "male") {
+      return `https://api.dicebear.com/7.x/adventurer/svg?seed=male-${encodeURIComponent(baseSeed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    } else if (gender === "female") {
+      return `https://api.dicebear.com/7.x/adventurer/svg?seed=female-${encodeURIComponent(baseSeed)}&backgroundColor=ffd5dc,ffdfbf,ffd5dc`;
+    }
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=neutral-${encodeURIComponent(baseSeed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+  })();
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transition-all animate-slideUp border border-gray-200 dark:border-gray-700 mx-2 sm:mx-4">
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center rounded-t-xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-indigo-100 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-900/20">
               <img
-                src={
-                  isProfileComplete && isPhoneVerified
-                    ? "https://t4.ftcdn.net/jpg/15/25/88/35/360_F_1525883513_jKfrd0siKwgg0vdNFL10xafVcjIOjxel.jpg"
-                    : "https://t3.ftcdn.net/jpg/07/51/48/94/360_F_751489462_vwzozYQfB2rQXOYyOrU7sF2awHI2jTEg.jpg"
-                }
+                src={avatarUrl}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />

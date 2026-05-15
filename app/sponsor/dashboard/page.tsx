@@ -267,7 +267,12 @@ function SponsorDashboardContent() {
     return <div className="p-6">Access denied.</div>;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] relative transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px]" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[120px]" />
+      </div>
       <DashboardNavbar
         title="Sponsor Dashboard"
         userName={user?.name || "User"}
@@ -277,7 +282,7 @@ function SponsorDashboardContent() {
         onLogout={logout}
         userGender={user?.gender}
       />
-      <div className="pt-20 sm:pt-24 max-w-5xl mx-auto px-3 sm:px-6 lg:px-10 p-3 sm:p-6 relative z-10">
+      <div className="relative z-10 pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <ProfileModal
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
@@ -492,8 +497,8 @@ function SponsorDashboardContent() {
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-5xl">
-          <div className="md:col-span-1 flex flex-col border border-gray-200 dark:border-gray-700 rounded-2xl p-4 sm:p-6 bg-linear-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 shadow-lg transition-colors min-h-[400px] md:h-[82vh] overflow-visible">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-5 flex flex-col border border-white/20 dark:border-white/5 rounded-3xl p-6 bg-white/70 dark:bg-gray-900/40 backdrop-blur-xl shadow-2xl transition-all min-h-[500px] lg:h-[calc(100vh-160px)] overflow-visible">
             {isProfileComplete && isPhoneVerified ? (
               <>
                 <h2 className="font-bold text-lg mb-4 dark:text-white transition-colors bg-linear-to-r from-blue-600 to-slate-600 bg-clip-text text-transparent">
@@ -509,7 +514,7 @@ function SponsorDashboardContent() {
                   </motion.div>
                 )}
                 {/* Stepper for sponsorship creation */}
-                <div className="flex-1 flex flex-col overflow-visible dark:bg-gray-800 rounded-xl">
+                <div className="flex-1 flex flex-col overflow-visible rounded-2xl">
                   <Stepper
                     initialStep={stepperStep}
                     onFinalStepCompleted={handleFinalSubmit}
@@ -518,9 +523,9 @@ function SponsorDashboardContent() {
                       setStepError("");
                       setStepperStep(step);
                     }}
-                    stepCircleContainerClassName="bg-linear-to-r from-blue-50 to-slate-50 dark:from-gray-700/50 dark:to-gray-700/50 rounded-t-xl h-15 bg-white"
-                    contentClassName="flex-1 overflow-y-auto px-5 py-10"
-                    footerClassName="border-t border-gray-200 dark:border-gray-700 p-4 "
+                    stepCircleContainerClassName="bg-gray-50/50 dark:bg-white/5 rounded-t-2xl h-16"
+                    contentClassName="flex-1 overflow-y-auto px-6 py-8"
+                    footerClassName="border-t border-gray-200/50 dark:border-white/5 p-4"
                     nextButtonText={stepperStep === 3 ? "Submit" : "Next"}
                   >
                     {/* Step 1: Browse and Select Tournament */}
@@ -764,7 +769,7 @@ function SponsorDashboardContent() {
               </div>
             )}
           </div>
-          <div className="md:col-span-1 space-y-4">
+          <div className="lg:col-span-7 space-y-6 min-h-[500px] lg:h-[calc(100vh-160px)] overflow-y-auto pr-2 custom-scrollbar">
             {showTournamentsList && (
               <div>
                 <div className="flex justify-between items-center mb-3">
@@ -797,12 +802,12 @@ function SponsorDashboardContent() {
                       availableTournaments.map((t) => (
                         <motion.div
                           key={t._id}
-                          className={`border rounded-2xl p-6 shadow-md hover:shadow-xl transition-all cursor-pointer ${
+                          className={`border p-6 rounded-3xl shadow-lg hover:shadow-2xl transition-all cursor-pointer ${
                             selectedTournamentId === t._id
-                              ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-400"
-                              : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-500"
+                              ? "border-indigo-500 bg-indigo-50/50 dark:bg-indigo-900/30 ring-2 ring-indigo-400"
+                              : "border-white/20 dark:border-white/5 bg-white/80 dark:bg-gray-900/40 backdrop-blur-md hover:border-indigo-300 dark:hover:border-indigo-500"
                           }`}
-                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileHover={{ scale: 1.01, y: -2 }}
                         >
                           <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
@@ -1315,7 +1320,7 @@ function SponsorDashboardContent() {
                         {filteredSponsorships.map((s) => (
                           <div
                             key={s._id}
-                            className="border border-gray-200 dark:border-gray-700 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-colors"
+                            className="group border border-white/20 dark:border-white/5 p-6 rounded-3xl bg-white/80 dark:bg-gray-900/60 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300"
                           >
                             <h3 className="font-semibold text-gray-900 dark:text-white transition-colors">
                               {s.tournament.sport
@@ -1354,7 +1359,7 @@ function SponsorDashboardContent() {
                                       handlePayment(s._id, s.amount)
                                     }
                                     disabled={payingId === s._id}
-                                    className="mt-3 w-full bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300 hover:shadow-lg disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="mt-4 w-full bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                   >
                                     {payingId === s._id ? (
                                       <>

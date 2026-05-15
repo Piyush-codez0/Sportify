@@ -2,6 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 import DashboardNavbar from "@/components/DashboardNavbar";
 import ProfileModal from "@/components/ProfileModal";
@@ -51,7 +52,13 @@ export default function PlayerDashboard() {
     return <div className="p-6">Access denied.</div>;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-indigo-50/40 via-white to-purple-50/40 dark:bg-[#040812] relative transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#040812] relative transition-colors overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px]" />
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[120px]" />
+      </div>
+
       <DashboardNavbar
         title="Player Dashboard"
         userName={user?.name || "User"}
@@ -66,14 +73,6 @@ export default function PlayerDashboard() {
           isOpen={showProfile}
           onClose={() => setShowProfile(false)}
         />
-        <div className="mb-4">
-          <Link
-            href="/tournaments"
-            className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium transition-colors"
-          >
-            ← Browse Tournaments
-          </Link>
-        </div>
         {error && (
           <div className="mb-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded border border-red-200 dark:border-red-800 transition-colors">
             {error}
@@ -121,8 +120,39 @@ export default function PlayerDashboard() {
               </div>
             ))}
             {registrations.length === 0 && (
-              <div className="text-gray-600 dark:text-gray-300 transition-colors">
-                No registrations yet.
+              <div className="col-span-full min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-12">
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="max-w-5xl w-full relative"
+                >
+                  <div className="relative z-10 flex flex-col items-center">
+                    <div className="relative mb-12 inline-block">
+                      <img 
+                        src="/icons/No reg.png" 
+                        alt="No registrations" 
+                        className="w-72 h-72 sm:w-[500px] sm:h-[500px] object-contain relative z-10 dark:hidden"
+                      />
+                      <img 
+                        src="/icons/no-reg-dark.png" 
+                        alt="No registrations" 
+                        className="w-72 h-72 sm:w-[500px] sm:h-[500px] object-contain relative z-10 hidden dark:block"
+                      />
+                    </div>
+                    
+                   
+                    <Link
+                      href="/tournaments"
+                      className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all duration-300"
+                    >
+                      <span>Explore Tournaments</span>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                  </div>
+                </motion.div>
               </div>
             )}
           </div>
