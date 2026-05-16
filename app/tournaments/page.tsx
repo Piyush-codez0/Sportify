@@ -148,6 +148,7 @@ export default function TournamentsBrowse() {
   );
   const [mounted, setMounted] = useState(false);
   const [userCity, setUserCity] = useState<string | null>(null);
+  const [userRegistrations, setUserRegistrations] = useState<string[]>([]); // Array of tournament IDs
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [fullTournamentData, setFullTournamentData] = useState<Tournament | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -194,6 +195,22 @@ export default function TournamentsBrowse() {
     filters.radiusKm,
     location,
   ]);
+
+  useEffect(() => {
+    const fetchRegistrations = async () => {
+      if (!user || user.role !== 'player') return;
+      try {
+        const res = await fetch('/api/registrations/my-registrations', { credentials: 'include' });
+        const data = await res.json();
+        if (res.ok && data.registrations) {
+          setUserRegistrations(data.registrations.map((r: any) => r.tournamentId?._id || r.tournamentId));
+        }
+      } catch (e) {
+        console.error("Error fetching registrations:", e);
+      }
+    };
+    fetchRegistrations();
+  }, [user]);
 
   useEffect(() => {
     const fetchFullDetails = async () => {
@@ -996,10 +1013,25 @@ export default function TournamentsBrowse() {
               {/* Action Footer */}
               <div className="p-3 sm:p-6 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700/50 flex flex-row gap-2.5 sm:gap-4 shrink-0">
                 <Link
-                  href={token ? `/tournaments/${selectedTournament._id}` : `/auth/register?role=player`}
-                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-size-[200%_auto] hover:bg-right text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95"
+                  href={token ? `/tournaments/${selectedTournament._id}` : `/auth/login?redirect=/tournaments/${selectedTournament._id}`}
+                  className="flex-[1.5] bg-linear-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-size-[200%_auto] hover:bg-right text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-xl sm:rounded-2xl text-center text-sm sm:text-base shadow-lg shadow-indigo-500/20 transition-all duration-500 active:scale-95 flex items-center justify-center gap-2"
                 >
-                  {token ? "Proceed to Register" : "Register to Compete"}
+                  {!token ? (
+                    <>
+                      <span>🚀</span>
+                      Register to Compete
+                    </>
+                  ) : userRegistrations.includes(selectedTournament._id) ? (
+                    <>
+                      <span>✅</span>
+                      View Registration
+                    </>
+                  ) : (
+                    <>
+                      <span>⚡</span>
+                      Proceed to Register
+                    </>
+                  )}
                 </Link>
                 <Link
                   href={`/auth/register?role=sponsor&tournamentId=${selectedTournament._id}`}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import { motion } from "framer-motion";
 
 import DashboardNavbar from "@/components/DashboardNavbar";
 import ProfileModal from "@/components/ProfileModal";
@@ -45,6 +46,8 @@ export default function TournamentDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showProfile, setShowProfile] = useState(false);
+  const [showRegistration, setShowRegistration] = useState(false);
+  const [userRegistration, setUserRegistration] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -99,6 +102,24 @@ export default function TournamentDetailPage() {
       );
     }
   }, [tournament]);
+  
+  useEffect(() => {
+    const checkReg = async () => {
+      if (!user || user.role !== 'player' || !id) return;
+      try {
+        const res = await fetch(`/api/registrations/check?tournamentId=${id}`, {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (res.ok && data.registration) {
+          setUserRegistration(data.registration);
+        }
+      } catch (e) {
+        console.error("Check registration error:", e);
+      }
+    };
+    checkReg();
+  }, [user, id]);
 
   const uploadAadhar = async (file: File): Promise<string> => {
     const formData = new FormData();
@@ -700,7 +721,201 @@ export default function TournamentDetailPage() {
               </div>
             )}
 
-            {/* Primary CTAs: Player Register and Sponsor */}
+            {/* Registration Form Section */}
+            {showRegistration && tournament && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mb-8 p-6 bg-indigo-50/30 dark:bg-indigo-500/5 rounded-2xl border border-indigo-100 dark:border-indigo-500/20"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-black text-gray-900 dark:text-white">Tournament Registration</h2>
+                  <button 
+                    onClick={() => setShowRegistration(false)}
+                    className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Registration Type Selection */}
+                {tournament.allowTeamRegistration && (
+                  <div className="flex gap-3 mb-6">
+                    <button
+                      onClick={() => setRegistrationType("individual")}
+                      className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${
+                        registrationType === "individual"
+                          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
+                          : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
+                      }`}
+                    >
+                      👤 Individual
+                    </button>
+                    <button
+                      onClick={() => setRegistrationType("team")}
+                      className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${
+                        registrationType === "team"
+                          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20"
+                          : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700"
+                      }`}
+                    >
+                      👥 Team (Size: {tournament.teamSize})
+                    </button>
+                  </div>
+                )}
+
+                {/* Individual Registration Form */}
+                {registrationType === "individual" ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Aadhar Number</label>
+                      <input
+                        type="text"
+                        value={aadharNumber}
+                        onChange={(e) => setAadharNumber(e.target.value)}
+                        placeholder="12-digit Aadhar number"
+                        className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
+                        maxLength={12}
+                      />
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Aadhar Front</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="file"
+                            onChange={(e) => setAadharFrontFile(e.target.files?.[0] || null)}
+                            className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300"
+                          />
+                          <button
+                            onClick={handleUploadFront}
+                            disabled={uploadingFront || !aadharFrontFile}
+                            className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-bold hover:bg-indigo-200 transition-colors disabled:opacity-50"
+                          >
+                            {uploadingFront ? "..." : aadharFrontUrl ? "✓" : "Upload"}
+                          </button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Aadhar Back</label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="file"
+                            onChange={(e) => setAadharBackFile(e.target.files?.[0] || null)}
+                            className="flex-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900/40 dark:file:text-indigo-300"
+                          />
+                          <button
+                            onClick={handleUploadBack}
+                            disabled={uploadingBack || !aadharBackFile}
+                            className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-bold hover:bg-indigo-200 transition-colors disabled:opacity-50"
+                          >
+                            {uploadingBack ? "..." : aadharBackUrl ? "✓" : "Upload"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Team Registration Form */
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1.5 uppercase tracking-wider">Team Name</label>
+                      <input
+                        type="text"
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
+                        placeholder="Enter your team name"
+                        className="w-full px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all dark:text-white"
+                      />
+                    </div>
+                    <div className="space-y-4">
+                      <p className="font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-2">Team Members Details</p>
+                      {teamMembers.map((member, idx) => (
+                        <div key={idx} className="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 space-y-3">
+                          <p className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Member {idx + 1} {idx === 0 ? "(Captain)" : ""}</p>
+                          <div className="grid sm:grid-cols-3 gap-3">
+                            <input
+                              placeholder="Name"
+                              className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm outline-none dark:text-white"
+                              value={member.name}
+                              onChange={(e) => setTeamMembers(prev => prev.map((m, i) => i === idx ? { ...m, name: e.target.value } : m))}
+                            />
+                            <input
+                              placeholder="Email"
+                              className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm outline-none dark:text-white"
+                              value={member.email}
+                              onChange={(e) => setTeamMembers(prev => prev.map((m, i) => i === idx ? { ...m, email: e.target.value } : m))}
+                            />
+                            <input
+                              placeholder="Phone"
+                              className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm outline-none dark:text-white"
+                              value={member.phone}
+                              onChange={(e) => setTeamMembers(prev => prev.map((m, i) => i === idx ? { ...m, phone: e.target.value } : m))}
+                            />
+                          </div>
+                          <div className="grid sm:grid-cols-2 gap-3">
+                            <input
+                              placeholder="Aadhar Number"
+                              className="px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-sm outline-none dark:text-white"
+                              value={member.aadharNumber}
+                              onChange={(e) => setTeamMembers(prev => prev.map((m, i) => i === idx ? { ...m, aadharNumber: e.target.value } : m))}
+                              maxLength={12}
+                            />
+                            <div className="flex gap-2">
+                              <div className="flex-1 space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Front</label>
+                                <input
+                                  type="file"
+                                  className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-indigo-50 file:text-indigo-700"
+                                  onChange={(e) => e.target.files?.[0] && handleTeamMemberAadharFront(idx, e.target.files[0])}
+                                />
+                                {member.aadharFrontDocument && <p className="text-[10px] text-green-500 font-bold">✓ Uploaded</p>}
+                              </div>
+                              <div className="flex-1 space-y-1">
+                                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Back</label>
+                                <input
+                                  type="file"
+                                  className="block w-full text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-indigo-50 file:text-indigo-700"
+                                  onChange={(e) => e.target.files?.[0] && handleTeamMemberAadharBack(idx, e.target.files[0])}
+                                />
+                                {member.aadharBackDocument && <p className="text-[10px] text-green-500 font-bold">✓ Uploaded</p>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {regMessage && (
+                  <div className={`mt-6 p-4 rounded-xl text-sm font-bold border ${
+                    regMessage.toLowerCase().includes("success") 
+                      ? "bg-green-50 text-green-700 border-green-200" 
+                      : "bg-amber-50 text-amber-700 border-amber-200"
+                  }`}>
+                    {regMessage}
+                  </div>
+                )}
+
+                <button
+                  onClick={register}
+                  disabled={regLoading || paymentLoading}
+                  className="w-full mt-8 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-black py-4 rounded-2xl text-lg shadow-xl shadow-indigo-600/30 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50"
+                >
+                  {regLoading || paymentLoading ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processing...
+                    </span>
+                  ) : (
+                    `Complete Registration (₹${tournament.entryFee})`
+                  )}
+                </button>
+              </motion.div>
+            )}
             {(() => {
               const now = new Date();
               now.setHours(0, 0, 0, 0);
@@ -758,14 +973,57 @@ export default function TournamentDetailPage() {
                 );
               }
 
+              if (userRegistration) {
+                return (
+                  <div className="mb-6 p-6 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-2xl">
+                        ✅
+                      </div>
+                      <div>
+                        <p className="text-lg font-black text-emerald-700 dark:text-emerald-400">Successfully Registered</p>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400 opacity-80">
+                          {userRegistration.paymentStatus === 'paid' 
+                            ? "Your registration is confirmed and paid." 
+                            : "Registration pending payment verification."}
+                        </p>
+                      </div>
+                    </div>
+                    {userRegistration.paymentStatus !== 'paid' && tournament.entryFee > 0 && (
+                      <button 
+                        onClick={() => startPayment(userRegistration._id, { amount: tournament.entryFee * 100, currency: "INR", orderId: userRegistration.razorpayOrderId })}
+                        className="w-full sm:w-auto px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20"
+                      >
+                        Complete Payment
+                      </button>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <div className="mb-6 flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href={`/auth/register?role=player`}
-                    className="flex-1 text-center bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
-                  >
-                    🚀 Register as Player
-                  </Link>
+                  {user ? (
+                    user.role === 'player' ? (
+                      <button
+                        onClick={() => setShowRegistration(!showRegistration)}
+                        className="flex-1 text-center bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
+                      >
+                        {showRegistration ? "Cancel Registration" : "🚀 Register as Player"}
+                      </button>
+                    ) : (
+                      <div className="flex-1 text-center bg-gray-100 dark:bg-gray-800 text-gray-400 font-bold py-3.5 px-6 rounded-xl cursor-not-allowed">
+                        Sponsors cannot register as players
+                      </div>
+                    )
+                  ) : (
+                    <Link
+                      href={`/auth/login?redirect=/tournaments/${id}`}
+                      className="flex-1 text-center bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg shadow-purple-500/30"
+                    >
+                      🚀 Login to Register
+                    </Link>
+                  )}
                   <Link
                     href={`/auth/register?role=sponsor&tournamentId=${id}`}
                     className="flex-1 text-center bg-white dark:bg-gray-800 border-2 border-purple-400 dark:border-purple-600 text-purple-700 dark:text-purple-300 font-semibold py-3.5 px-6 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-600 dark:hover:border-purple-500 transition-all duration-300 hover:scale-[1.02]"

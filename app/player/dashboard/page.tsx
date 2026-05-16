@@ -120,31 +120,31 @@ export default function PlayerDashboard() {
               </div>
             ))}
             {registrations.length === 0 && (
-              <div className="col-span-full min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-12">
+              <div className="col-span-full min-h-[60vh] flex flex-col items-center justify-center text-center px-4 pt-20 pb-8">
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
-                  className="max-w-5xl w-full relative"
+                  className="max-w-5xl w-full relative -mt-16 sm:-mt-24"
                 >
                   <div className="relative z-10 flex flex-col items-center">
-                    <div className="relative mb-12 inline-block">
+                    <div className="relative inline-block">
                       <img 
                         src="/icons/No reg.png" 
                         alt="No registrations" 
-                        className="w-72 h-72 sm:w-[500px] sm:h-[500px] object-contain relative z-10 dark:hidden"
+                        className="w-72 h-72 sm:w-[550px] sm:h-[550px] object-contain relative z-10 dark:hidden"
                       />
                       <img 
                         src="/icons/no-reg-dark.png" 
                         alt="No registrations" 
-                        className="w-72 h-72 sm:w-[500px] sm:h-[500px] object-contain relative z-10 hidden dark:block"
+                        className="w-72 h-72 sm:w-[550px] sm:h-[550px] object-contain relative z-10 hidden dark:block"
                       />
                     </div>
                     
                    
                     <Link
                       href="/tournaments"
-                      className="inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all duration-300"
+                      className="inline-flex items-center justify-center px-8 py-3.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-bold text-lg active:scale-95 transition-all duration-300"
                     >
                       <span>Explore Tournaments</span>
                       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
