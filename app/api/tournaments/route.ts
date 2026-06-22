@@ -4,6 +4,9 @@ import Tournament from "@/models/Tournament";
 import "@/models/User"; // register User schema so .populate("organizer") works
 import { requireRole, AuthenticatedRequest } from "@/lib/middleware";
 
+const escapeRegExp = (input: string) =>
+  input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // GET: Fetch all tournaments with filters
 export async function GET(request: NextRequest) {
   try {
@@ -22,14 +25,15 @@ export async function GET(request: NextRequest) {
     const query: any = {};
 
     if (district) {
+      const safeDistrict = escapeRegExp(district);
       query.$or = [
-        { district: new RegExp(district, "i") },
-        { city: new RegExp(district, "i") },
+        { district: new RegExp(safeDistrict, "i") },
+        { city: new RegExp(safeDistrict, "i") },
       ];
     }
-    if (city) query.city = new RegExp(city, "i");
-    if (state) query.state = new RegExp(state, "i");
-    if (sport) query.sport = new RegExp(sport, "i");
+    if (city) query.city = new RegExp(escapeRegExp(city), "i");
+    if (state) query.state = new RegExp(escapeRegExp(state), "i");
+    if (sport) query.sport = new RegExp(escapeRegExp(sport), "i");
     if (status) query.status = status;
 
     // Radius filter logic (optional): if lat,lng,radiusKm provided, apply geospatial $near
