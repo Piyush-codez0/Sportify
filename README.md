@@ -81,7 +81,6 @@ By digitizing the entire tournament lifecycle—from creation to registration to
 
 - ✅ Discover relevant tournaments by location and sport
 - ✅ Submit sponsorship proposals with custom amounts
-- ✅ Choose sponsorship tiers (Title, Platinum, Gold, Silver, Bronze, Associate)
 - ✅ Track proposal status (pending/accepted/rejected)
 - ✅ Promote brand visibility in sports communities
 
@@ -120,11 +119,9 @@ By digitizing the entire tournament lifecycle—from creation to registration to
 #### 💳 **Payment Processing**
 
 - **Razorpay Integration**: India's leading payment gateway
-- **Server-Side Verification**: Cryptographic signature validation
 - **Order Management**: Create → Pay → Verify flow
 - **Payment Status Tracking**: Real-time updates
 - **Refund Support**: Ready for dispute resolution
-- **Test Mode**: Safe development with test cards
 
 </td>
 <td width="50%">
@@ -133,10 +130,8 @@ By digitizing the entire tournament lifecycle—from creation to registration to
 
 - **Automated Emails**: Registration, payment, verification updates
 - **Gmail SMTP**: Reliable email delivery
-- **Rich Templates**: HTML emails with tournament details
 - **Event Notifications**: Reminders for upcoming tournaments
 - **Verification Alerts**: Aadhar approval/rejection notices
-- **Async Processing**: Non-blocking email queue
 
 </td>
 </tr>
@@ -150,19 +145,6 @@ By digitizing the entire tournament lifecycle—from creation to registration to
 - **File Validation**: Type and size restrictions
 - **CDN Delivery**: Fast document retrieval
 - **Permanent Storage**: Reliable backup system
-- **Direct URLs**: Easy access for organizers
-
-</td>
-<td width="50%">
-
-#### 🎨 **User Experience**
-
-- **Dark Mode**: System-aware theme with manual toggle
-- **Responsive Design**: Mobile-first approach
-- **Animated Backgrounds**: Sports-themed doodles
-- **Real-time Updates**: Dynamic data without page refresh
-- **Form Validation**: Client + server-side checks
-- **Loading States**: Clear feedback for async operations
 
 </td>
 </tr>
@@ -180,8 +162,6 @@ By digitizing the entire tournament lifecycle—from creation to registration to
 - **Prize Pool Management**: Define prizes for multiple positions
 - **Entry Fee Flexibility**: Free or paid tournaments
 - **Age Group Filtering**: U19, U23, Open, etc.
-- **Skill Level Matching**: Beginner, Intermediate, Advanced
-- **Sponsorship Tiers**: 6 levels from Title to Associate
 
 ---
 
@@ -244,7 +224,7 @@ Get Sportify running locally in 5 minutes:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/sportify.git
+git clone https://github.com/piyush-codez0/sportify.git
 cd sportify
 
 # 2. Install dependencies
@@ -284,7 +264,7 @@ Before starting, ensure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/sportify.git
+git clone https://github.com/Piyush-codez0/sportify.git
 cd sportify
 
 # Install all dependencies
@@ -705,69 +685,6 @@ A:
 ### **Deployment & Production**
 
 <details>
-<summary><b>Q: Why can't I deploy to Vercel Hobby plan?</b></summary>
-
-A: Your project has 21 API routes, but Hobby plan only allows 12 serverless functions. Solutions:
-
-1. **Upgrade to Pro** ($20/month) - easiest option
-2. **Consolidate API routes** - combine similar endpoints (advanced)
-3. **Deploy elsewhere** - use Render, Railway, or AWS Lambda
-
-</details>
-
-<details>
-<summary><b>Q: How do I connect a custom domain?</b></summary>
-
-A: After deployment on Vercel:
-
-1. Buy domain from GoDaddy, Namecheap, etc.
-2. Vercel Dashboard → Settings → Domains → Add domain
-3. Update nameservers to Vercel's (instructions provided)
-4. Wait 24-48 hours for DNS propagation
-
-</details>
-
-<details>
-<summary><b>Q: Should I use MongoDB Atlas free tier in production?</b></summary>
-
-A: **Not recommended** for production:
-
-- Free tier has storage limits (512MB)
-- No automatic backups
-- Limited performance
-- Upgrade to M2 ($9/month) or higher for production
-
-</details>
-
-<details>
-<summary><b>Q: How do I enable HTTPS?</b></summary>
-
-A: Vercel automatically handles HTTPS with free SSL certificate. Your domain will use `https://yourdomain.com` by default.
-
-</details>
-
-### **Features & Functionality**
-
-<details>
-<summary><b>Q: Can organizers edit tournaments after publishing?</b></summary>
-
-A: Currently, tournaments are immutable after publishing. To change details, organizers must create a new tournament. You can modify the code to allow edits if needed.
-
-</details>
-
-<details>
-<summary><b>Q: Can players withdraw registrations and get refunds?</b></summary>
-
-A: Currently not implemented. To add this:
-
-1. Create withdrawal API endpoint
-2. Validate withdrawal window (e.g., 3 days before tournament)
-3. Integrate Razorpay refund API
-4. Send confirmation email
-
-</details>
-
-<details>
 <summary><b>Q: How are teams managed in team tournaments?</b></summary>
 
 A: Captain registers with full roster:
@@ -913,19 +830,6 @@ A: The theme context stores preference in browser localStorage. Check:
 - Cache is cleared after code updates
 
 </details>
-
----
-
-=======
-
-## 👥 Team
-
-**Project**: Sportify - Sports Tournament Management Platform  
-**Type**: Full-Stack Web Application  
-**Tech**: Next.js, TypeScript, MongoDB, Tailwind CSS  
-**Status**: Active Development
-
----
 
 <div align="center">
 
